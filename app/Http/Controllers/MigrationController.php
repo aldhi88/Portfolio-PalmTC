@@ -29,6 +29,5 @@ class MigrationController extends Controller
     public function update(Request $request)
     {
         TcMigration::where('id',$request->id)->update(['batch' => $request->value]);
-        return alert(1,null,null);
     }
 }

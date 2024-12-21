@@ -26,7 +26,7 @@ class TcWorker extends Model
     public function getNameAttribute($value){
         return Str::upper($value);
     }
-    
+
     public function selDataDt(){
         return $this->orderBy('created_at', 'DESC')
                     ->where('id','!=',0)

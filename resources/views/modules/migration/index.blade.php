@@ -6,7 +6,6 @@
 
 @section('js')
     @include('modules.migration.include.index_js')
-    @include('modules.migration.include.delete_js')
 @endsection
 
 @section('content')

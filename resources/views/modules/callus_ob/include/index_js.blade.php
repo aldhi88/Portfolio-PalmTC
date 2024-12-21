@@ -23,7 +23,7 @@
             { data: 'bottle_oxi', name: 'bottle_oxi', orderable:false, searchable:true},
             { data: 'explant_oxi', name: 'explant_oxi', orderable:false, searchable:true},
             { data: 'bottle_contam', name: 'bottle_contam', orderable:false, searchable:true},
-            { data: 'explant_contam', name: 'explant_contam', orderable:false, searchable:true},            
+            { data: 'explant_contam', name: 'explant_contam', orderable:false, searchable:true},
         ],
         initComplete: function () {
                 $('#header-filter th').each(function() {

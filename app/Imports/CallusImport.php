@@ -14,13 +14,20 @@ class CallusImport implements ToCollection
     public function collection(Collection $rows)
     {
         foreach ($rows as $key => $value) {
+            dump($value);
+
             if ($key != 0) {
+
+                if($value[0]=='<end>'){
+                    break;
+                }
+
                 $data = [
-                    'tc_worker_id' => $value[1],
-                    'date_schedule' => Carbon::createFromFormat('d/m/Y', $value[2])->format('Y-m-d'),
-                    'date_ob' => Carbon::createFromFormat('d/m/Y', $value[2])->format('Y-m-d'),
+                    'tc_worker_id' => 0,
+                    'date_schedule' => Carbon::createFromFormat('d/m/Y', $value[1])->format('Y-m-d'),
+                    'date_ob' => Carbon::createFromFormat('d/m/Y', $value[1])->format('Y-m-d'),
                     'status' => 1,
-                    'bottle_callus' => $value[3],
+                    'bottle_callus' => $value[2],
                 ];
                 $qUpCallusOb = TcCallusOb::where('tc_init_id', '=', $value[0])->first();
                 $qUpCallusOb->update($data);
@@ -31,7 +38,7 @@ class CallusImport implements ToCollection
                 // //prepare data obs baru
                 $data = [
                     'tc_init_id' => $value[0],
-                    'tc_worker_id' => $value[1],
+                    'tc_worker_id' => 0,
                     'date_schedule' => Carbon::parse($data['date_ob'])->addMonths(1),
                     'date_ob' => Carbon::parse($data['date_ob'])->addMonths(1),
                     'status' => 0,
@@ -40,14 +47,14 @@ class CallusImport implements ToCollection
                 TcCallusOb::create($data);
                 unset($data);
 
-                $jlhBotol = $value[3] + $value[5] + $value[6];
+                $jlhBotol = $value[2] + $value[4] + $value[5];
                 $botol = TcInitBottle::query()
                     ->select('id')
                     ->where('tc_init_id', $value[0])
                     ->orderBy('id', 'ASC')
                     ->take($jlhBotol)
                     ->get()->toArray();
-                
+
                 $btl['callus'] = (array_chunk($botol, $value[3]))[0];
                 $btl['oxi'] = array_chunk(((array_chunk($botol, $value[3]))[1]), $value[5])[0];
                 $btl['contam'] = array_chunk(((array_chunk($botol, $value[3]))[1]), $value[6])[0];
@@ -59,7 +66,7 @@ class CallusImport implements ToCollection
 
                 $indexBotol = 0;
                 $indexPlant = 1;
-                for ($i=0; $i < $value[4]; $i++) { 
+                for ($i=0; $i < $value[4]; $i++) {
                     $dt['callus'][$i] = $dataWajib;
                     $dt['callus'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['callus'][$i]['explant_number'] = $indexPlant;
@@ -78,7 +85,7 @@ class CallusImport implements ToCollection
 
                 $indexBotol = $value[3];
                 $indexPlant = 1;
-                for ($i=0; $i < $value[5]*3; $i++) { 
+                for ($i=0; $i < $value[5]*3; $i++) {
                     $dt['oxi'][$i] = $dataWajib;
                     $dt['oxi'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['oxi'][$i]['explant_number'] = $indexPlant;
@@ -97,7 +104,7 @@ class CallusImport implements ToCollection
 
                 $indexBotol = $value[3]+$value[5];
                 $indexPlant = 1;
-                for ($i=0; $i < $value[6]*3; $i++) { 
+                for ($i=0; $i < $value[6]*3; $i++) {
                     $dt['contam'][$i] = $dataWajib;
                     $dt['contam'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['contam'][$i]['explant_number'] = $indexPlant;

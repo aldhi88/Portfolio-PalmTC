@@ -18,11 +18,11 @@
             { data: 'id', name: 'id', orderable: false, searchable:false },
         ],
         initComplete: function () {
-            initFormObs();
+            delProcess();
         }
     });
 
-    function initFormObs(){
+    function delProcess(){
         $('body').on('change','input.batch',function(){
             var formData = {};
             formData.id = $(this).attr('data-id');
@@ -33,17 +33,17 @@
                 url: '{{ route("migrations.update") }}',
                 data: formData,
                 success: function(a) {
-                    $('#myTable').DataTable().ajax.reload(function(){ 
+                    $('#myTable').DataTable().ajax.reload(function(){
                         // initFormObs();
                         // initSearchColumn();
                     },false);
-                    showAlert(a.data.type, a.data.icon, a.data.el, a.data.msg);
+                    // showAlert(a.data.type, a.data.icon, a.data.el, a.data.msg);
                 },
                 error: (a) => {
-                    alert("Error #003, CallusObservationController - store function is invalid.");
+                    // alert("Error #003, CallusObservationController - store function is invalid.");
                 }
             });
-            
+
         });
     }
 </script>

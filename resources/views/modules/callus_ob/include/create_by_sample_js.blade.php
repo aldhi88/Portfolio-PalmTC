@@ -129,6 +129,6 @@
                 alert("Error #003, CallusObservationController - store function is invalid.");
             }
         });
-        
+
     });
 </script>

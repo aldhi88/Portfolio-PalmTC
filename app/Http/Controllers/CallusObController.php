@@ -19,8 +19,8 @@ class CallusObController extends Controller
         $data['title'] = "Callus Observation Data";
         $data['desc'] = "Display all observation summary by sample data";
         $q = TcInit::get()->count();
-        $data['dtInit'] = $q==0? false:true;
-        return view('modules.callus_ob.index',compact('data'));
+        $data['dtInit'] = $q == 0 ? false : true;
+        return view('modules.callus_ob.index', compact('data'));
     }
     public function dt(Request $request)
     {
@@ -29,72 +29,71 @@ class CallusObController extends Controller
                 "tc_samples"
             ])
             ->withCount([
-                "tc_callus_obs" => function($q){
-                    $q->where('status',1);
+                "tc_callus_obs" => function ($q) {
+                    $q->where('status', 1);
                 }
-            ])
-        ;
+            ]);
         return DataTables::of($data)
-            ->addColumn('reminder',function($data){
+            ->addColumn('reminder', function ($data) {
                 return '';
             })
-            ->addColumn('sample_action',function($data){
-                $q = TcCallusOb::where('tc_init_id',$data->id)
+            ->addColumn('sample_action', function ($data) {
+                $q = TcCallusOb::where('tc_init_id', $data->id)
                     ->latest()
                     ->first();
-                $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';
+                $el = '<p class="mb-0"><strong>' . $data->tc_samples->sample_number_display . '</strong></p>';
                 $el .= "
                     <p class='mb-0'>
-                        <a class='text-primary' href='".route('callus-obs.show',$data->id)."'>View</a>
+                        <a class='text-primary' href='" . route('callus-obs.show', $data->id) . "'>View</a>
                 ";
 
                 $el .= "
                         <span class='text-muted mx-1'>-</span>
-                        <a class='text-link' href='".route('callus-obs.create',$q->id)."'>Observation</a>
+                        <a class='text-link' href='" . route('callus-obs.create', $q->id) . "'>Observation</a>
                     ";
                 $el .= '</p>';
                 return $el;
             })
-            ->addColumn('init_date',function($data){
+            ->addColumn('init_date', function ($data) {
                 return Carbon::parse($data->created_at)->format('d/m/Y');
             })
-            ->addColumn('bottle_callus',function($data){
+            ->addColumn('bottle_callus', function ($data) {
                 return TcCallusObDetail::getTotalBottleCallusByInit($data->id);
             })
-            ->addColumn('persen_bottle_callus',function($data){
+            ->addColumn('persen_bottle_callus', function ($data) {
                 $bottleCallus = TcCallusObDetail::getTotalBottleCallusByInit($data->id);
                 $totalBottle = TcInitBottle::select('bottle_number')
-                    ->where('tc_init_id',$data->id)
-                    ->where('status',1)
+                    ->where('tc_init_id', $data->id)
+                    ->where('status', 1)
                     ->get()
                     ->count();
-                return number_format($bottleCallus/$totalBottle*100,2,',','.');
+                return number_format($bottleCallus / $totalBottle * 100, 2, ',', '.');
             })
-            ->addColumn('explant_callus',function($data){
+            ->addColumn('explant_callus', function ($data) {
                 return TcCallusObDetail::getTotalExplantCallusByInit($data->id);
             })
-            ->addColumn('persen_explant_callus',function($data){
+            ->addColumn('persen_explant_callus', function ($data) {
                 $bottleCallus = TcCallusObDetail::getTotalExplantCallusByInit($data->id);
                 $totalBottle = TcInitBottle::select('bottle_number')
-                    ->where('tc_init_id',$data->id)
-                    ->where('status',1)
+                    ->where('tc_init_id', $data->id)
+                    ->where('status', 1)
                     ->get()
                     ->count();
                 $totalExplant = $totalBottle * $data->number_of_plant;
-                return number_format($bottleCallus/$totalExplant*100,2,',','.');
+                return number_format($bottleCallus / $totalExplant * 100, 2, ',', '.');
             })
-            ->addColumn('bottle_oxi',function($data){
+            ->addColumn('bottle_oxi', function ($data) {
                 return TcCallusObDetail::getTotalBottleOxiByInit($data->id);
             })
-            ->addColumn('explant_oxi',function($data){
+            ->addColumn('explant_oxi', function ($data) {
                 return TcCallusObDetail::getTotalBottleOxiByInit($data->id) * $data->number_of_plant;
             })
-            ->addColumn('bottle_contam',function($data){
+            ->addColumn('bottle_contam', function ($data) {
                 return TcCallusObDetail::getTotalBottleContamByInit($data->id);
             })
-            ->addColumn('explant_contam',function($data){
+            ->addColumn('explant_contam', function ($data) {
                 // return TcCallusObDetail::getTotalExplantContamByInit($data->id) * $data->number_of_plant;
-                return TcCallusObDetail::getTotalExplantContamByInit($data->id) ;
+                return TcCallusObDetail::getTotalExplantContamByInit($data->id);
             })
             ->rawColumns(['sample_action'])
             ->toJson();
@@ -168,35 +167,36 @@ class CallusObController extends Controller
     {
         $data['title'] = "Callus Observation Data";
         $data['desc'] = "Display all observation summary by sample data";
-        
-        $qObs = TcCallusOb::where('id',$obsId)
+
+        $qObs = TcCallusOb::where('id', $obsId)
             ->with('tc_inits')
-            ->orderBy('date_ob','desc')
+            ->orderBy('date_ob', 'desc')
             ->get();
-        $data['date_ob'] = $qObs->first()->status==0?date('Y-m-d'):Carbon::parse($qObs->first()->date_ob)->format('Y-m-d');
-        $data['worker_now'] = $qObs->first()->status==0?null:$qObs->first()->tc_worker_id;
+        $data['date_ob'] = $qObs->first()->status == 0 ? date('Y-m-d') : Carbon::parse($qObs->first()->date_ob)->format('Y-m-d');
+        $data['worker_now'] = $qObs->first()->status == 0 ? null : $qObs->first()->tc_worker_id;
         $data['init'] = $qObs->first()->tc_inits;
-        $data['bottles'] = TcInitBottle::where('tc_init_id',$data['init']->id)->get();
-        $data['lastObs'] = (count($qObs)-1)==0?'--/--/----':Carbon::parse($qObs->first()->date_ob)->format('d M Y');
+        $data['bottles'] = TcInitBottle::where('tc_init_id', $data['init']->id)->get();
+        $data['lastObs'] = (count($qObs) - 1) == 0 ? '--/--/----' : Carbon::parse($qObs->first()->date_ob)->format('d M Y');
         $data['countObs'] = count($qObs);
-        $data['start'] = ($qObs->first()->status == 0)?false:true;
+        $data['start'] = ($qObs->first()->status == 0) ? false : true;
         $data['initId'] = $qObs->first()->tc_init_id;
         $data['obsId'] = $qObs->first()->id;
         $data['schedule'] = Carbon::parse($qObs->first()->date_schedule)->format('d/m/Y');
 
-        $data['workers'] = TcWorker::where('status',1)->where('id','!=',0)->get();
+        $data['workers'] = TcWorker::where('status', 1)->where('id', '!=', 0)->get();
 
-        return view('modules.callus_ob.create_by_sample',compact('data'));
+        return view('modules.callus_ob.create_by_sample', compact('data'));
     }
-    public function startObs(Request $request){
-        $q = TcCallusOb::where('id',$request->id)->get();
+    public function startObs(Request $request)
+    {
+        $q = TcCallusOb::where('id', $request->id)->get();
         $initId = $q->first()->tc_init_id;
-        $dateObLbhKecil = TcCallusOb::where('tc_init_id',$initId)
-                ->where('date_ob','>=',$request->date_ob)
-                ->where('id','<',$request->id)
-                ->get()
-                ->count();
-        if($dateObLbhKecil != 0){
+        $dateObLbhKecil = TcCallusOb::where('tc_init_id', $initId)
+            ->where('date_ob', '>=', $request->date_ob)
+            ->where('id', '<', $request->id)
+            ->get()
+            ->count();
+        if ($dateObLbhKecil != 0) {
             return response()->json([
                 'status' => 'error',
                 'data' => [
@@ -208,18 +208,18 @@ class CallusObController extends Controller
             ]);
         }
 
-        if($request->action == 'start'){
-            $q = TcCallusOb::where('id',$request->id)
+        if ($request->action == 'start') {
+            $q = TcCallusOb::where('id', $request->id)
                 ->update([
                     'status' => 1,
                     'date_ob' => $request->date_ob,
                     'tc_worker_id' => $request->tc_worker_id
                 ]);
 
-            $q = TcCallusOb::where('id',$request->id)
-                ->orderBy('date_ob','desc')
+            $q = TcCallusOb::where('id', $request->id)
+                ->orderBy('date_ob', 'desc')
                 ->first();
-            
+
             $dtObs['date_schedule'] = Carbon::parse($q->date_ob)->addMonths(1);
             $dtObs['date_ob'] = $dtObs['date_schedule'];
             $dtObs['tc_init_id'] = $q->tc_init_id;
@@ -236,7 +236,7 @@ class CallusObController extends Controller
                     'status' => 'update',
                 ],
             ]);
-        }else{
+        } else {
             TcCallusOb::where('id', $request->id)
                 ->update([
                     'date_ob' => $request->date_ob,
@@ -257,99 +257,96 @@ class CallusObController extends Controller
     {
         $initId = $request->initId;
         $obsId = $request->obsId;
-        $explantNumber = TcInit::where('id',$initId)
+        $explantNumber = TcInit::where('id', $initId)
             ->first()
             ->getAttribute('number_of_plant');
-        $data = TcInitBottle::where('tc_init_id',$initId)
-            ->with('tc_workers:id,code')
-        ;
+        $data = TcInitBottle::where('tc_init_id', $initId)
+            ->with('tc_workers:id,code');
         // dd($data->get()->toArray());
         return DataTables::of($data)
-            ->addColumn('explant_number',function($data) use($explantNumber,$obsId){
+            ->addColumn('explant_number', function ($data) use ($explantNumber, $obsId) {
                 $el = null;
                 $qOption = TcContamination::all();
-                $checkDisable = TcCallusObDetail::where('tc_callus_ob_id','<',$obsId)
-                    ->where('tc_init_bottle_id',$data->id)
-                    ->where('result','!=',1)
+                $checkDisable = TcCallusObDetail::where('tc_callus_ob_id', '<', $obsId)
+                    ->where('tc_init_bottle_id', $data->id)
+                    ->where('result', '!=', 1)
                     ->get();
-                if(count($checkDisable) > 0){
+                if (count($checkDisable) > 0) {
                     $result = $checkDisable->first()->result;
-                    $text = $result==2?"OXIDATION":"CONTAMINATION (".$checkDisable->first()->tc_contaminations->code.")";
+                    $text = $result == 2 ? "OXIDATION" : "CONTAMINATION (" . $checkDisable->first()->tc_contaminations->code . ")";
                     $el .= '
-                        <label class="badge badge-light-danger mb-0 d-block w-100 rounded-0">'.$text.'</label>
+                        <label class="badge badge-light-danger mb-0 d-block w-100 rounded-0">' . $text . '</label>
                     ';
-                }else{
-                    for ($i=1; $i <= $explantNumber ; $i++) { 
+                } else {
+                    for ($i = 1; $i <= $explantNumber; $i++) {
                         // checked or not
-                        $countCallus = TcCallusObDetail::where('tc_callus_ob_id',$obsId)
-                            ->where('tc_init_bottle_id',$data->id)
-                            ->where('explant_number',$i)
-                            ->where('result',1)
+                        $countCallus = TcCallusObDetail::where('tc_callus_ob_id', $obsId)
+                            ->where('tc_init_bottle_id', $data->id)
+                            ->where('explant_number', $i)
+                            ->where('result', 1)
                             ->get()
                             ->count();
-                        $callusCheck = $countCallus > 0?'checked':null;
-                        $countOxi = TcCallusObDetail::where('tc_callus_ob_id',$obsId)
-                            ->where('tc_init_bottle_id',$data->id)
-                            ->where('explant_number',$i)
-                            ->where('result',2)
+                        $callusCheck = $countCallus > 0 ? 'checked' : null;
+                        $countOxi = TcCallusObDetail::where('tc_callus_ob_id', $obsId)
+                            ->where('tc_init_bottle_id', $data->id)
+                            ->where('explant_number', $i)
+                            ->where('result', 2)
                             ->get()
                             ->count();
-                        $oxiCheck = $countOxi > 0?'checked':null;
-                        
+                        $oxiCheck = $countOxi > 0 ? 'checked' : null;
+
                         $dtOption = null;
                         foreach ($qOption as $key => $value) {
-                            $countContam = TcCallusObDetail::where('tc_callus_ob_id',$obsId)
-                                ->where('tc_init_bottle_id',$data->id)
-                                ->where('explant_number',$i)
-                                ->where('result',3)
-                                ->where('tc_contamination_id',$value->id)
+                            $countContam = TcCallusObDetail::where('tc_callus_ob_id', $obsId)
+                                ->where('tc_init_bottle_id', $data->id)
+                                ->where('explant_number', $i)
+                                ->where('result', 3)
+                                ->where('tc_contamination_id', $value->id)
                                 ->get()
                                 ->count();
-                            $contamCheck = $countContam > 0?'selected':null;
-                            $dtOption .= '<option '.$contamCheck.' value="'.$value->id.'">'.$value->code.'</option>';
+                            $contamCheck = $countContam > 0 ? 'selected' : null;
+                            $dtOption .= '<option ' . $contamCheck . ' value="' . $value->id . '">' . $value->code . '</option>';
                         }
-                        $border = $i != $explantNumber?'border-bottom':null;
-    
-                        $callusCount = TcCallusObDetail::where('tc_callus_ob_id','<',$obsId)
-                            ->where('tc_init_bottle_id',$data->id)
-                            ->where('explant_number',$i)
-                            ->where('result',1)
+                        $border = $i != $explantNumber ? 'border-bottom' : null;
+
+                        $callusCount = TcCallusObDetail::where('tc_callus_ob_id', '<', $obsId)
+                            ->where('tc_init_bottle_id', $data->id)
+                            ->where('explant_number', $i)
+                            ->where('result', 1)
                             ->get()
                             ->count();
-    
+
                         $el .= '
-                            <div class="row '.$border.'">
+                            <div class="row ' . $border . '">
                                 <div class="col-3 mt-1">
                                     <div class="row">
-                                        <div class="col-5">   
-                                            <label class="badge badge-light-success border border-success d-block w-100 rounded-0 px-0">'.$callusCount.'</label>
+                                        <div class="col-5">
+                                            <label class="badge badge-light-success border border-success d-block w-100 rounded-0 px-0">' . $callusCount . '</label>
                                         </div>
-                                        <div class="col px-0"><i class="fas fa-leaf text-success"></i> '.$i.'.</div>
+                                        <div class="col px-0"><i class="fas fa-leaf text-success"></i> ' . $i . '.</div>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="form-group p-0 mb-0 form-check mt-1">
-                                        <input '.$callusCheck.' type="checkbox" name="result" value="1" data-bottle="'.$data->id.'" data-explant="'.$i.'" class="form-check-input check-callus" id="callus_'.$data->bottle_number.$i.'">
-                                        <label class="form-check-label" for="callus_'.$data->bottle_number.$i.'">Callus</label>
+                                        <input ' . $callusCheck . ' type="checkbox" name="result" value="1" data-bottle="' . $data->id . '" data-explant="' . $i . '" class="form-check-input check-callus" id="callus_' . $data->bottle_number . $i . '">
+                                        <label class="form-check-label" for="callus_' . $data->bottle_number . $i . '">Callus</label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col">
                                     <div class="form-group p-0 mb-0 form-check mt-1">
-                                        <input '.$oxiCheck.' type="checkbox" name="result" value="2" data-bottle="'.$data->id.'" data-explant="'.$i.'" class="form-check-input" id="oxi_'.$data->bottle_number.$i.'">
-                                        <label class="form-check-label" for="oxi_'.$data->bottle_number.$i.'">Oxidate</label>
+                                        <input ' . $oxiCheck . ' type="checkbox" name="result" value="2" data-bottle="' . $data->id . '" data-explant="' . $i . '" class="form-check-input" id="oxi_' . $data->bottle_number . $i . '">
+                                        <label class="form-check-label" for="oxi_' . $data->bottle_number . $i . '">Oxidate</label>
                                     </div>
                                 </div>
                                 <div class="col-4">
-                                    <select class="form-control form-control-sm" data-bottle="'.$data->id.'">
+                                    <select class="form-control form-control-sm" data-bottle="' . $data->id . '">
                                         <option value="0">Uncontaminated</option>
-                                        '.$dtOption.'
+                                        ' . $dtOption . '
                                     </select>
                                 </div>
                             </div>
                         ';
-                        
-                        
                     }
                 }
                 return $el;
@@ -361,131 +358,100 @@ class CallusObController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('action');
-        if($data['result']==1){
-            
-            $qBottleCallus = TcCallusObDetail::where('tc_callus_ob_id',$request->tc_callus_ob_id)
-                ->where('tc_init_bottle_id',$request->tc_init_bottle_id)
-                ->where('result',1)
-                ->get()
+        $data['created_at'] = Carbon::now();
+        $data['updated_at'] = Carbon::now();
+
+        if ($data['result'] == 1) {
+            // Cek apakah bottle_callus perlu ditingkatkan
+            $qBottleCallus = TcCallusObDetail::where('tc_callus_ob_id', $request->tc_callus_ob_id)
+                ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                ->where('result', 1)
                 ->count();
-            if($qBottleCallus == 0){
-                TcCallusOb::where('id',$request->tc_callus_ob_id)
-                    ->increment('bottle_callus');
+
+            if ($qBottleCallus == 0) {
+                TcCallusOb::where('id', $request->tc_callus_ob_id)->increment('bottle_callus');
             }
 
-            $cek = TcCallusObDetail::where('result',1)
-                ->where('tc_init_bottle_id',$request->tc_init_bottle_id)
-                ->where('tc_callus_ob_id','<',$request->tc_callus_ob_id)
-                ->get()
-                ->count();
-            $data['is_count_bottle'] = $cek!=0?0:1;
-            $cek = TcCallusObDetail::where('result',1)
-                ->where('tc_init_bottle_id',$request->tc_init_bottle_id)
-                ->where('explant_number',$request->explant_number)
-                ->where('tc_callus_ob_id','<',$request->tc_callus_ob_id)
-                ->get()
-                ->count();
-            $data['is_count_explant'] = $cek!=0?0:1;
-            
-            if($request->action=='insert'){
-                TcCallusObDetail::where('tc_callus_ob_id',$data['tc_callus_ob_id'])
-                    ->where('tc_init_bottle_id',$data['tc_init_bottle_id'])
-                    ->where('result','!=',1)
+            // Set is_count_bottle
+            $data['is_count_bottle'] = TcCallusObDetail::where('result', 1)
+                ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                ->where('tc_callus_ob_id', '<', $request->tc_callus_ob_id)
+                ->exists() ? 0 : 1;
+
+            // Set is_count_explant
+            $data['is_count_explant'] = TcCallusObDetail::where('result', 1)
+                ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                ->where('explant_number', $request->explant_number)
+                ->where('tc_callus_ob_id', '<', $request->tc_callus_ob_id)
+                ->exists() ? 0 : 1;
+
+            if ($request->action == 'insert') {
+                TcCallusObDetail::where('tc_callus_ob_id', $data['tc_callus_ob_id'])
+                    ->where('tc_init_bottle_id', $data['tc_init_bottle_id'])
+                    ->where('result', '!=', 1)
                     ->forceDelete();
+
                 TcCallusObDetail::create($data);
-            }else{
-                TcCallusObDetail::where('tc_callus_ob_id',$data['tc_callus_ob_id'])
-                    ->where('tc_init_bottle_id',$data['tc_init_bottle_id'])
-                    ->where('explant_number',$data['explant_number'])
-                    ->where('result',1)
+            } else {
+                TcCallusObDetail::where('tc_callus_ob_id', $data['tc_callus_ob_id'])
+                    ->where('tc_init_bottle_id', $data['tc_init_bottle_id'])
+                    ->where('explant_number', $data['explant_number'])
+                    ->where('result', 1)
                     ->forceDelete();
-                $qBottleCallus = TcCallusObDetail::where('tc_callus_ob_id',$request->tc_callus_ob_id)
-                    ->where('tc_init_bottle_id',$request->tc_init_bottle_id)
-                    ->where('result',1)
-                    ->get()
-                    ->count();
-                if($qBottleCallus == 0){
-                    TcCallusOb::where('id',$request->tc_callus_ob_id)
-                        ->decrement('bottle_callus');
+
+                if (!TcCallusObDetail::where('tc_callus_ob_id', $request->tc_callus_ob_id)
+                    ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                    ->where('result', 1)
+                    ->exists()) {
+                    TcCallusOb::where('id', $request->tc_callus_ob_id)->decrement('bottle_callus');
                 }
             }
-        }else{
-            $q = TcInitBottle::select('id','tc_init_id')
-                ->where('id',$data['tc_init_bottle_id'])
+        } else {
+            // Cek apakah bottle_callus perlu dikurangi
+            if (TcCallusObDetail::where('tc_callus_ob_id', $request->tc_callus_ob_id)
+                ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                ->where('result', 1)
+                ->exists()
+            ) {
+                TcCallusOb::where('id', $request->tc_callus_ob_id)->decrement('bottle_callus');
+            }
+
+            $q = TcInitBottle::select('id', 'tc_init_id')
+                ->where('id', $data['tc_init_bottle_id'])
                 ->first();
             $explantNumber = $q->tc_inits->number_of_plant;
 
-            $cek = TcCallusObDetail::where('result',1)
-                ->where('tc_callus_ob_id','<',$request->tc_callus_ob_id)
-                ->where('tc_init_bottle_id',$request->tc_init_bottle_id)
-                ->get()
-                ->count();
-            $data['is_count_bottle'] = $cek!=0?0:1;
-            $data['created_at'] = Carbon::now();
-            $data['updated_at'] = Carbon::now();
+            // Set is_count_bottle
+            $data['is_count_bottle'] = TcCallusObDetail::where('result', 1)
+                ->where('tc_callus_ob_id', '<', $request->tc_callus_ob_id)
+                ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                ->exists() ? 0 : 1;
 
-            $cekDaun = TcCallusObDetail::select('explant_number')
-                ->where('tc_init_id',$request->tc_init_id)
-                ->where('tc_callus_ob_id','<',$request->tc_callus_ob_id)
-                ->where('tc_init_bottle_id',$request->tc_init_bottle_id)
-                ->where('result',1)
-                ->get()
+            // Ambil daftar explant_number yang sudah ada
+            $existingExplantNumbers = TcCallusObDetail::where('tc_init_id', $request->tc_init_id)
+                ->where('tc_callus_ob_id', '<', $request->tc_callus_ob_id)
+                ->where('tc_init_bottle_id', $request->tc_init_bottle_id)
+                ->where('result', 1)
+                ->pluck('explant_number')
                 ->toArray();
 
-            if($data['result']==2){
-                if($request->action=='insert'){
-                    TcCallusObDetail::where('tc_callus_ob_id',$data['tc_callus_ob_id'])
-                        ->where('tc_init_bottle_id',$data['tc_init_bottle_id'])
-                        ->where('result','!=',2)
-                        ->forceDelete();
-                    
-                    $aryExplantNumb = [];
-                    foreach ($cekDaun as $key => $value) {
-                        $aryExplantNumb[] = $value['explant_number'];
-                    }
-                    
-                    for ($i=1; $i <= $explantNumber ; $i++) {
-                        if(!in_array($i,$aryExplantNumb)){
-                            $data['is_count_explant'] = 1;
-                        }else{
-                            $data['is_count_explant'] = 0;
-                        }
-                        $data['explant_number'] = $i; 
-                        $dt[$i-1] = $data;
-                    }
-                    TcCallusObDetail::insert($dt);
-                }else{
-                    TcCallusObDetail::where('tc_callus_ob_id',$data['tc_callus_ob_id'])
-                        ->where('tc_init_bottle_id',$data['tc_init_bottle_id'])
-                        ->where('result',2)
-                        ->forceDelete();
+            if ($request->action == 'insert') {
+                TcCallusObDetail::where('tc_callus_ob_id', $data['tc_callus_ob_id'])
+                    ->where('tc_init_bottle_id', $data['tc_init_bottle_id'])
+                    ->forceDelete();
+
+                $dt = [];
+                for ($i = 1; $i <= $explantNumber; $i++) {
+                    $data['explant_number'] = $i;
+                    $data['is_count_explant'] = in_array($i, $existingExplantNumbers) ? 0 : 1;
+                    $dt[] = $data;
                 }
-            }else{
-                if($request->action=='insert'){
-                    TcCallusObDetail::where('tc_callus_ob_id',$data['tc_callus_ob_id'])
-                        ->where('tc_init_bottle_id',$data['tc_init_bottle_id'])
-                        ->forceDelete();
-                    
-                    $aryExplantNumb = [];
-                    foreach ($cekDaun as $key => $value) {
-                        $aryExplantNumb[] = $value['explant_number'];
-                    }
-                    for ($i=1; $i <= $explantNumber ; $i++) {
-                        if(!in_array($i,$aryExplantNumb)){
-                            $data['is_count_explant'] = 1;
-                        }else{
-                            $data['is_count_explant'] = 0;
-                        }
-                        $data['explant_number'] = $i; 
-                        $dt[$i-1] = $data;
-                    }
-                    TcCallusObDetail::insert($dt);
-                }else{
-                    TcCallusObDetail::where('tc_callus_ob_id',$data['tc_callus_ob_id'])
-                        ->where('tc_init_bottle_id',$data['tc_init_bottle_id'])
-                        ->where('result',3)
-                        ->forceDelete();
-                }
+                TcCallusObDetail::insert($dt);
+            } else {
+                TcCallusObDetail::where('tc_callus_ob_id', $data['tc_callus_ob_id'])
+                    ->where('tc_init_bottle_id', $data['tc_init_bottle_id'])
+                    ->where('result', $data['result'] == 2 ? 2 : 3)
+                    ->forceDelete();
             }
         }
     }
@@ -499,41 +465,41 @@ class CallusObController extends Controller
 
         $qInit = TcInit::select('*')
             ->with([
-                'tc_samples' =>function($q){
-                    $q->select('id','sample_number');
+                'tc_samples' => function ($q) {
+                    $q->select('id', 'sample_number');
                 },
                 'tc_rooms'
             ])
-            ->where('id',$id)
+            ->where('id', $id)
             ->first();
         $data['sampleNumber'] = $qInit->tc_samples->sample_number_display;
         // ======================
-        $qCallusOb = collect(TcCallusOb::where('tc_init_id',$id)->get()->toArray());
+        $qCallusOb = collect(TcCallusOb::where('tc_init_id', $id)->get()->toArray());
 
         $cekUdahObBlum = $qCallusOb->sortByDesc('date_ob')
-            ->where('status',1)
+            ->where('status', 1)
             ->count();
-        if($cekUdahObBlum){
-            $data['lastDateOb'] = Carbon::parse( 
+        if ($cekUdahObBlum) {
+            $data['lastDateOb'] = Carbon::parse(
                 $qCallusOb->sortByDesc('date_ob')
-                    ->where('status',1)
-                    ->first()['date_ob'] 
+                    ->where('status', 1)
+                    ->first()['date_ob']
             )->format('d M Y');
-        }else{
+        } else {
             $data['lastDateOb'] = '-';
         }
-        
-        $data['nextDateOb'] = Carbon::parse( 
+
+        $data['nextDateOb'] = Carbon::parse(
             $qCallusOb->sortByDesc('date_ob')
-                ->where('status',0)
-                ->first()['date_ob'] 
+                ->where('status', 0)
+                ->first()['date_ob']
         )->format('d M Y');
-        $data['countObDone'] = $qCallusOb->where('status',1)->count();
-        
+        $data['countObDone'] = $qCallusOb->where('status', 1)->count();
+
         // ==================
         $qInitBottle = collect(
-            TcInitBottle::where('tc_init_id',$id)
-                ->where('status',1)
+            TcInitBottle::where('tc_init_id', $id)
+                ->where('status', 1)
                 ->get()
                 ->toArray()
         );
@@ -545,11 +511,11 @@ class CallusObController extends Controller
 
         // ===============
         $data['totalBottleCallusPerInit'] = TcCallusObDetail::getTotalBottleCallusByInit($id);
-        $data['persenBottleCallus'] = number_format($data['totalBottleCallusPerInit']/$data['totalBottle']*100,2,',','.');
+        $data['persenBottleCallus'] = number_format($data['totalBottleCallusPerInit'] / $data['totalBottle'] * 100, 2, ',', '.');
         $data['listBottleCallusPerInit'] = TcCallusObDetail::getListBottleCallusByInit($id);
         // ===============
         $data['totalExplantCallusPerInit'] = TcCallusObDetail::getTotalExplantCallusByInit($id);
-        $data['persenExplantCallus'] = number_format($data['totalExplantCallusPerInit']/$data['totalExplant']*100,2,',','.');
+        $data['persenExplantCallus'] = number_format($data['totalExplantCallusPerInit'] / $data['totalExplant'] * 100, 2, ',', '.');
         $data['listExplantCallusPerInit'] = TcCallusObDetail::getListExplantCallusByInit($id);
         // ===============
         $data['totalBottleOxiPerInit'] = TcCallusObDetail::getTotalBottleOxiByInit($id);
@@ -563,74 +529,75 @@ class CallusObController extends Controller
         $data['listExplantContamPerInit'] = TcCallusObDetail::getListExplantContamByInit($id);
 
         $data['nextObId'] = $qCallusOb->sortBy('status')->first()['id'];
-        
-        
-        return view("modules.callus_ob.detail_observation",compact('data'));
+
+
+        return view("modules.callus_ob.detail_observation", compact('data'));
     }
-    public function dtDetailObs(Request $request){
+    public function dtDetailObs(Request $request)
+    {
         $data = TcCallusOb::select([
-                "tc_callus_obs.*"
-            ])
-            ->where('tc_init_id',$request->initId)
+            "tc_callus_obs.*"
+        ])
+            ->where('tc_init_id', $request->initId)
             ->where('status', 1)
             ->with('tc_callus_ob_details')
-            ->with('tc_workers')
-        ;
-        
+            ->with('tc_workers');
+
         return DataTables::of($data)
-            ->addColumn('action',function($data){
+            ->addColumn('action', function ($data) {
                 $el = "
                     <p class='mb-0 font-size-14'>
-                        <a class='text-primary' href='".route('callus-obs.create',$data->id)."'>Edit</a>
+                        <a class='text-primary' href='" . route('callus-obs.create', $data->id) . "'>Edit</a>
                 ";
                 $el .= '</p>';
                 return $el;
             })
-            ->addColumn('date_ob_format', function($data) use($request){
-                $el = '<strong class="mt-0 font-size-14">'.Carbon::parse($data->date_ob)->format('d/m/Y').'</strong>';
+            ->addColumn('date_ob_format', function ($data) use ($request) {
+                $el = '<strong class="mt-0 font-size-14">' . Carbon::parse($data->date_ob)->format('d/m/Y') . '</strong>';
                 return $el;
             })
-            ->addColumn('new_bottle_callus',function($data){
+            ->addColumn('new_bottle_callus', function ($data) {
                 return TcCallusObDetail::getTotalNewBottleCallusByOb($data->id);
             })
-            ->addColumn('old_bottle_callus',function($data){
+            ->addColumn('old_bottle_callus', function ($data) {
                 return TcCallusObDetail::getTotalOldBottleCallusByOb($data->id);
             })
-            ->addColumn('new_explant_callus',function($data){
+            ->addColumn('new_explant_callus', function ($data) {
                 return TcCallusObDetail::getTotalNewExplantCallusByOb($data->id);
             })
-            ->addColumn('old_explant_callus',function($data){
+            ->addColumn('old_explant_callus', function ($data) {
                 return TcCallusObDetail::getTotalOldExplantCallusByOb($data->id);
             })
-            ->addColumn('bottle_oxi',function($data){
+            ->addColumn('bottle_oxi', function ($data) {
                 return TcCallusObDetail::getTotalBottleOxiByOb($data->id);
             })
-            ->addColumn('explant_oxi',function($data){
+            ->addColumn('explant_oxi', function ($data) {
                 return TcCallusObDetail::getTotalExplantOxiByOb($data->id);
             })
-            ->addColumn('bottle_contam',function($data){
+            ->addColumn('bottle_contam', function ($data) {
                 return TcCallusObDetail::getTotalBottleContamByOb($data->id);
             })
-            ->addColumn('explant_contam',function($data){
+            ->addColumn('explant_contam', function ($data) {
                 return TcCallusObDetail::getTotalExplantContamByOb($data->id);
             })
-            ->rawColumns(['date_ob_format','action'])
+            ->rawColumns(['date_ob_format', 'action'])
             ->toJson();
     }
 
-    public function printObsForm(Request $request){
+    public function printObsForm(Request $request)
+    {
         $data['title'] = "Print Observation Form";
         $data['desc'] = "Printing observation form before input observation result";
         $id = $request->initId;
-        if($id == 'blank'){
-            if($request->page == 1){
+        if ($id == 'blank') {
+            if ($request->page == 1) {
                 $data['totalRow'] = $request->page * 25;
-            }else{
+            } else {
                 $data['totalRow'] = ($request->page * 27) - 2;
             }
-            return view('modules.callus_ob.print.form_obs_blank',compact('data'));
+            return view('modules.callus_ob.print.form_obs_blank', compact('data'));
         }
-        
+
         // $data['init'] = TcInit::where('id',$id)->get()->first();
         // $data['explantNumber'] = $data['init']->number_of_plant;
         // $data['sample_number'] = $data['init']->tc_samples->sample_number_display;
@@ -649,7 +616,6 @@ class CallusObController extends Controller
         // }else{
         //     $data['totalRow'] = ($request->page * 27) - 2;
         // }
-        return view('modules.callus_ob.print.form_obs',compact('data'));
+        return view('modules.callus_ob.print.form_obs', compact('data'));
     }
-
 }

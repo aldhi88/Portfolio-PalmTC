@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 {{-- @if ($data['dtInit']) --}}
-    
+
 @section('css')
 @include('modules.callus_ob.include.index_css')
 @endsection
@@ -72,7 +72,7 @@
                             {{-- Oxidate --}}
                             <th class="text-center" width="50"><i class="fas fa-flask text-danger"></i></th>
                             <th class="text-center" width="50"><i class="fas fa-leaf text-danger"></i></th>
-                            
+
                         </tr>
                     </thead>
                     <thead id="header-filter" class="bg-white">
@@ -94,7 +94,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -117,7 +117,7 @@
                         <input name="file" type="file" class="form-control form-control-sm">
                         <small><span class="file text-danger msg"></span></small>
                     </div>
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
