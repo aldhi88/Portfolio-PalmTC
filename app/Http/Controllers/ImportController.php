@@ -26,6 +26,19 @@ class ImportController extends Controller
     public function sampleImport(Request $request)
     {
         Excel::import(new SampleForImport, $request->file);
+
+        if(SampleForImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.SampleForImport::$error,
+                ],
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [

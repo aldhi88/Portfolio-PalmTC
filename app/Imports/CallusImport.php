@@ -14,7 +14,6 @@ class CallusImport implements ToCollection
     public function collection(Collection $rows)
     {
         foreach ($rows as $key => $value) {
-            dump($value);
 
             if ($key != 0) {
 
@@ -22,22 +21,27 @@ class CallusImport implements ToCollection
                     break;
                 }
 
+                $ex_init_id = $value[0];
+                $ex_tgl_obs = $value[1];
+                $ex_botol_callus = $value[2];
+                $ex_daun_callus= $value[3];
+                $ex_botol_oxi = $value[4];
+                $ex_botol_kontam = $value[5];
+
                 $data = [
                     'tc_worker_id' => 0,
-                    'date_schedule' => Carbon::createFromFormat('d/m/Y', $value[1])->format('Y-m-d'),
-                    'date_ob' => Carbon::createFromFormat('d/m/Y', $value[1])->format('Y-m-d'),
+                    'date_schedule' => Carbon::createFromFormat('d/m/Y', $ex_tgl_obs)->format('Y-m-d'),
+                    'date_ob' => Carbon::createFromFormat('d/m/Y', $ex_tgl_obs)->format('Y-m-d'),
                     'status' => 1,
-                    'bottle_callus' => $value[2],
+                    'bottle_callus' => $ex_botol_callus,
                 ];
-                $qUpCallusOb = TcCallusOb::where('tc_init_id', '=', $value[0])->first();
+                $qUpCallusOb = TcCallusOb::where('tc_init_id', '=', $ex_init_id)->first();
                 $qUpCallusOb->update($data);
                 $obsId = $qUpCallusOb->id;
-                // dd($obsId);
-                // dd(0);
 
                 // //prepare data obs baru
                 $data = [
-                    'tc_init_id' => $value[0],
+                    'tc_init_id' => $ex_init_id,
                     'tc_worker_id' => 0,
                     'date_schedule' => Carbon::parse($data['date_ob'])->addMonths(1),
                     'date_ob' => Carbon::parse($data['date_ob'])->addMonths(1),
@@ -47,33 +51,33 @@ class CallusImport implements ToCollection
                 TcCallusOb::create($data);
                 unset($data);
 
-                $jlhBotol = $value[2] + $value[4] + $value[5];
+                $jlhBotol = $ex_botol_callus + $ex_botol_oxi + $ex_botol_kontam;
                 $botol = TcInitBottle::query()
                     ->select('id')
-                    ->where('tc_init_id', $value[0])
+                    ->where('tc_init_id', $ex_init_id)
                     ->orderBy('id', 'ASC')
                     ->take($jlhBotol)
                     ->get()->toArray();
 
-                $btl['callus'] = (array_chunk($botol, $value[3]))[0];
-                $btl['oxi'] = array_chunk(((array_chunk($botol, $value[3]))[1]), $value[5])[0];
-                $btl['contam'] = array_chunk(((array_chunk($botol, $value[3]))[1]), $value[6])[0];
+                $btl['callus'] = (array_chunk($botol, $ex_botol_callus))[0];
+                $btl['oxi'] = array_chunk(((array_chunk($botol, $ex_botol_callus))[1]), $ex_botol_oxi)[0];
+                $btl['contam'] = array_chunk(((array_chunk($botol, $ex_botol_callus))[1]), $ex_botol_kontam)[0];
 
                 $dataWajib = [
-                    'tc_init_id' => $value[0],
+                    'tc_init_id' => $ex_init_id,
                     'tc_callus_ob_id' => $obsId
                 ];
 
                 $indexBotol = 0;
                 $indexPlant = 1;
-                for ($i=0; $i < $value[4]; $i++) {
+                for ($i=0; $i < $ex_daun_callus; $i++) {
                     $dt['callus'][$i] = $dataWajib;
                     $dt['callus'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['callus'][$i]['explant_number'] = $indexPlant;
                     $dt['callus'][$i]['result'] = 1;
                     $dt['callus'][$i]['created_at'] = Carbon::now();
                     $dt['callus'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $value[3]-1){
+                    if($indexBotol == $ex_botol_callus-1){
                         $indexBotol = 0;
                         $indexPlant++;
                     }else{
@@ -83,17 +87,17 @@ class CallusImport implements ToCollection
                 TcCallusObDetail::insert($dt['callus']);
                 unset($dt);
 
-                $indexBotol = $value[3];
+                $indexBotol = $ex_botol_callus;
                 $indexPlant = 1;
-                for ($i=0; $i < $value[5]*3; $i++) {
+                for ($i=0; $i < $ex_botol_oxi*3; $i++) {
                     $dt['oxi'][$i] = $dataWajib;
                     $dt['oxi'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['oxi'][$i]['explant_number'] = $indexPlant;
                     $dt['oxi'][$i]['result'] = 2;
                     $dt['oxi'][$i]['created_at'] = Carbon::now();
                     $dt['oxi'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $value[5]+$value[3]-1){
-                        $indexBotol = $value[3];
+                    if($indexBotol == $ex_botol_oxi+$ex_botol_callus-1){
+                        $indexBotol = $ex_botol_callus;
                         $indexPlant++;
                     }else{
                         $indexBotol++;
@@ -102,9 +106,9 @@ class CallusImport implements ToCollection
                 TcCallusObDetail::insert($dt['oxi']);
                 unset($dt);
 
-                $indexBotol = $value[3]+$value[5];
+                $indexBotol = $ex_botol_callus+$ex_botol_oxi;
                 $indexPlant = 1;
-                for ($i=0; $i < $value[6]*3; $i++) {
+                for ($i=0; $i < $ex_botol_kontam*3; $i++) {
                     $dt['contam'][$i] = $dataWajib;
                     $dt['contam'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['contam'][$i]['explant_number'] = $indexPlant;
@@ -112,8 +116,8 @@ class CallusImport implements ToCollection
                     $dt['contam'][$i]['tc_contamination_id'] = 1;
                     $dt['contam'][$i]['created_at'] = Carbon::now();
                     $dt['contam'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $value[6]+$value[3]+$value[5]-1){
-                        $indexBotol = $value[3]+$value[5];
+                    if($indexBotol == $ex_botol_kontam+$ex_botol_callus+$ex_botol_oxi-1){
+                        $indexBotol = $ex_botol_callus+$ex_botol_oxi;
                         $indexPlant++;
                     }else{
                         $indexBotol++;
