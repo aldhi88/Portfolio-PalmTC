@@ -106,7 +106,8 @@ class MediumController extends Controller
         ]);
     }
     public function dt(){
-        $data = TcMedium::with('tc_medium_stocks','tc_medium_opname');
+        $data = TcMedium::with('tc_medium_stocks','tc_medium_opname')
+            ->where('id', '!=', 99);
         return DataTables::of($data)
             ->addColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';

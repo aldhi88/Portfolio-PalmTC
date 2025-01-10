@@ -28,7 +28,7 @@ class DeathController extends Controller
         ]);
     }
     public function dt(){
-        $data = TcDeath::query();
+        $data = TcDeath::query()->where('id', '!=', 99);
         return Datatables::of($data)
             ->editColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';

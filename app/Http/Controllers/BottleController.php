@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BottleCreate;
 use App\Http\Requests\BottleEdit;
 use App\Models\TcBottle;
-use Yajra\DataTables\CollectionDataTable;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\Request;
+use DataTables;
+
 
 class BottleController extends Controller
 {
@@ -22,9 +21,8 @@ class BottleController extends Controller
         ]);
     }
     public function dt(){
-        $TcBottle = new TcBottle();
-        $data = $TcBottle->selDataDt();
-        return (new CollectionDataTable($data))
+        $data = TcBottle::query()->where('id', '!=', 99);
+        return DataTables::of($data)
             ->editColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';
                 $attch['id'] = $data->id;

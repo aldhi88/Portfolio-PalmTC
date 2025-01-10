@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AgarCreate;
 use App\Http\Requests\AgarEdit;
 use App\Models\TcAgar;
-use Yajra\DataTables\Facades\DataTables;
-use Yajra\DataTables\CollectionDataTable;
-use Illuminate\Http\Request;
+use DataTables;
+
 
 class AgarController extends Controller
 {
@@ -30,9 +29,8 @@ class AgarController extends Controller
         ]);
     }
     public function dt(){
-        $TcAgar = new TcAgar();
-        $data = $TcAgar->selDataDt();
-        return (new CollectionDataTable($data))
+        $data = TcAgar::query()->where('id', '!=', 99);
+        return DataTables::of($data)
             ->editColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';
                 $attch['id'] = $data->id;

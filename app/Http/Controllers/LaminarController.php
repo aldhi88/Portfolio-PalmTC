@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LaminarCreate;
 use App\Http\Requests\LaminarEdit;
 use App\Models\TcLaminar;
-use Illuminate\Http\Request;
-use Yajra\DataTables\CollectionDataTable;
+use DataTables;
+
 
 class LaminarController extends Controller
 {
@@ -30,9 +30,9 @@ class LaminarController extends Controller
     }
     
     public function dt(){
-        $TcLaminar = new TcLaminar();
-        $data = $TcLaminar->selDataDt();
-        return (new CollectionDataTable($data))
+        $data = TcLaminar::query()->where('id', '!=', 99);
+    
+        return DataTables::of($data)
             ->editColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';
                 $attch['id'] = $data->id;

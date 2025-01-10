@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PlantationCreate;
 use App\Http\Requests\PlantationEdit;
 use App\Models\TcPlantation;
-use Illuminate\Http\Request;
 use DataTables;
 
 class PlantationController extends Controller
@@ -28,7 +27,7 @@ class PlantationController extends Controller
         ]);
     }
     public function dt(){
-        $data = TcPlantation::query();
+        $data = TcPlantation::query()->where('id', '!=', 99);
         return Datatables::of($data)
             ->editColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';

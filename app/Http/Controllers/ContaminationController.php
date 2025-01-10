@@ -29,8 +29,7 @@ class ContaminationController extends Controller
         ]);
     }
     public function dt(){
-        $TcContamination = new TcContamination();
-        $data = $TcContamination->selDataDt();
+        $data = TcContamination::query()->where('id', '!=', 99);
         return Datatables::of($data)
             ->editColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';

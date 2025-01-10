@@ -21,7 +21,6 @@ class ImportController extends Controller
     public function sampleExport()
     {
         return response()->download(storage_path('/app/public/form_import/form_import_sample.xlsx'));
-        // return Excel::download(new SampleForExport, 'form_import_sample.xlsx');
     }
     public function sampleImport(Request $request)
     {
@@ -58,6 +57,18 @@ class ImportController extends Controller
     public function initsImport(Request $request)
     {
         Excel::import(new InitsImport, $request->file);
+        if(InitsImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.InitsImport::$error,
+                ],
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [

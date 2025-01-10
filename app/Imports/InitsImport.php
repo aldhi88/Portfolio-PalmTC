@@ -7,76 +7,106 @@ use App\Models\TcInit;
 use App\Models\TcInitBottle;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
 
 class InitsImport implements ToCollection
 {
+    public static $error;
+
     public function collection(Collection $rows)
     {
+        self::$error = false;
 
-        $qLastId = TcInit::select('id')->orderBy('id','desc')->get();
-        if($qLastId->count()==0){
-            $initId = 1;
-        }else{
-            $initId = $qLastId->first()->id + 1;
-        }
+        // Ambil ID terakhir dari TcInit
+        $lastId = TcInit::max('id') ?? 0; 
+        $currentId = $lastId;
 
-        $qLastId = TcInitBottle::select('id')->orderBy('id','desc')->get();
-        if($qLastId->count()==0){
-            $initBottleId = 1;
-        }else{
-            $initBottleId = $qLastId->first()->id + 1;
-        }
+        $tcInitData = [];   
+        $tcCallusObsData = []; 
+        $tcInitBottleData = []; 
 
+        // Step 1: Prepare TcInit and TcCallusOb data
         foreach ($rows as $key => $value) {
-            if ($key > 0) {
-                $data = [
-                    // 'id' => $initId++,
-                    'tc_sample_id' => $value[0],
-                    'tc_room_id' => $value[1],
-                    'number_of_block' => 60,
-                    'number_of_bottle' => 8,
-                    'number_of_plant' => 3,
-                    'desc' => $value[2],
-                    'date_work' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
-                    'created_at' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
-                ];
+            if ($key === 0) {
+                continue;
+            }
 
-                $q = TcInit::create($data);
-                unset($data);
-                $id = $q->id;
+            if (isset($value[0]) && $value[0] === '<end>') {
+                break;
+            }
 
-                $startBottle = 1;
-                for ($i = 1; $i <= 60; $i++) {
-                    for ($j = $startBottle; $j < ($startBottle + 8); $j++) {
-                        $dtBottle[] = [
-                            // 'id' => $initBottleId++,
-                            'tc_init_id' => $id,
-                            'block_number' => $i,
-                            'bottle_number' => $j,
-                            'tc_worker_id' => 0,
-                            'tc_laminar_id' => 0,
-                            'tc_medium_stock_id' => 0,
-                            'status' => 1,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
-                        ];
-                        // TcInitBottle::create($dtBot);
-                    }
-                    TcInitBottle::insert($dtBottle);
-                    unset($dtBottle);
-                    $startBottle = $j;
+            if( 
+                empty($value[0])||empty($value[1])||empty($value[2]) || 
+                $value[0]=='-'||$value[1]=='-'||$value[2]=='-'
+            ){
+                self::$error = "Pada data excel ada data value yang kosong / tidak valid. Cek baris ke- " . ($key + 1);
+                return;
+            }
+
+            $currentId++;
+
+            $tcInitData[] = [
+                'id' => $currentId,
+                'tc_sample_id' => $value[0],
+                'tc_room_id' => 99,
+                'number_of_block' => 60,
+                'number_of_bottle' => 8,
+                'number_of_plant' => 3,
+                'desc' => "IMPORT DATA",
+                'date_work' => Carbon::createFromFormat('d/m/Y', $value[2])->format('Y-m-d'),
+                'date_stop' => null,
+                'created_at' => Carbon::createFromFormat('d/m/Y', $value[1])->format('Y-m-d'),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $tcCallusObsData[] = [
+                'tc_init_id' => $currentId, 
+                'date_schedule' => Carbon::createFromFormat('d/m/Y', $value[2])->addMonths(3)->format('Y-m-d'),
+                'date_ob' => Carbon::createFromFormat('d/m/Y', $value[2])->addMonths(3)->format('Y-m-d'),
+                'status' => 0,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $startBottle = 1;
+            for ($blockNumber = 1; $blockNumber <= 60; $blockNumber++) {
+                for ($bottleNumber = $startBottle; $bottleNumber < ($startBottle + 8); $bottleNumber++) {
+                    $tcInitBottleData[] = [
+                        'tc_init_id' => $currentId,
+                        'block_number' => $blockNumber,
+                        'bottle_number' => $bottleNumber,
+                        'tc_worker_id' => 99,
+                        'tc_laminar_id' => 99,
+                        'tc_medium_stock_id' => 99,
+                        'status' => 1,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
                 }
+                $startBottle = $bottleNumber;
+            }
+        }
 
+        if (!empty($tcInitData)) {
+            DB::unprepared('SET IDENTITY_INSERT tc_inits ON');
+            TcInit::insert($tcInitData);
+            DB::unprepared('SET IDENTITY_INSERT tc_inits OFF');
+        }
 
-                $dtCalluOb['tc_init_id'] = $id;
-                $dtCalluOb['date_schedule'] = Carbon::now();
-                $dtCalluOb['date_ob'] = Carbon::now();
-                $dtCalluOb['status'] = 0;
-                TcCallusOb::create($dtCalluOb);
-                unset($dtCalluOb);
+        if (!empty($tcCallusObsData)) {
+            TcCallusOb::insert($tcCallusObsData);
+        }
+
+        if (!empty($tcInitBottleData)) {
+            $batchSize = 200;
+            $chunks = array_chunk($tcInitBottleData, $batchSize);
+            foreach ($chunks as $chunk) {
+                TcInitBottle::insert($chunk);
             }
         }
     }
+
+    
 }

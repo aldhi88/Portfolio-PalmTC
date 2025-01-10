@@ -21,21 +21,22 @@ class SampleForImport implements ToCollection
     {
         self::$error = false;
         foreach ($rows as $key => $value) {
-            if ($key != 0) {
-
-                if (isset($value[0]) && $value[0] == '<end>') {
-                    break;
-                }
-
-                $data[] = [
-                    'sample_number' => $value[0],
-                    'master_treefile_id' => $value[1],
-                    'program' => $value[2],
-                    'desc' => 'IMPORT DATA',
-                    'created_at' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
-                    'updated_at' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
-                ];
+            if ($key === 0) {
+                continue;
             }
+
+            if (isset($value[0]) && $value[0] == '<end>') {
+                break;
+            }
+
+            $data[] = [
+                'sample_number' => $value[0],
+                'master_treefile_id' => $value[1],
+                'program' => $value[2],
+                'desc' => 'IMPORT DATA',
+                'created_at' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
+                'updated_at' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
+            ];
         }
 
         // Validasi data kosong

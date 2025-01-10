@@ -10,13 +10,12 @@ use App\Models\TcMediumStock;
 use App\Models\TcBottle;
 use App\Models\TcCallusTransferStock;
 use App\Models\TcInit;
-use App\Models\TcInitBottle;
-use App\Models\TcInitOfMedium;
 use App\Models\TcWorker;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
+use DataTables;
+
 
 use function PHPUnit\Framework\isNull;
 
@@ -77,15 +76,18 @@ class MediumStockController extends Controller
     }
 
     public function dt(Request $request){
-        $TcMediumStock = new TcMediumStock();
-        $data = $TcMediumStock->with('tc_mediums:id,name,code')
-            ->where('id','!=',0)
+        $data = TcMediumStock::with('tc_mediums:id,name,code')
             ->with('tc_workers:id,code,name')
             ->with('tc_init_bottles')
             ->where('tc_medium_id', $request->id)
+            ->where('id', '!=', 99)
         ;
         if($request->id == 0){
-            $data = $TcMediumStock->selDataDt();
+            $data = TcMediumStock::query()
+            ->with('tc_mediums:id,name,code')
+            ->with('tc_workers:id,code,name')
+            ->where('id', '!=', 99)
+            ;
         }
         // dd($data->get()->toArray());
         return Datatables::of($data)

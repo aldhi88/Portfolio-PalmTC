@@ -24,9 +24,11 @@ class WorkerController extends Controller
     public function dt(){
 
         $data = TcWorker::select([
-            'tc_workers.*',
-            DB::raw('convert(varchar,date_of_birth, 103) as date_of_birth_format') //note*
-        ])
+                'tc_workers.*',
+                DB::raw('convert(varchar,date_of_birth, 103) as date_of_birth_format'), //note*
+            ])
+            ->where('id', '!=', 99);
+            
         ;
         return DataTables::of($data)
             ->addColumn('created_at_custom',function($data){

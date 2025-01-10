@@ -817,6 +817,7 @@ class InitController extends Controller
                 }
             ])
             ->get();
+        // dd($data['bottles'][0]->toArray());
         if($request->type == 1){
             return view("modules.init.print.print_label_botol_layout", compact('data'));
         }else{
