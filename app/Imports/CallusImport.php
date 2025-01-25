@@ -29,7 +29,7 @@ class CallusImport implements ToCollection
                 $ex_botol_kontam = $value[5];
 
                 $data = [
-                    'tc_worker_id' => 0,
+                    'tc_worker_id' => 99,
                     'date_schedule' => Carbon::createFromFormat('d/m/Y', $ex_tgl_obs)->format('Y-m-d'),
                     'date_ob' => Carbon::createFromFormat('d/m/Y', $ex_tgl_obs)->format('Y-m-d'),
                     'status' => 1,
@@ -42,7 +42,7 @@ class CallusImport implements ToCollection
                 // //prepare data obs baru
                 $data = [
                     'tc_init_id' => $ex_init_id,
-                    'tc_worker_id' => 0,
+                    'tc_worker_id' => 99,
                     'date_schedule' => Carbon::parse($data['date_ob'])->addMonths(1),
                     'date_ob' => Carbon::parse($data['date_ob'])->addMonths(1),
                     'status' => 0,

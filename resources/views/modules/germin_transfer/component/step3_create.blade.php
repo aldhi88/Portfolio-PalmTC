@@ -26,7 +26,7 @@
                     <button data-id="next" type="button" class="btn btn-primary btn-sm py-0 has-ripple" data-toggle="modal" data-target="#modalMediumStock">Pick</button>
                 </div>
                 <div class="input-group-append">
-                    <input type="number" name="leaf_count" min="1" required placeholder="Explant Count" class="form-control form-control-sm px-2 border">
+                    <input type="number" name="leaf_count" min="1" placeholder="Explant Count" class="form-control form-control-sm px-2 border">
                 </div>
             </div>
         </div>
