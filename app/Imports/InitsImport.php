@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\TcCallusOb;
 use App\Models\TcInit;
 use App\Models\TcInitBottle;
+use App\Models\TcSample;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -89,6 +90,10 @@ class InitsImport implements ToCollection
             }
         }
 
+        if ($this->cekNotExistData($tcInitData)) {
+            return;
+        }
+
         if (!empty($tcInitData)) {
             DB::unprepared('SET IDENTITY_INSERT tc_inits ON');
             TcInit::insert($tcInitData);
@@ -106,6 +111,24 @@ class InitsImport implements ToCollection
                 TcInitBottle::insert($chunk);
             }
         }
+    }
+
+    public function cekNotExistData($data)
+    {
+        $importID = array_column($data, 'tc_sample_id');
+
+        $foundIds = TcSample::query()
+            ->whereIn('id', $importID)
+            ->pluck('id') 
+            ->toArray();
+
+        if(count($importID) != count($foundIds)){
+            $notFoundIds = array_diff($importID, $foundIds);
+            self::$error = "Pada data excel ada Sample ID yang tidak valid, yaitu ID = " . (implode(', ', $notFoundIds));
+            return true;
+        }
+
+        return false;
     }
 
     
