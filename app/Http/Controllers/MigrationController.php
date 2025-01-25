@@ -23,6 +23,7 @@ class MigrationController extends Controller
                 return $el;
             })
             ->rawColumns(['batch_format'])
+            ->addIndexColumn()
             ->toJson();
     }
 

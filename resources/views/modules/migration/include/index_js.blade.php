@@ -6,16 +6,15 @@
     // datatables
     var dtTable = $('#myTable').DataTable({
         processing: true,serverSide: true,pageLength: 100,
-        order: [[1, 'asc'],],
+        order: [[1, 'asc'],[2, 'asc']],
         columnDefs: [
             { className: 'text-center', targets: [] },
         ],
         ajax: '{{ route("migrations.dtIndex") }}',
         columns: [
-            { data: 'id', name: 'id', orderable: true, searchable:false },
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: true, searchable:false },
             { data: 'migration', name: 'migration', orderable: true, searchable:true },
             { data: 'batch_format', name: 'batch', orderable: true, searchable:false },
-            { data: 'id', name: 'id', orderable: false, searchable:false },
         ],
         initComplete: function () {
             delProcess();

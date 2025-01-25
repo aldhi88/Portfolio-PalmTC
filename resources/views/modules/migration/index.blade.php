@@ -13,12 +13,12 @@
     <div class="col">
         <span id="alert-area"></span>
         <div class="card">
-            <div class="card-header">
+            <!-- <div class="card-header">
                 <h5>
                     <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createModal"><i class="feather mr-2 icon-plus"></i>Add New</button>
                 </h5>
                 @include('components.card_tool')
-            </div>
+            </div> -->
             <div class="card-body">
                 <table id="myTable" class="table table-xs table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                     <thead>
@@ -26,7 +26,6 @@
                             <th>ID</th>
                             <th>Migration</th>
                             <th width="10">Batch</th>
-                            <th>#</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
