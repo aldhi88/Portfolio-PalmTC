@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\TcCallusOb;
 use App\Models\TcCallusObDetail;
+use App\Models\TcInit;
 use App\Models\TcInitBottle;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -11,93 +12,121 @@ use Illuminate\Support\Collection;
 
 class CallusImport implements ToCollection
 {
+    public static $error;
+
     public function collection(Collection $rows)
     {
+        self::$error = false;
+
         foreach ($rows as $key => $value) {
+            if ($key === 0) { continue; }
 
-            if ($key != 0) {
+            if (isset($value[0]) && $value[0] === '<end>') {
+                break;
+            }
 
-                if($value[0]=='<end>'){
-                    break;
+            if(
+                empty($value[0]) || $value[0]=='' ||
+                empty($value[1]) || $value[1]=='' ||
+                empty($value[2]) || $value[2]=='' ||
+                empty($value[3]) || $value[3]=='' ||
+                empty($value[4]) || $value[4]=='' ||
+                empty($value[5]) || $value[5]==''
+            ){
+                self::$error = "Pada data excel ada data value yang kosong. Cek baris ke- " . ($key + 1);
+                return;
+            }
+
+            $initID[] = $value[0];
+
+            $dtExcel[] = [
+                'id_init' => $value[0],
+                'tgl_obs' => Carbon::createFromFormat('d/m/Y', $value[1])->format('Y-m-d'),
+                'botol_callus' => $value[2],
+                'daun_callus' => $value[3],
+                'botol_oksi' => $value[4],
+                'botol_kontam' => $value[5]
+            ];
+
+        }
+
+        if (!$this->isForeignKeyExist($initID)) {
+            return;
+        }
+
+        foreach ($dtExcel as $key => $value) {
+
+            //prepare data obs yang di update
+            $data = [
+                'tc_worker_id' => 99,
+                'date_schedule' => $value['tgl_obs'],
+                'date_ob' => $value['tgl_obs'],
+                'status' => 1,
+                'bottle_callus' => $value['botol_callus']
+            ];
+
+            $qUpCallusOb = TcCallusOb::where('tc_init_id', '=', $value['id_init'])->first();
+            $qUpCallusOb->update($data);
+            $obsId = $qUpCallusOb->id;
+
+            //prepare data obs baru
+            $data = [
+                'tc_init_id' => $value['id_init'],
+                'date_schedule' => Carbon::parse($data['date_ob'])->addMonths(1),
+                'date_ob' => Carbon::parse($data['date_ob'])->addMonths(1),
+                'status' => 0,
+                'bottle_callus' => 0
+            ];
+            TcCallusOb::create($data);
+            unset($data);
+
+            $jlhBotol = $value['botol_callus'] + $value['botol_oksi'] + $value['botol_kontam'];
+            $botol = TcInitBottle::query()
+                ->select('id')
+                ->where('tc_init_id', $value['id_init'])
+                ->orderBy('id', 'ASC')
+                ->take($jlhBotol)
+                ->get()->toArray();
+
+            $btl['callus'] = (array_chunk($botol, $value['botol_callus']))[0];
+            $btl['oxi'] = array_chunk(((array_chunk($botol, $value['botol_callus']))[1]), $value['botol_oksi'])[0];
+            $btl['contam'] = array_chunk(array_chunk(((array_chunk($botol, $value['botol_callus']))[1]), $value['botol_oksi'])[1], $value['botol_kontam'])[0];
+
+            $dataWajib = [
+                'tc_init_id' => $value['id_init'],
+                'tc_callus_ob_id' => $obsId
+            ];
+
+            $indexBotol = 0;
+            $indexPlant = 1;
+            for ($i=0; $i < $value['daun_callus']; $i++) {
+                $dt['callus'][$i] = $dataWajib;
+                $dt['callus'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
+                $dt['callus'][$i]['explant_number'] = $indexPlant;
+                $dt['callus'][$i]['result'] = 1;
+                $dt['callus'][$i]['created_at'] = Carbon::now();
+                $dt['callus'][$i]['updated_at'] = Carbon::now();
+                if($indexBotol == $value['botol_callus']-1){
+                    $indexBotol = 0;
+                    $indexPlant++;
+                }else{
+                    $indexBotol++;
                 }
+            }
+            TcCallusObDetail::insert($dt['callus']);
+            unset($dt);
 
-                $ex_init_id = $value[0];
-                $ex_tgl_obs = $value[1];
-                $ex_botol_callus = $value[2];
-                $ex_daun_callus= $value[3];
-                $ex_botol_oxi = $value[4];
-                $ex_botol_kontam = $value[5];
-
-                $data = [
-                    'tc_worker_id' => 99,
-                    'date_schedule' => Carbon::createFromFormat('d/m/Y', $ex_tgl_obs)->format('Y-m-d'),
-                    'date_ob' => Carbon::createFromFormat('d/m/Y', $ex_tgl_obs)->format('Y-m-d'),
-                    'status' => 1,
-                    'bottle_callus' => $ex_botol_callus,
-                ];
-                $qUpCallusOb = TcCallusOb::where('tc_init_id', '=', $ex_init_id)->first();
-                $qUpCallusOb->update($data);
-                $obsId = $qUpCallusOb->id;
-
-                // //prepare data obs baru
-                $data = [
-                    'tc_init_id' => $ex_init_id,
-                    'tc_worker_id' => 99,
-                    'date_schedule' => Carbon::parse($data['date_ob'])->addMonths(1),
-                    'date_ob' => Carbon::parse($data['date_ob'])->addMonths(1),
-                    'status' => 0,
-                    'bottle_callus' => 0
-                ];
-                TcCallusOb::create($data);
-                unset($data);
-
-                $jlhBotol = $ex_botol_callus + $ex_botol_oxi + $ex_botol_kontam;
-                $botol = TcInitBottle::query()
-                    ->select('id')
-                    ->where('tc_init_id', $ex_init_id)
-                    ->orderBy('id', 'ASC')
-                    ->take($jlhBotol)
-                    ->get()->toArray();
-
-                $btl['callus'] = (array_chunk($botol, $ex_botol_callus))[0];
-                $btl['oxi'] = array_chunk(((array_chunk($botol, $ex_botol_callus))[1]), $ex_botol_oxi)[0];
-                $btl['contam'] = array_chunk(((array_chunk($botol, $ex_botol_callus))[1]), $ex_botol_kontam)[0];
-
-                $dataWajib = [
-                    'tc_init_id' => $ex_init_id,
-                    'tc_callus_ob_id' => $obsId
-                ];
-
-                $indexBotol = 0;
+            $indexBotol = $value['botol_callus'];
                 $indexPlant = 1;
-                for ($i=0; $i < $ex_daun_callus; $i++) {
-                    $dt['callus'][$i] = $dataWajib;
-                    $dt['callus'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
-                    $dt['callus'][$i]['explant_number'] = $indexPlant;
-                    $dt['callus'][$i]['result'] = 1;
-                    $dt['callus'][$i]['created_at'] = Carbon::now();
-                    $dt['callus'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $ex_botol_callus-1){
-                        $indexBotol = 0;
-                        $indexPlant++;
-                    }else{
-                        $indexBotol++;
-                    }
-                }
-                TcCallusObDetail::insert($dt['callus']);
-                unset($dt);
-
-                $indexBotol = $ex_botol_callus;
-                $indexPlant = 1;
-                for ($i=0; $i < $ex_botol_oxi*3; $i++) {
+                for ($i=0; $i < $value['botol_oksi']*3; $i++) {
                     $dt['oxi'][$i] = $dataWajib;
                     $dt['oxi'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['oxi'][$i]['explant_number'] = $indexPlant;
                     $dt['oxi'][$i]['result'] = 2;
                     $dt['oxi'][$i]['created_at'] = Carbon::now();
                     $dt['oxi'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $ex_botol_oxi+$ex_botol_callus-1){
-                        $indexBotol = $ex_botol_callus;
+                    if($indexBotol == $value['botol_oksi']+$value['botol_callus']-1){
+                        $indexBotol = $value['botol_callus'];
                         $indexPlant++;
                     }else{
                         $indexBotol++;
@@ -106,9 +135,9 @@ class CallusImport implements ToCollection
                 TcCallusObDetail::insert($dt['oxi']);
                 unset($dt);
 
-                $indexBotol = $ex_botol_callus+$ex_botol_oxi;
+                $indexBotol = $value['botol_callus']+$value['botol_oksi'];
                 $indexPlant = 1;
-                for ($i=0; $i < $ex_botol_kontam*3; $i++) {
+                for ($i=0; $i < $value['botol_kontam']*3; $i++) {
                     $dt['contam'][$i] = $dataWajib;
                     $dt['contam'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
                     $dt['contam'][$i]['explant_number'] = $indexPlant;
@@ -116,8 +145,8 @@ class CallusImport implements ToCollection
                     $dt['contam'][$i]['tc_contamination_id'] = 1;
                     $dt['contam'][$i]['created_at'] = Carbon::now();
                     $dt['contam'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $ex_botol_kontam+$ex_botol_callus+$ex_botol_oxi-1){
-                        $indexBotol = $ex_botol_callus+$ex_botol_oxi;
+                    if($indexBotol == $value['botol_kontam']+$value['botol_callus']+$value['botol_oksi']-1){
+                        $indexBotol = $value['botol_callus']+$value['botol_oksi'];
                         $indexPlant++;
                     }else{
                         $indexBotol++;
@@ -125,8 +154,35 @@ class CallusImport implements ToCollection
                 }
                 TcCallusObDetail::insert($dt['contam']);
                 unset($dt);
-            }
 
         }
+
+    }
+
+    public function notFoundObs($data)
+    {
+        $foundIds = TcCallusOb::query()
+            ->whereIn('tc_init_id', $data)
+            ->pluck('tc_init_id')
+            ->toArray();
+
+        $notFoundIds = array_diff($data, $foundIds);
+        return $notFoundIds;
+    }
+
+    public function isForeignKeyExist($data)
+    {
+        $foundIds = TcInit::query()
+            ->whereIn('id', $data)
+            ->pluck('id')
+            ->toArray();
+
+        if(count($data) != count($foundIds)){
+            $notFoundIds = array_diff($data, $foundIds);
+            self::$error = "Pada data excel ada Initiation ID yang tidak valid, yaitu ID = " . (implode(', ', $notFoundIds));
+            return false;
+        }
+
+        return true;
     }
 }

@@ -21,10 +21,7 @@ class SampleForImport implements ToCollection
     {
         self::$error = false;
         foreach ($rows as $key => $value) {
-            if ($key === 0) {
-                continue;
-            }
-
+            if ($key === 0) { continue; }
             if (isset($value[0]) && $value[0] == '<end>') {
                 break;
             }

@@ -11,6 +11,7 @@
 @endsection
 
 @section('content')
+<span id="alert-area"></span>
 <div id="exportPrint" class="d-none"></div>
 <div class="row">
     <div class="col">

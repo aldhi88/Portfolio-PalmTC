@@ -84,12 +84,23 @@ class ImportController extends Controller
 
     public function callusExport()
     {
-        // return Excel::download(new CallusExport, 'form_import_callus.xlsx');
         return response()->download(storage_path('/app/public/form_import/form_import_callus.xlsx'));
     }
     public function callusImport(Request $request)
     {
         Excel::import(new CallusImport, $request->file);
+        if(CallusImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.CallusImport::$error,
+                ],
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-    
+
 @section('css')
     @include('modules.init.include.show_css')
 @endsection
@@ -16,7 +16,7 @@
         <a href="{{ route('inits.index') }}" class="btn btn-warning btn-sm d-none d-sm-inline"><i class="feather mr-2 icon-skip-back"></i>Back to All Initiation Data</a>
         <a href="{{ route('inits.index') }}" class="btn btn-warning btn-sm btn-block d-sm-none"><i class="feather mr-2 icon-skip-back"></i>Back to All Initiation Data</a>
     </div>
-    
+
     <div class="card-body">
         <div id="step1">
             <div class="row align-items-center">
@@ -80,14 +80,14 @@
                                     </div>
                                 </div>
                             </div>
-                        
-                            
+
+
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
         <div id="step2">
