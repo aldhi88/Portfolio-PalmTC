@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div class="card-body">
-                
+
                 <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
                     <thead>
                         <tr class="text-center">
@@ -51,7 +51,7 @@
                             <th id="lastTotal" class="text-center"></th>
                         </tr>
                     </thead>
-                    
+
                     <thead id="header-filter" class="bg-white">
                         <tr>
                             <th class="bg-white"></th>
@@ -66,7 +66,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -98,7 +98,7 @@
                             <th>Worker</th>
                             <th>Last<br>Total</th>
                         </tr>
-                        
+
                     </thead>
                     <thead id="header-filter2" class="bg-white">
                         <tr>
@@ -117,7 +117,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

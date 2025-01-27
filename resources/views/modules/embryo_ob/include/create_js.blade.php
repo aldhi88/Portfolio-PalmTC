@@ -8,7 +8,7 @@
         loader(true);
         e.preventDefault();
         var formData = new FormData(this);
-        formData.append('tc_init_id', '{{ $data["initId"] }}'); 
+        formData.append('tc_init_id', '{{ $data["initId"] }}');
         $.ajax({
             type: 'POST',
             url: "{{ route('embryo-obs.store') }}",
@@ -87,7 +87,7 @@
                 data: formData,
                 success: function(a) {
                     $('#alert-area2').empty();
-                    $('#myTable').DataTable().ajax.reload(function(){ 
+                    $('#myTable').DataTable().ajax.reload(function(){
                         // initFormObs();
                         // initSearchColumn();
                     },false);
@@ -97,7 +97,7 @@
                     alert("Error #003, CallusObservationController - store function is invalid.");
                 }
             });
-            
+
         });
     }
     function initSearchColumn(){

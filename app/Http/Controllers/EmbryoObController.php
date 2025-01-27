@@ -93,7 +93,7 @@ class EmbryoObController extends Controller
             ->addColumn('sum_bottle_other_format',function($data){
                 return is_null($data->sum_bottle_other)?0:$data->sum_bottle_other;
             })
-            
+
             ->rawColumns(['sample_number_format'])
             ->toJson();
     }
@@ -135,7 +135,7 @@ class EmbryoObController extends Controller
             'tc_workers:id,code',
         ])
         ->get()->toArray();
-        
+
         $qOb = TcEmbryoObDetail::where('tc_embryo_ob_id',$obsId)
             ->get()->toArray();
         $dtOb = collect($qOb);
@@ -153,7 +153,7 @@ class EmbryoObController extends Controller
                 $reData[] = $value;
             }
         }
-               
+
         $data = collect($reData);
 
         return DataTables::of($data)
@@ -261,11 +261,12 @@ class EmbryoObController extends Controller
             TcEmbryoObDetail::where('tc_embryo_ob_id',$request->tc_embryo_ob_id)->with('tc_embryo_bottles')
                 ->where('tc_embryo_bottle_id',$request->tc_embryo_bottle_id)->get()->toArray()
         );
-
+        // dump($request->all());
         $stokAwal = TcEmbryoBottle::firstStock($request->tc_embryo_bottle_id);
+        // dd($stokAwal);
         $dt1 = $request->except('sub','type','value');
         $dt1[$this->aryType($request->type)] = $request->value;
-        
+
         // dd($stokAwal);
         if(count($dtDetailPerBottle) == 0){ //jika data ob detail untuk bottle itu belum ada
             if(count($dtDetailPerOb) != 0){
@@ -275,7 +276,6 @@ class EmbryoObController extends Controller
                 // }
             }
             if($request->value != 0){ //hanya proses jika yg diinput tidak 0
-                // dd($stokAwal);
                 if($stokAwal >= $request->value){
                     TcEmbryoObDetail::create($dt1);
                     if($request->type == 1){
@@ -335,7 +335,7 @@ class EmbryoObController extends Controller
                         }
                     }
                     $dt3 = $dt1;
-                    $stokAwal = TcEmbryoList::where('tc_embryo_ob_id',$request->tc_embryo_ob_id)
+                    $stokAwal = TcEmbryoList::where('tc_embryo_bottle_id',$request->tc_embryo_bottle_id)
                         ->select('first_total')
                         ->first()
                         ->getAttribute('first_total');
@@ -347,7 +347,7 @@ class EmbryoObController extends Controller
                 }
             }
             return $this->returnTemplate(0,'Error, bottle count is bigger than bottle total.');
-        }        
+        }
     }
 
     public function returnTemplate($type,$msg)
@@ -389,11 +389,11 @@ class EmbryoObController extends Controller
         $q = TcEmbryoObDetail::where('tc_embryo_ob_id',$obsId)->get();
         $data['sub'] = $q->count()==0?null:$q[0]->tc_embryo_bottles->sub;
         $dt = collect($q->toArray());
-        $data['total_bottle_embryo'] = $dt->sum('bottle_embryo'); 
-        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate'); 
-        $data['total_bottle_contam'] = $dt->sum('bottle_contam'); 
+        $data['total_bottle_embryo'] = $dt->sum('bottle_embryo');
+        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate');
+        $data['total_bottle_contam'] = $dt->sum('bottle_contam');
         $data['total_bottle_other'] = $dt->sum('bottle_other');
-        TcEmbryoOb::where('id',$obsId)->update($data); 
+        TcEmbryoOb::where('id',$obsId)->update($data);
     }
     public function upStatusBottle($bottleId)
     {
@@ -420,7 +420,7 @@ class EmbryoObController extends Controller
         $data['totalContam'] = $q->where('status',1)->sum('total_bottle_contam');
         $data['totalOther'] = $q->where('status',1)->sum('total_bottle_other');
         $q = TcEmbryoOb::select('id')->where('status',0)->get();
-        
+
         $data['initId'] = $id;
         $data['nextOb'] = TcEmbryoOb::nextOb($id);
         $q = TcInit::where('id',$id)->first();
