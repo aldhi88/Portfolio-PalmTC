@@ -1,7 +1,7 @@
 /node_modules
-/public/hot
 /public/storage
-/storage/*.key
+/storage/app/public/excel_temp
+/storage/app/public/pdf_temp
 /vendor
 .env
 .env.backup
