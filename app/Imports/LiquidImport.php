@@ -135,19 +135,6 @@ class LiquidImport implements ToCollection
             TcLiquidTransferBottle::create($dtTcLiquidTransferBottle[$i]);
         }
 
-
-        // DB::unprepared('SET IDENTITY_INSERT tc_liquid_bottles ON');
-        // DB::table('tc_liquid_bottles')->insert($dtTcLiquidBottle);
-        // DB::unprepared('SET IDENTITY_INSERT tc_liquid_bottles OFF');
-
-        // DB::unprepared('SET IDENTITY_INSERT tc_liquid_obs ON');
-        // DB::table('tc_liquid_obs')->insert($dtTcLiquidObs);
-        // DB::table('tc_liquid_obs')->insert($dtTcLiquidObsTemp);
-        // DB::unprepared('SET IDENTITY_INSERT tc_liquid_obs OFF');
-
-        // TcLiquidObDetail::insert($dtTcLiquidObsDetail);
-        // TcLiquidTransaction::insert($dtTcLiquidTransaction);
-        // TcLiquidTransferBottle::insert($dtTcLiquidTransferBottle);
     }
 
     public function isForeignKeyInitIDExist($data)
