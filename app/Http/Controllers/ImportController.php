@@ -121,6 +121,18 @@ class ImportController extends Controller
     public function embryoImport(Request $request)
     {
         Excel::import(new EmbryoImport, $request->file);
+        if(EmbryoImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.EmbryoImport::$error,
+                ],
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [

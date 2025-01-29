@@ -7,6 +7,7 @@ use App\Models\TcEmbryoList;
 use App\Models\TcEmbryoOb;
 use App\Models\TcEmbryoObDetail;
 use App\Models\TcEmbryoTransferBottle;
+use App\Models\TcInit;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -17,103 +18,163 @@ class EmbryoImport implements ToCollection
     /**
     * @param Collection $collection
     */
+    public static $error;
     public function collection(Collection $rows)
     {
-        $qTcEmbryoBottleId = TcEmbryoBottle::select('id')->orderBy('id','desc')->first();
-        $lastTcEmbryoBottleId = is_null($qTcEmbryoBottleId)?1:$qTcEmbryoBottleId->id+1;
-
-        $qTcEmbryoObsId = TcEmbryoOb::select('id')->orderBy('id','desc')->first();
-        $lastTcEmbryoObsId = is_null($qTcEmbryoBottleId)?1:$qTcEmbryoObsId->id+1;
+        self::$error = false;
 
         foreach ($rows as $key => $value) {
-            if ($key != 0) {
-                $dtTcEmbryoBottle[] = [
-                    'id' => $lastTcEmbryoBottleId++,
-                    'tc_init_id' => $value[0],
-                    'tc_worker_id' => $value[1],
-                    'tc_laminar_id' => 0,
-                    'sub' => $value[2],
-                    'number_of_bottle' => $value[3],
-                    'status' => 1,
-                    'bottle_date' => Carbon::createFromFormat('d/m/Y', $value[4])->format('Y-m-d'),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
 
-                $dtTcEmbryoObs[] = [
-                    'id' => $lastTcEmbryoObsId++,
-                    'tc_init_id' => $value[0],
-                    'tc_worker_id' => $value[1],
-                    'sub' => 1,
-                    'total_bottle_embryo' => $value[5],
-                    'total_bottle_oxidate' => $value[6],
-                    'total_bottle_contam' => $value[7],
-                    'total_bottle_other' => $value[8],
-                    'status' => 1,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-                $dtTcEmbryoObsDetail[] = [
-                    'tc_init_id' => $value[0],
-                    'tc_embryo_ob_id' => $lastTcEmbryoObsId-1,
-                    'tc_embryo_bottle_id' => $lastTcEmbryoBottleId-1,
-                    'tc_worker_id' => $value[1],
-                    'bottle_embryo' => $value[5],
-                    'bottle_oxidate' => $value[6],
-                    'bottle_contam' => $value[7],
-                    'bottle_other' => $value[8],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-                $dtTcEmbryoTransferBottle[] = [
-                    'tc_init_id' => $value[0],
-                    'tc_embryo_ob_id' => $lastTcEmbryoObsId-1,
-                    'tc_embryo_bottle_id' => $lastTcEmbryoBottleId-1,
-                    'tc_worker_id' => $value[1],
-                    'bottle_embryo' => $value[5],
-                    'bottle_left' => $value[5],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-                $dtTcEmbryoObsTemp[] = [
-                    'id' => $lastTcEmbryoObsId++,
-                    'tc_init_id' => $value[0],
-                    'total_bottle_embryo' => 0,
-                    'total_bottle_oxidate' => 0,
-                    'total_bottle_contam' => 0,
-                    'total_bottle_other' => 0,
-                    'status' => 0,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
+            if ($key === 0) { continue; }
 
-                
-
-                $dtTcEmbryoList[] = [
-                    'tc_init_id' => $value[0],
-                    'tc_embryo_ob_id' => $lastTcEmbryoObsId-2,
-                    'tc_embryo_bottle_id' => $lastTcEmbryoBottleId-1,
-                    'tc_worker_id' => $value[1],
-                    'first_total' => $value[3],
-                    'last_total' => $value[3] - ($value[6]+$value[7]+$value[8]),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-
+            if (isset($value[0]) && $value[0] === '<end>') {
+                break;
             }
 
+            if(
+                empty($value[0]) || $value[0]=='' ||
+                empty($value[1]) || $value[1]=='' ||
+                empty($value[2]) || $value[2]=='' ||
+                empty($value[3]) || $value[3]=='' ||
+                empty($value[4]) || $value[4]=='' ||
+                empty($value[5]) || $value[5]=='' ||
+                empty($value[6]) || $value[6]=='' ||
+                empty($value[7]) || $value[7]==''
+            ){
+                self::$error = "Pada data excel ada data value yang kosong. Cek baris ke- " . ($key + 1);
+                return;
+            }
+
+            $initID[] = $value[0];
+
+            $dtTcEmbryoBottle[] = [
+                // 'id' => $lastTcEmbryoBottleId++,
+                'tc_init_id' => $value[0],
+                'tc_worker_id' => 99,
+                'tc_laminar_id' => 99,
+                'sub' => $value[1],
+                'number_of_bottle' => $value[2],
+                'status' => 1,
+                'bottle_date' => Carbon::createFromFormat('d/m/Y', $value[3])->format('Y-m-d'),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $dtTcEmbryoObs[] = [
+                // 'id' => $lastTcEmbryoObsId++,
+                'tc_init_id' => $value[0],
+                'tc_worker_id' => 99,
+                'sub' => 1,
+                'total_bottle_embryo' => $value[4],
+                'total_bottle_oxidate' => $value[5],
+                'total_bottle_contam' => $value[6],
+                'total_bottle_other' => $value[7],
+                'status' => 1,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $dtTcEmbryoObsDetail[] = [
+                'tc_init_id' => $value[0],
+                'tc_worker_id' => 99,
+                'bottle_embryo' => $value[4],
+                'bottle_oxidate' => $value[5],
+                'bottle_contam' => $value[6],
+                'bottle_other' => $value[7],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $dtTcEmbryoTransferBottle[] = [
+                'tc_init_id' => $value[0],
+                'tc_worker_id' => 99,
+                'bottle_embryo' => $value[4],
+                'bottle_left' => $value[4],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $dtTcEmbryoObsTemp[] = [
+                // 'id' => $lastTcEmbryoObsId++,
+                'tc_init_id' => $value[0],
+                'total_bottle_embryo' => 0,
+                'total_bottle_oxidate' => 0,
+                'total_bottle_contam' => 0,
+                'total_bottle_other' => 0,
+                'status' => 0,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            $dtTcEmbryoList[] = [
+                'tc_init_id' => $value[0],
+                'tc_worker_id' => 99,
+                'first_total' => $value[2],
+                'last_total' => $value[2] - ($value[5]+$value[6]+$value[7]),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
         }
-        DB::unprepared('SET IDENTITY_INSERT tc_embryo_bottles ON');
-        DB::table('tc_embryo_bottles')->insert($dtTcEmbryoBottle);
-        DB::unprepared('SET IDENTITY_INSERT tc_embryo_bottles OFF');
 
-        DB::unprepared('SET IDENTITY_INSERT tc_embryo_obs ON');
-        DB::table('tc_embryo_obs')->insert($dtTcEmbryoObs);
-        DB::table('tc_embryo_obs')->insert($dtTcEmbryoObsTemp);
-        DB::unprepared('SET IDENTITY_INSERT tc_embryo_obs OFF');
+        if (!$this->isForeignKeyInitIDExist($initID)) {
+            return;
+        }
 
-        DB::table('tc_embryo_ob_details')->insert($dtTcEmbryoObsDetail);
-        DB::table('tc_embryo_lists')->insert($dtTcEmbryoList);
-        TcEmbryoTransferBottle::insert($dtTcEmbryoTransferBottle);
+        // dd($dtTcEmbryoBottle);
+
+        for ($i=0; $i < count($initID); $i++) {
+
+            $qTcEmbryoBottle = TcEmbryoBottle::create($dtTcEmbryoBottle[$i]);
+            $qTcEmbryoOb = TcEmbryoOb::create($dtTcEmbryoObs[$i]);
+            TcEmbryoOb::create($dtTcEmbryoObsTemp[$i]);
+
+            $dtTcEmbryoObsDetail[$i]['tc_embryo_ob_id'] = $qTcEmbryoOb->id;
+            $dtTcEmbryoObsDetail[$i]['tc_embryo_bottle_id'] = $qTcEmbryoBottle->id;
+            TcEmbryoObDetail::create($dtTcEmbryoObsDetail[$i]);
+
+            $dtTcEmbryoList[$i]['tc_embryo_ob_id'] = $qTcEmbryoOb->id;
+            $dtTcEmbryoList[$i]['tc_embryo_bottle_id'] = $qTcEmbryoBottle->id;
+            TcEmbryoList::create($dtTcEmbryoList[$i]);
+
+            $dtTcEmbryoTransferBottle[$i]['tc_embryo_ob_id'] = $qTcEmbryoOb->id;
+            $dtTcEmbryoTransferBottle[$i]['tc_embryo_bottle_id'] = $qTcEmbryoBottle->id;
+            TcEmbryoTransferBottle::create($dtTcEmbryoTransferBottle[$i]);
+        }
+
+        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_bottles ON');
+        // DB::table('tc_embryo_bottles')->insert($dtTcEmbryoBottle);
+        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_bottles OFF');
+
+        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_obs ON');
+        // DB::table('tc_embryo_obs')->insert($dtTcEmbryoObs);
+        // DB::table('tc_embryo_obs')->insert($dtTcEmbryoObsTemp);
+        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_obs OFF');
+
+        // DB::table('tc_embryo_ob_details')->insert($dtTcEmbryoObsDetail);
+        // DB::table('tc_embryo_lists')->insert($dtTcEmbryoList);
+
+        // TcEmbryoBottle::insert($dtTcEmbryoBottle);
+        // TcEmbryoOb::insert($dtTcEmbryoObs);
+        // TcEmbryoOb::insert($dtTcEmbryoObsTemp);
+        // TcEmbryoObDetail::insert($dtTcEmbryoObsDetail);
+        // TcEmbryoList::insert($dtTcEmbryoList);
+        // TcEmbryoTransferBottle::insert($dtTcEmbryoTransferBottle);
+    }
+
+    public function isForeignKeyInitIDExist($data)
+    {
+        $foundIds = TcInit::query()
+            ->whereIn('id', $data)
+            ->pluck('id')
+            ->toArray();
+
+        if(count($data) != count($foundIds)){
+            $notFoundIds = array_diff($data, $foundIds);
+            self::$error = "Pada data excel ada Initiation ID yang tidak valid, yaitu ID = " . (implode(', ', $notFoundIds));
+            return false;
+        }
+
+        return true;
     }
 }
