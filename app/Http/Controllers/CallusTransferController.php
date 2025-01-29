@@ -39,7 +39,7 @@ class CallusTransferController extends Controller
             ->withCount([ //note!
                 'tc_callus_obs as total_callus' => function(Builder $q){
                     $q->select(DB::raw("SUM(bottle_callus) as bottlecallus"));
-                } 
+                }
             ])
             ->whereHas('tc_callus_obs')
             ->with([
@@ -122,7 +122,7 @@ class CallusTransferController extends Controller
                 }
             ])
         ;
-    
+
         // dd($data->get()->toArray());
         return DataTables::of($data)
             ->addColumn('date_obs_format', function($data) use($request){
@@ -177,7 +177,7 @@ class CallusTransferController extends Controller
                 $data = collect($data->tc_callus_transfer_bottles->toArray());
                 $firstNumber = $data->first()['bottle_number'];
                 $lastNumber = $data->last()['bottle_number'];
-                return $firstNumber.' - '.$lastNumber;                
+                return $firstNumber.' - '.$lastNumber;
             })
             ->addColumn('subculture',function(){
                 return 1;
@@ -200,7 +200,7 @@ class CallusTransferController extends Controller
     }
 
     public function create($id){
-        
+
         $data['title'] = "Callus Transfer Form";
         $data['desc'] = "Input new transfer per observation";
 
@@ -224,12 +224,12 @@ class CallusTransferController extends Controller
         $data['worker'] = TcWorker::where('status',1)->where('id','!=',0)->get();
         $data['laminar'] = TcLaminar::where('id','!=',0)->get();
         $data['medium_stock'] = TcMediumStock::with("tc_mediums")
-            ->orderBy("created_at","desc")    
+            ->orderBy("created_at","desc")
             ->get();
 
         session(['medium_stock' => []]);
         $data['medium_stock'] = session('medium_stock');
-        
+
         return view('modules.callus_transfer.create',compact('data'));
     }
     public function dtCallusTransfer(Request $request){
@@ -246,7 +246,7 @@ class CallusTransferController extends Controller
                 $data = collect($data->tc_callus_transfer_bottles->toArray());
                 $firstNumber = $data->first()['bottle_number'];
                 $lastNumber = $data->last()['bottle_number'];
-                return $firstNumber.' - '.$lastNumber;                
+                return $firstNumber.' - '.$lastNumber;
             })
             ->addColumn('delete',function($data){
                 $embryoId = TcEmbryoBottle::where('tc_callus_transfer_id',$data->id)->first()->getAttribute('id');
@@ -310,13 +310,13 @@ class CallusTransferController extends Controller
             $data['tc_callus_ob_id'] = $request->tc_callus_ob_id;
             $totalBottle = $totalBottle+$value['stock_used'];
             $dtEmbryo['number_of_bottle'] = $totalBottle;
-            for ($i=1; $i <=$value['stock_used'] ; $i++) { 
+            for ($i=1; $i <=$value['stock_used'] ; $i++) {
                 TcCallusTransferBottle::create($data);
                 $data['bottle_number'] += 1;
             }
-            
+
             $nextNumber = $data['bottle_number'];
-            
+
             $datax[] = [
                 "tc_callus_transfer_id" => $transferId,
                 "tc_medium_stock_id" => $value['id'],
@@ -354,7 +354,7 @@ class CallusTransferController extends Controller
             ],
         ]);
     }
-    
+
 
     public function delTransfer(Request $request){
         $id = $request->id;
@@ -404,7 +404,7 @@ class CallusTransferController extends Controller
                 'tc_medium_stocks.*',
             ])
             ->with("tc_mediums","tc_bottles","tc_agars");
-        
+
         $data = collect();
         foreach ($q->get() as $key => $value) {
             if($value->current_stock > 0){
@@ -455,7 +455,7 @@ class CallusTransferController extends Controller
             ->smart(false)
             ->toJson();
     }
-    
+
     public function deletePickedMedStock(Request $request){
         $data = collect($request->session()->get('medium_stock'));
         $dataDel = $data->where('id', '!=', $request->id)->toArray();
@@ -503,7 +503,7 @@ class CallusTransferController extends Controller
         $q = TcCallusTransferBottle::where('date_work',$request->dateWork)
             ->orderBy('bottle_number','asc')
             ->get();
-        
+
         $data['bottles'] = $q;
         return view('modules.callus_transfer.print_label_layout',compact('data'));
     }
@@ -513,7 +513,7 @@ class CallusTransferController extends Controller
         $q = TcCallusTransferBottle::where('tc_callus_transfer_id',$request->transferId)
             ->orderBy('bottle_number','asc')
             ->get();
-        
+
         $data['bottles'] = $q;
         return view('modules.callus_transfer.print_label_layout',compact('data'));
     }

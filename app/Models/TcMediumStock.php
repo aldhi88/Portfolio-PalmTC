@@ -3,14 +3,11 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TcMediumStock extends Model
 {
-    use HasFactory;
     use SoftDeletes;
     protected $guarded = [];
     protected $appends = [
@@ -21,15 +18,39 @@ class TcMediumStock extends Model
         'stock_out',
         'stock_used',
         'callus_transfer_used',
+        'embryo_transfer_used',
+        'embryo_transfer_used',
+        'liquid_transfer_used',
         'current_stock',
     ];
-    
+
     public function getCurrentStockAttribute(){
-        return $this->stock + 
-            $this->getStockInAttribute() - 
-            $this->getStockOutAttribute() - 
-            $this->getStockUsedAttribute() - 
-            $this->getCallusTransferUsedAttribute();
+        return $this->stock +
+            $this->getStockInAttribute() -
+            $this->getStockOutAttribute() -
+            $this->getStockUsedAttribute() -
+            $this->getCallusTransferUsedAttribute() -
+            $this->getEmbryoTransferUsedAttribute();
+    }
+    public function getLiquidTransferUsedAttribute(){
+        $id = $this->id;
+        $data = TcLiquidTransferStock::where("tc_medium_stock_id", $id);
+        if(count($data->get()) == 0){
+            $return = 0;
+        }else{
+            $return = $data->sum("used_stock");
+        }
+        return $return;
+    }
+    public function getEmbryoTransferUsedAttribute(){
+        $id = $this->id;
+        $data = TcEmbryoTransferStock::where("tc_medium_stock_id", $id);
+        if(count($data->get()) == 0){
+            $return = 0;
+        }else{
+            $return = $data->sum("used_stock");
+        }
+        return $return;
     }
     public function getCallusTransferUsedAttribute(){
         $id = $this->id;
@@ -70,7 +91,7 @@ class TcMediumStock extends Model
         return $return;
     }
     public function getAgeAttribute(){
-        return Carbon::parse($this->created_at)->diffInDays(now()); 
+        return Carbon::parse($this->created_at)->diffInDays(now());
     }
     public function getCreatedAtShortFormatAttribute(){
         return Carbon::parse($this->created_at)->format('d/m/y');
@@ -96,6 +117,12 @@ class TcMediumStock extends Model
     }
     public function tc_callus_transfer_stocks(){
         return $this->hasMany('App\Models\TcCallusTransferStock','tc_medium_stock_id','id');
+    }
+    public function tc_embryo_transfer_stocks(){
+        return $this->hasMany('App\Models\TcEmbryoTransferStock','tc_medium_stock_id','id');
+    }
+    public function tc_liquid_transfer_stocks(){
+        return $this->hasMany(TcLiquidTransferStock::class,'tc_medium_stock_id','id');
     }
     public function tc_init_bottles(){
         return $this->hasMany('App\Models\TcInitBottle','tc_medium_stock_id','id');

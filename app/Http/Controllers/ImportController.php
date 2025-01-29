@@ -153,6 +153,18 @@ class ImportController extends Controller
     public function liquidImport(Request $request)
     {
         Excel::import(new LiquidImport, $request->file);
+        if(LiquidImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.LiquidImport::$error,
+                ],
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [

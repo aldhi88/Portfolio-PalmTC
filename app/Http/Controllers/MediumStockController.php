@@ -9,7 +9,9 @@ use App\Models\TcMedium;
 use App\Models\TcMediumStock;
 use App\Models\TcBottle;
 use App\Models\TcCallusTransferStock;
+use App\Models\TcEmbryoTransferStock;
 use App\Models\TcInit;
+use App\Models\TcLiquidTransferStock;
 use App\Models\TcWorker;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -72,6 +74,21 @@ class MediumStockController extends Controller
             $data['callus_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
             $data['callus_trans'][$key]['total'] = $lastStock;
         }
+
+        $data['embryo_trans'] = TcEmbryoTransferStock::where('tc_medium_stock_id',$id)->get()->toArray();
+        foreach ($data['embryo_trans'] as $key => $value) {
+            $lastStock = $stock - $value['used_stock'];
+            $data['embryo_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
+            $data['embryo_trans'][$key]['total'] = $lastStock;
+        }
+
+        $data['liquid_trans'] = TcLiquidTransferStock::where('tc_medium_stock_id',$id)->get()->toArray();
+        foreach ($data['liquid_trans'] as $key => $value) {
+            $lastStock = $stock - $value['used_stock'];
+            $data['liquid_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
+            $data['liquid_trans'][$key]['total'] = $lastStock;
+        }
+
         return view('modules.medium_stock.history', compact('data'));
     }
 
@@ -132,8 +149,13 @@ class MediumStockController extends Controller
                 $stockOut = $data->tc_medium_opname->sum('stock_out');
                 $stockUsed = $data->tc_init_bottles->count();
                 $callusTransfer = $data->tc_callus_transfer_stocks->sum('stock_used');
+                $embryoTransfer = $data->tc_embryo_transfer_stocks->sum('used_stock');
+                $liquidTransfer = $data->tc_liquid_transfer_stocks->sum('used_stock');
                 $stock = $data->stock;
-                $currentStock = $stock + $stockIn - $stockOut - $stockUsed - $callusTransfer;
+                $currentStock = $stock + $stockIn -
+                    $stockOut - $stockUsed - $callusTransfer -
+                    $embryoTransfer - $liquidTransfer
+                ;
                 return $currentStock;
             })
 
@@ -141,7 +163,7 @@ class MediumStockController extends Controller
             ->toJson();
 
     }
-    
+
     public function index()
     {
         $data['title'] = "Medium Stock Data";
@@ -241,7 +263,7 @@ class MediumStockController extends Controller
      */
     public function update(MediumStockEdit $request, $id)
     {
-        
+
         $data = $request->except('_token', '_method','id');
         $TcMediumStock = new TcMediumStock();
         $TcMediumStock->upData($id, $data);

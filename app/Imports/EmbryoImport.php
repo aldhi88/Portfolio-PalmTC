@@ -10,7 +10,6 @@ use App\Models\TcEmbryoTransferBottle;
 use App\Models\TcInit;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
 class EmbryoImport implements ToCollection
@@ -48,7 +47,6 @@ class EmbryoImport implements ToCollection
             $initID[] = $value[0];
 
             $dtTcEmbryoBottle[] = [
-                // 'id' => $lastTcEmbryoBottleId++,
                 'tc_init_id' => $value[0],
                 'tc_worker_id' => 99,
                 'tc_laminar_id' => 99,
@@ -61,7 +59,6 @@ class EmbryoImport implements ToCollection
             ];
 
             $dtTcEmbryoObs[] = [
-                // 'id' => $lastTcEmbryoObsId++,
                 'tc_init_id' => $value[0],
                 'tc_worker_id' => 99,
                 'sub' => 1,
@@ -95,7 +92,6 @@ class EmbryoImport implements ToCollection
             ];
 
             $dtTcEmbryoObsTemp[] = [
-                // 'id' => $lastTcEmbryoObsId++,
                 'tc_init_id' => $value[0],
                 'total_bottle_embryo' => 0,
                 'total_bottle_oxidate' => 0,
@@ -121,8 +117,6 @@ class EmbryoImport implements ToCollection
             return;
         }
 
-        // dd($dtTcEmbryoBottle);
-
         for ($i=0; $i < count($initID); $i++) {
 
             $qTcEmbryoBottle = TcEmbryoBottle::create($dtTcEmbryoBottle[$i]);
@@ -142,24 +136,6 @@ class EmbryoImport implements ToCollection
             TcEmbryoTransferBottle::create($dtTcEmbryoTransferBottle[$i]);
         }
 
-        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_bottles ON');
-        // DB::table('tc_embryo_bottles')->insert($dtTcEmbryoBottle);
-        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_bottles OFF');
-
-        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_obs ON');
-        // DB::table('tc_embryo_obs')->insert($dtTcEmbryoObs);
-        // DB::table('tc_embryo_obs')->insert($dtTcEmbryoObsTemp);
-        // DB::unprepared('SET IDENTITY_INSERT tc_embryo_obs OFF');
-
-        // DB::table('tc_embryo_ob_details')->insert($dtTcEmbryoObsDetail);
-        // DB::table('tc_embryo_lists')->insert($dtTcEmbryoList);
-
-        // TcEmbryoBottle::insert($dtTcEmbryoBottle);
-        // TcEmbryoOb::insert($dtTcEmbryoObs);
-        // TcEmbryoOb::insert($dtTcEmbryoObsTemp);
-        // TcEmbryoObDetail::insert($dtTcEmbryoObsDetail);
-        // TcEmbryoList::insert($dtTcEmbryoList);
-        // TcEmbryoTransferBottle::insert($dtTcEmbryoTransferBottle);
     }
 
     public function isForeignKeyInitIDExist($data)

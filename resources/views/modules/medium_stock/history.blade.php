@@ -27,7 +27,7 @@
                         <td class="text-right">{{ $data['histories']['stock'] }}</td>
                     </tr>
                     @if ($data['histories'] != null)
-                        
+
                         @foreach ($data['tc_medium_opname'] as $item)
                             <tr>
                                 <td>{{ $item['created_at_short_format'] }}</td>
@@ -53,6 +53,24 @@
                             <td>Callus Transfer</td>
                             <td class="text-right">0</td>
                             <td class="text-right">{{ $item['stock_used'] }}</td>
+                            <td class="text-right">{{ $item['total'] }}</td>
+                        </tr>
+                        @endforeach
+                        @foreach ($data['embryo_trans'] as $item)
+                        <tr>
+                            <td>{{ $item['created_at'] }}</td>
+                            <td>Embryo Transfer</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">{{ $item['used_stock'] }}</td>
+                            <td class="text-right">{{ $item['total'] }}</td>
+                        </tr>
+                        @endforeach
+                        @foreach ($data['liquid_trans'] as $item)
+                        <tr>
+                            <td>{{ $item['created_at'] }}</td>
+                            <td>Liquid Transfer</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">{{ $item['used_stock'] }}</td>
                             <td class="text-right">{{ $item['total'] }}</td>
                         </tr>
                         @endforeach

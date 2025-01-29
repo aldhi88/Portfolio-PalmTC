@@ -43,10 +43,10 @@ class TcLiquidBottle extends Model
         $minBottleTransfer = 0;
         $q = TcLiquidTransferBottle::where('tc_liquid_bottle_id',$bottleId)->get();
         foreach ($q as $key => $value) {
-            $minBottleTransfer += ($value['bottle_liquid']-$value['bottle_left']); 
+            $minBottleTransfer += ($value['bottle_liquid']-$value['bottle_left']);
         }
-        
-        $return = $minBottleOb + $minBottleTransfer;  
+
+        $return = $minBottleOb + $minBottleTransfer;
         return $return;
     }
 

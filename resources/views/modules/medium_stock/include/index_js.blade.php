@@ -25,15 +25,15 @@
                 { data: 'tc_workers.code', name: 'tc_workers.code', orderable: false, searchable: true },
                 { data: 'age', name: 'created_at', orderable: true, searchable: false },
                 { data: 'stock', name: 'stock', orderable: false, searchable: false },
-                { data: 'current_stock', name: 'current_stock', orderable: false, searchable: false },            
+                { data: 'current_stock', name: 'current_stock', orderable: false, searchable: false },
             ]
         });
 
     $('select[name="filter"]').change(function(){
         dtTable.ajax.reload();
     });
-    
-    
+
+
 </script>
 
 @include('modules.medium_opname.include.create_js');

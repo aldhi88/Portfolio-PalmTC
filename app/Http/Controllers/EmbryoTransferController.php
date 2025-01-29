@@ -149,11 +149,11 @@ class EmbryoTransferController extends Controller
     {
         $page = 'step2_blank';
         $data['initId'] = $request->initId;
-        
+
         $qCode = DB::raw('convert(varchar,tc_embryo_bottles.bottle_date, 103) as bottle_date_format');
         if(config('database.default') != 'sqlsrv'){
             $qCode = DB::raw('DATE_FORMAT(tc_embryo_bottles.bottle_date, "%d/%m/%Y") as bottle_date_format');
-        }      
+        }
 
         if(session()->has("embtrans_step2")){
             $data['bottles'] = TcEmbryoTransferBottle::select([
@@ -175,7 +175,7 @@ class EmbryoTransferController extends Controller
             $data['total'] = (collect($dtSession)->sum('work_bottle'));
             return view('modules.embryo_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.embryo_transfer.component.'.$page,compact('data'));
     }
     public function addItemStep2(Request $request)
@@ -246,7 +246,7 @@ class EmbryoTransferController extends Controller
             }
             return view('modules.embryo_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.embryo_transfer.component.'.$page,compact('data'));
     }
     public function getMedStock(Request $request)
@@ -264,14 +264,14 @@ class EmbryoTransferController extends Controller
         $data['medStock'] = $qCollect->filter(function($value,$key){
             return $value['current_stock'] != 0;
         })->toArray();
-        
+
         $data['medStockCallus'] = session('embtrans_step3')['medStock']['callus'];
         $data['medStockSolid'] = session('embtrans_step3')['medStock']['solid'];
         $data['medStockSuspen'] = session('embtrans_step3')['medStock']['suspen'];
         $data['medStockPicked'] = session('embtrans_step3')['medStock'][$request->for];
         $data['for'] = $request->for;
         if($request->for != 'callus'){
-            
+
             if($request->for == 'suspen'){
                 $aryBottleInit = ['liquid_column1','liquid_column2'];
             }else{
@@ -346,7 +346,7 @@ class EmbryoTransferController extends Controller
         if(
             $callus == 0 &&
             $solid == 0 &&
-            $suspen == 0 
+            $suspen == 0
         ){
             return response()->json([
                 'status' => 'error',
@@ -382,10 +382,10 @@ class EmbryoTransferController extends Controller
             if(!is_null($request->page)){
                 $page = $request->page;
             }
-            
+
             return view('modules.embryo_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.embryo_transfer.component.'.$page,compact('data'));
     }
     public function finishStep4(Request $request)
@@ -408,7 +408,7 @@ class EmbryoTransferController extends Controller
             session()->has('embtrans_step1') &&
             session()->has('embtrans_step2') &&
             session()->has('embtrans_step3') &&
-            session()->has('embtrans_step4') 
+            session()->has('embtrans_step4')
         ){
             if(
                 session('embtrans_step1')['page'] &&
@@ -420,7 +420,7 @@ class EmbryoTransferController extends Controller
                 $dtStep2 = collect(session('embtrans_step2')['data']);
                 $dtStep3 = collect(session('embtrans_step3')['medStock']);
                 $dtStep4 = collect(session('embtrans_step4')['data']);
-                
+
                 try {
                     // insert ke table tc_embryo_transfers
                     $dt1 = $dtStep1->toArray();
@@ -587,7 +587,7 @@ class EmbryoTransferController extends Controller
                 ],
             ]);
         }
-        
+
 
     }
 
@@ -770,7 +770,7 @@ class EmbryoTransferController extends Controller
         $index = 0;
         foreach ($q2 as $key => $value) {
             $loop = $value->used_stock;
-            for ($i=0; $i < $loop ; $i++) { 
+            for ($i=0; $i < $loop ; $i++) {
                 $data['transfer'][$index]['sample_number'] = $q->tc_inits->tc_samples->sample_number_display;
                 $data['transfer'][$index]['sub'] = $q->sub;
 
@@ -786,7 +786,7 @@ class EmbryoTransferController extends Controller
                     $data['transfer'][$index]['alpha'] = "B";
                     $data['transfer'][$index]['cat'] = "D";
                 }
-                
+
                 $index++;
             }
         }
