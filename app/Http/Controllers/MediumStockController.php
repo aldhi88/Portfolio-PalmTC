@@ -10,6 +10,7 @@ use App\Models\TcMediumStock;
 use App\Models\TcBottle;
 use App\Models\TcCallusTransferStock;
 use App\Models\TcEmbryoTransferStock;
+use App\Models\TcGerminTransferStock;
 use App\Models\TcInit;
 use App\Models\TcLiquidTransferStock;
 use App\Models\TcMaturTransferStock;
@@ -97,6 +98,14 @@ class MediumStockController extends Controller
             $lastStock = $stock - $value['used_stock'];
             $data['matur_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
             $data['matur_trans'][$key]['total'] = $lastStock;
+            $stock = $lastStock;
+        }
+
+        $data['germin_trans'] = TcGerminTransferStock::where('tc_medium_stock_id',$id)->get()->toArray();
+        foreach ($data['germin_trans'] as $key => $value) {
+            $lastStock = $stock - $value['used_stock'];
+            $data['germin_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
+            $data['germin_trans'][$key]['total'] = $lastStock;
             $stock = $lastStock;
         }
 

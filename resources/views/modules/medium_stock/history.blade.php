@@ -83,6 +83,15 @@
                             <td class="text-right">{{ $item['total'] }}</td>
                         </tr>
                         @endforeach
+                        @foreach ($data['germin_trans'] as $item)
+                        <tr>
+                            <td>{{ $item['created_at'] }}</td>
+                            <td>Germination Transfer</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">{{ $item['used_stock'] }}</td>
+                            <td class="text-right">{{ $item['total'] }}</td>
+                        </tr>
+                        @endforeach
                     @endif
                 </tbody>
             </table>

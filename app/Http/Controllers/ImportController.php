@@ -217,6 +217,18 @@ class ImportController extends Controller
     public function germinImport(Request $request)
     {
         Excel::import(new GerminImport, $request->file);
+        if(GerminImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.MaturImport::$error,
+                ],
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [
