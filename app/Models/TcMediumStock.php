@@ -21,6 +21,7 @@ class TcMediumStock extends Model
         'embryo_transfer_used',
         'embryo_transfer_used',
         'liquid_transfer_used',
+        'matur_transfer_used',
         'current_stock',
     ];
 
@@ -30,7 +31,20 @@ class TcMediumStock extends Model
             $this->getStockOutAttribute() -
             $this->getStockUsedAttribute() -
             $this->getCallusTransferUsedAttribute() -
-            $this->getEmbryoTransferUsedAttribute();
+            $this->getEmbryoTransferUsedAttribute() -
+            $this->getLiquidTransferUsedAttribute() -
+            $this->getMaturTransferUsedAttribute()
+        ;
+    }
+    public function getMaturTransferUsedAttribute(){
+        $id = $this->id;
+        $data = TcMaturTransferStock::where("tc_medium_stock_id", $id);
+        if(count($data->get()) == 0){
+            $return = 0;
+        }else{
+            $return = $data->sum("used_stock");
+        }
+        return $return;
     }
     public function getLiquidTransferUsedAttribute(){
         $id = $this->id;
@@ -123,6 +137,9 @@ class TcMediumStock extends Model
     }
     public function tc_liquid_transfer_stocks(){
         return $this->hasMany(TcLiquidTransferStock::class,'tc_medium_stock_id','id');
+    }
+    public function tc_matur_transfer_stocks(){
+        return $this->hasMany(TcMaturTransferStock::class,'tc_medium_stock_id','id');
     }
     public function tc_init_bottles(){
         return $this->hasMany('App\Models\TcInitBottle','tc_medium_stock_id','id');

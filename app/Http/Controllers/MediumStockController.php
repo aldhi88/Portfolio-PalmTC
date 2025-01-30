@@ -12,6 +12,7 @@ use App\Models\TcCallusTransferStock;
 use App\Models\TcEmbryoTransferStock;
 use App\Models\TcInit;
 use App\Models\TcLiquidTransferStock;
+use App\Models\TcMaturTransferStock;
 use App\Models\TcWorker;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -80,6 +81,7 @@ class MediumStockController extends Controller
             $lastStock = $stock - $value['used_stock'];
             $data['embryo_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
             $data['embryo_trans'][$key]['total'] = $lastStock;
+            $stock = $lastStock;
         }
 
         $data['liquid_trans'] = TcLiquidTransferStock::where('tc_medium_stock_id',$id)->get()->toArray();
@@ -87,6 +89,15 @@ class MediumStockController extends Controller
             $lastStock = $stock - $value['used_stock'];
             $data['liquid_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
             $data['liquid_trans'][$key]['total'] = $lastStock;
+            $stock = $lastStock;
+        }
+
+        $data['matur_trans'] = TcMaturTransferStock::where('tc_medium_stock_id',$id)->get()->toArray();
+        foreach ($data['matur_trans'] as $key => $value) {
+            $lastStock = $stock - $value['used_stock'];
+            $data['matur_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
+            $data['matur_trans'][$key]['total'] = $lastStock;
+            $stock = $lastStock;
         }
 
         return view('modules.medium_stock.history', compact('data'));
@@ -144,20 +155,21 @@ class MediumStockController extends Controller
                 }
                 return $return;
             })
-            ->addColumn('current_stock', function($data){
-                $stockIn = $data->tc_medium_opname->sum('stock_in');
-                $stockOut = $data->tc_medium_opname->sum('stock_out');
-                $stockUsed = $data->tc_init_bottles->count();
-                $callusTransfer = $data->tc_callus_transfer_stocks->sum('stock_used');
-                $embryoTransfer = $data->tc_embryo_transfer_stocks->sum('used_stock');
-                $liquidTransfer = $data->tc_liquid_transfer_stocks->sum('used_stock');
-                $stock = $data->stock;
-                $currentStock = $stock + $stockIn -
-                    $stockOut - $stockUsed - $callusTransfer -
-                    $embryoTransfer - $liquidTransfer
-                ;
-                return $currentStock;
-            })
+            // ->addColumn('current_stock', function($data){
+            //     $stockIn = $data->tc_medium_opname->sum('stock_in');
+            //     $stockOut = $data->tc_medium_opname->sum('stock_out');
+            //     $stockUsed = $data->tc_init_bottles->count();
+            //     $callusTransfer = $data->tc_callus_transfer_stocks->sum('stock_used');
+            //     $embryoTransfer = $data->tc_embryo_transfer_stocks->sum('used_stock');
+            //     $liquidTransfer = $data->tc_liquid_transfer_stocks->sum('used_stock');
+            //     $maturTransfer = $data->tc_matur_transfer_stocks->sum('used_stock');
+            //     $stock = $data->stock;
+            //     $currentStock = $stock + $stockIn -
+            //         $stockOut - $stockUsed - $callusTransfer -
+            //         $embryoTransfer - $liquidTransfer - $maturTransfer
+            //     ;
+            //     return $currentStock;
+            // })
 
             ->rawColumns(['custom_name', 'composition'])
             ->toJson();
@@ -254,13 +266,6 @@ class MediumStockController extends Controller
         return view('modules.medium_stock.edit', compact('data'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(MediumStockEdit $request, $id)
     {
 
@@ -278,12 +283,6 @@ class MediumStockController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $TcMediumStock = new TcMediumStock();

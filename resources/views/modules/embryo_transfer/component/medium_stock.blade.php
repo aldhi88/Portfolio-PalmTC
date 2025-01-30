@@ -7,8 +7,8 @@
         font-size: 10px;
     }
 
-    .dataTables_filter { 
-        display: none; 
+    .dataTables_filter {
+        display: none;
     }
 </style>
 <div class="col">

@@ -83,14 +83,14 @@ class LiquidObController extends Controller
                 $nextOb = TcLiquidOb::where('tc_init_id',$data->id)
                     ->where('status',0)
                     ->get();
-                
+
                 if(count($nextOb)==0){
                     $q = TcLiquidOb::create(['tc_init_id' => $data->id]);
                     $nextOb = $q->id;
                 }else{
                     $nextOb = $nextOb->first()->id;
                 }
-                
+
                 $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';
                 $el .= "
                     <p class='mb-0'>
@@ -112,7 +112,7 @@ class LiquidObController extends Controller
             ->addColumn('sum_bottle_other_format',function($data){
                 return is_null($data->sum_bottle_other)?0:$data->sum_bottle_other;
             })
-            
+
             ->rawColumns(['sample_number_format'])
             ->toJson();
     }
@@ -160,7 +160,7 @@ class LiquidObController extends Controller
                 'tc_bottles:id,code',
             ])
             ->get()->toArray();
-        
+
         $qOb = TcLiquidObDetail::where('tc_liquid_ob_id',$obsId)
             ->get()->toArray();
         $dtOb = collect($qOb);
@@ -179,10 +179,10 @@ class LiquidObController extends Controller
                 $reData[$key] = $value;
                 $reData[$key]['alpha_cycle'] = $value['alpha'].'/'.$value['cycle'];
             }
-            
+
         }
         $data = collect($reData);
-        
+
         return DataTables::of($data)
             ->addColumn('first_total',function($data) use($initId,$obsId){
                 return TcLiquidObDetail::firstTotal($initId,$obsId,$data['id']);
@@ -367,7 +367,7 @@ class LiquidObController extends Controller
                 }
             }
             return $this->returnTemplate(0,'Error, bottle count is bigger than bottle total.');
-        } 
+        }
     }
     public function returnTemplate($type,$msg)
     {
@@ -408,12 +408,12 @@ class LiquidObController extends Controller
         $data['alpha'] = $q->count()==0?null:$q[0]->tc_liquid_bottles->alpha;
         $data['cycle'] = $q->count()==0?null:$q[0]->tc_liquid_bottles->cycle;
         $dt = collect($q->toArray());
-        $data['total_bottle_liquid'] = $dt->sum('bottle_liquid'); 
-        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate'); 
-        $data['total_bottle_contam'] = $dt->sum('bottle_contam'); 
+        $data['total_bottle_liquid'] = $dt->sum('bottle_liquid');
+        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate');
+        $data['total_bottle_contam'] = $dt->sum('bottle_contam');
         $data['total_bottle_other'] = $dt->sum('bottle_other');
         TcLiquidOb::where('id',$obsId)
-            ->update($data); 
+            ->update($data);
     }
     public function upStatusBottle($bottleId)
     {
@@ -439,11 +439,11 @@ class LiquidObController extends Controller
         $data['totalOxidate'] = $q->where('status',1)->sum('total_bottle_oxidate');
         $data['totalContam'] = $q->where('status',1)->sum('total_bottle_contam');
         $data['totalOther'] = $q->where('status',1)->sum('total_bottle_other');
-        
+
         $q = TcLiquidOb::select('id')
             ->where('status',0)
             ->get();
-        
+
         $data['obId'] = count($q)==0? 0 : $q->first()->id;
         $data['initId'] = $id;
         $q = TcInit::where('id',$id)->first();

@@ -117,7 +117,9 @@ Route::name('import.')->group(function () {
         Route::get('embryoExport', [ImportController::class, 'embryoExport'])->name('embryoExport');
         Route::post('embryoImport', [ImportController::class, 'embryoImport'])->name('embryoImport');
         Route::get('liquidExport', [ImportController::class, 'liquidExport'])->name('liquidExport');
+        Route::get('maturExport', [ImportController::class, 'maturExport'])->name('maturExport');
         Route::post('liquidImport', [ImportController::class, 'liquidImport'])->name('liquidImport');
+        Route::post('maturImport', [ImportController::class, 'maturImport'])->name('maturImport');
         Route::get('germinExport', [ImportController::class, 'germinExport'])->name('germinExport');
         Route::post('germinImport', [ImportController::class, 'germinImport'])->name('germinImport');
     });
