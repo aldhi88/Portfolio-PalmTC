@@ -84,7 +84,7 @@ class AclimObController extends Controller
                     ;
                 }
             ]);
-        }   
+        }
 
         // dd($data->get()->toArray());
         return DataTables::of($data)
@@ -111,7 +111,7 @@ class AclimObController extends Controller
                 $q->where('id',$id);
             })
             ->first()->getAttribute('sample_number_display');
-        $data['death'] = TcDeath::all();
+        $data['death'] = TcDeath::where('code', '!=','XX')->get();
         return view('modules.aclim_ob.show',compact('data'));
     }
 
@@ -156,7 +156,7 @@ class AclimObController extends Controller
         if($request->filter == 1 || !isset($request->filter)){
             $data->where('tc_aclims.status','!=',0);
         }
-        
+
         $dtDeath = TcDeath::all();
         foreach ($dtDeath as $key => $value) {
             $deathId = $value->id;
@@ -165,7 +165,7 @@ class AclimObController extends Controller
                     $q->where('is_death',1)->where('tc_death_id',$deathId);
                 }
             ]);
-        }   
+        }
 
         $initId = $request->initId;
         return DataTables::of($data)
@@ -183,17 +183,17 @@ class AclimObController extends Controller
                     $obId = $q->id;
                 }else{
                     $obId = $q->first()->id;
-                }   
+                }
 
                 if($data->total_active != 0){
                     $el .= '
-                        <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="'.route('aclim-obs.create',$obId).'">Obs</a> - 
+                        <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="'.route('aclim-obs.create',$obId).'">Observation</a>
                     ';
                 }
 
-                $el .= '
-                    <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="#'.$data->id.'">Detail</a>
-                ';
+                // $el .= '
+                //     <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="#'.$data->id.'">Detail</a>
+                // ';
                 return $el;
             })
             ->rawColumns(['tree_date_action'])
@@ -234,7 +234,7 @@ class AclimObController extends Controller
                     $q->where('is_death',1)->where('tc_death_id',$deathId);
                 }
             ]);
-        } 
+        }
         return DataTables::of($data)
             ->addColumn('tree_date_format',function($data){
                 return Carbon::parse($data->tc_aclims->tree_date)->format('d/m/Y');

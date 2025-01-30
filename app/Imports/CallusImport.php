@@ -26,14 +26,19 @@ class CallusImport implements ToCollection
             }
 
             if(
-                empty($value[0]) || $value[0]=='' ||
-                empty($value[1]) || $value[1]=='' ||
-                empty($value[2]) || $value[2]=='' ||
-                empty($value[3]) || $value[3]=='' ||
-                empty($value[4]) || $value[4]=='' ||
-                empty($value[5]) || $value[5]==''
+                is_null($value[0]) || $value[0]==='' ||
+                is_null($value[1]) || $value[1]==='' ||
+                is_null($value[2]) || $value[2]==='' ||
+                is_null($value[3]) || $value[3]==='' ||
+                is_null($value[4]) || $value[4]==='' ||
+                is_null($value[5]) || $value[5]===''
             ){
                 self::$error = "Pada data excel ada data value yang kosong. Cek baris ke- " . ($key + 1);
+                return;
+            }
+
+            if(($value[2]+$value[4]+$value[5])>480){
+                self::$error = "Jumlah botol melebihi batas maksimum, total botol callus, oksidasi dan kontaminasi maksimal 480. Cek baris ke- " . ($key + 1);
                 return;
             }
 
@@ -88,10 +93,6 @@ class CallusImport implements ToCollection
                 ->take($jlhBotol)
                 ->get()->toArray();
 
-            $btl['callus'] = (array_chunk($botol, $value['botol_callus']))[0];
-            $btl['oxi'] = array_chunk(((array_chunk($botol, $value['botol_callus']))[1]), $value['botol_oksi'])[0];
-            $btl['contam'] = array_chunk(array_chunk(((array_chunk($botol, $value['botol_callus']))[1]), $value['botol_oksi'])[1], $value['botol_kontam'])[0];
-
             $dataWajib = [
                 'tc_init_id' => $value['id_init'],
                 'tc_callus_ob_id' => $obsId
@@ -113,48 +114,62 @@ class CallusImport implements ToCollection
                     $indexBotol++;
                 }
             }
-            TcCallusObDetail::insert($dt['callus']);
+            if($value['daun_callus']>0){
+                $chunks = array_chunk($dt['callus'], 100);
+                foreach ($chunks as $chunk) {
+                    TcCallusObDetail::insert($chunk);
+                }
+            }
             unset($dt);
 
             $indexBotol = $value['botol_callus'];
-                $indexPlant = 1;
-                for ($i=0; $i < $value['botol_oksi']*3; $i++) {
-                    $dt['oxi'][$i] = $dataWajib;
-                    $dt['oxi'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
-                    $dt['oxi'][$i]['explant_number'] = $indexPlant;
-                    $dt['oxi'][$i]['result'] = 2;
-                    $dt['oxi'][$i]['created_at'] = Carbon::now();
-                    $dt['oxi'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $value['botol_oksi']+$value['botol_callus']-1){
-                        $indexBotol = $value['botol_callus'];
-                        $indexPlant++;
-                    }else{
-                        $indexBotol++;
-                    }
+            $indexPlant = 1;
+            for ($i=0; $i < $value['botol_oksi']*3; $i++) {
+                $dt['oxi'][$i] = $dataWajib;
+                $dt['oxi'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
+                $dt['oxi'][$i]['explant_number'] = $indexPlant;
+                $dt['oxi'][$i]['result'] = 2;
+                $dt['oxi'][$i]['created_at'] = Carbon::now();
+                $dt['oxi'][$i]['updated_at'] = Carbon::now();
+                if($indexBotol == $value['botol_oksi']+$value['botol_callus']-1){
+                    $indexBotol = $value['botol_callus'];
+                    $indexPlant++;
+                }else{
+                    $indexBotol++;
                 }
-                TcCallusObDetail::insert($dt['oxi']);
-                unset($dt);
-
-                $indexBotol = $value['botol_callus']+$value['botol_oksi'];
-                $indexPlant = 1;
-                for ($i=0; $i < $value['botol_kontam']*3; $i++) {
-                    $dt['contam'][$i] = $dataWajib;
-                    $dt['contam'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
-                    $dt['contam'][$i]['explant_number'] = $indexPlant;
-                    $dt['contam'][$i]['result'] = 3;
-                    $dt['contam'][$i]['tc_contamination_id'] = 1;
-                    $dt['contam'][$i]['created_at'] = Carbon::now();
-                    $dt['contam'][$i]['updated_at'] = Carbon::now();
-                    if($indexBotol == $value['botol_kontam']+$value['botol_callus']+$value['botol_oksi']-1){
-                        $indexBotol = $value['botol_callus']+$value['botol_oksi'];
-                        $indexPlant++;
-                    }else{
-                        $indexBotol++;
-                    }
+            }
+            if($value['botol_oksi']>0){
+                $chunks = array_chunk($dt['oxi'], 100);
+                foreach ($chunks as $chunk) {
+                    TcCallusObDetail::insert($chunk);
                 }
-                TcCallusObDetail::insert($dt['contam']);
-                unset($dt);
+            }
+            unset($dt);
 
+            $indexBotol = $value['botol_callus']+$value['botol_oksi'];
+            $indexPlant = 1;
+            for ($i=0; $i < $value['botol_kontam']*3; $i++) {
+                $dt['contam'][$i] = $dataWajib;
+                $dt['contam'][$i]['tc_init_bottle_id'] = $botol[$indexBotol]['id'];
+                $dt['contam'][$i]['explant_number'] = $indexPlant;
+                $dt['contam'][$i]['result'] = 3;
+                $dt['contam'][$i]['tc_contamination_id'] = 1;
+                $dt['contam'][$i]['created_at'] = Carbon::now();
+                $dt['contam'][$i]['updated_at'] = Carbon::now();
+                if($indexBotol == $value['botol_kontam']+$value['botol_callus']+$value['botol_oksi']-1){
+                    $indexBotol = $value['botol_callus']+$value['botol_oksi'];
+                    $indexPlant++;
+                }else{
+                    $indexBotol++;
+                }
+            }
+            if($value['botol_kontam']>0){
+                $chunks = array_chunk($dt['contam'], 100);
+                foreach ($chunks as $chunk) {
+                    TcCallusObDetail::insert($chunk);
+                }
+            }
+            unset($dt);
         }
 
     }

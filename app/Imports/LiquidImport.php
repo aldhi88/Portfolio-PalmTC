@@ -32,14 +32,14 @@ class LiquidImport implements ToCollection
             }
 
             if(
-                empty($value[0]) || $value[0]=='' ||
-                empty($value[1]) || $value[1]=='' ||
-                empty($value[2]) || $value[2]=='' ||
-                empty($value[3]) || $value[3]=='' ||
-                empty($value[4]) || $value[4]=='' ||
-                empty($value[5]) || $value[5]=='' ||
-                empty($value[6]) || $value[6]=='' ||
-                empty($value[7]) || $value[7]==''
+                is_null($value[0]) || $value[0]==='' ||
+                is_null($value[1]) || $value[1]==='' ||
+                is_null($value[2]) || $value[2]==='' ||
+                is_null($value[3]) || $value[3]==='' ||
+                is_null($value[4]) || $value[4]==='' ||
+                is_null($value[5]) || $value[5]==='' ||
+                is_null($value[6]) || $value[6]==='' ||
+                is_null($value[7]) || $value[7]===''
             ){
                 self::$error = "Pada data excel ada data value yang kosong. Cek baris ke- " . ($key + 1);
                 return;

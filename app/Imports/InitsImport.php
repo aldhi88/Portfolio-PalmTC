@@ -102,7 +102,7 @@ class InitsImport implements ToCollection
         }
 
         if (!empty($tcInitBottleData)) {
-            $batchSize = 200;
+            $batchSize = 100;
             $chunks = array_chunk($tcInitBottleData, $batchSize);
             foreach ($chunks as $chunk) {
                 TcInitBottle::insert($chunk);

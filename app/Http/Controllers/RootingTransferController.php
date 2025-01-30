@@ -661,6 +661,7 @@ class RootingTransferController extends Controller
         $data = TcRootingTransfer::select([
                 'tc_rooting_transfers.*',
             ])
+            ->where('tc_rooting_transfers.tc_init_id', $request->initId)
             ->with([
                 'tc_workers:id,code',
                 'tc_laminars:id,code',

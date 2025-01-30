@@ -11,7 +11,7 @@
 <span id="alert-area"></span>
 <div class="row">
     <div class="col">
-        
+
 
         <div class="card">
 
@@ -45,7 +45,7 @@
                         </tr>
                         <tr>
                             @foreach ($data['death'] as $item)
-                                <th class="bg-warning">{{ $item['code'] }}</th>
+                            <th class="bg-warning">{{ $item['code'] }}</th>
                             @endforeach
                             <th class="bg-danger text-white">Total</th>
                         </tr>
@@ -69,7 +69,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -121,7 +121,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
