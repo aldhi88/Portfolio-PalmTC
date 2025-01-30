@@ -8,6 +8,7 @@ use App\Imports\GerminImport;
 use App\Imports\InitsImport;
 use App\Imports\LiquidImport;
 use App\Imports\MaturImport;
+use App\Imports\RootingImport;
 use App\Imports\SampleForImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -224,7 +225,38 @@ class ImportController extends Controller
                     'type' => 'danger',
                     'icon' => 'times',
                     'el' => 'alert-area',
-                    'msg' => 'Import Error, '.MaturImport::$error,
+                    'msg' => 'Import Error, '.GerminImport::$error,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been imported.',
+            ],
+        ]);
+    }
+
+    // ==================== Rooting
+    public function rootingExport()
+    {
+        return response()->download(storage_path('/app/public/form_import/form_import_rooting.xlsx'));
+    }
+    public function rootingImport(Request $request)
+    {
+        Excel::import(new RootingImport, $request->file);
+        if(RootingImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.RootingImport::$error,
                 ],
             ]);
         }

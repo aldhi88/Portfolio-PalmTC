@@ -14,6 +14,7 @@ use App\Models\TcGerminTransferStock;
 use App\Models\TcInit;
 use App\Models\TcLiquidTransferStock;
 use App\Models\TcMaturTransferStock;
+use App\Models\TcRootingTransferStock;
 use App\Models\TcWorker;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -106,6 +107,14 @@ class MediumStockController extends Controller
             $lastStock = $stock - $value['used_stock'];
             $data['germin_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
             $data['germin_trans'][$key]['total'] = $lastStock;
+            $stock = $lastStock;
+        }
+
+        $data['rooting_trans'] = TcRootingTransferStock::where('tc_medium_stock_id',$id)->get()->toArray();
+        foreach ($data['rooting_trans'] as $key => $value) {
+            $lastStock = $stock - $value['used_stock'];
+            $data['rooting_trans'][$key]['created_at'] = Carbon::parse($value['created_at'])->format('d/m/y');
+            $data['rooting_trans'][$key]['total'] = $lastStock;
             $stock = $lastStock;
         }
 

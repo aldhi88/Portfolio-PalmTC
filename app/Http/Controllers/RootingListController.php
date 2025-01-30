@@ -271,6 +271,7 @@ class RootingListController extends Controller
                 'tc_rooting_bottles.tc_workers',
                 'tc_workers:id,code',
             ])
+            ->where('tc_rooting_transactions.tc_init_id',$request->initId)
             ->whereHas('tc_rooting_bottles',function(Builder $q){
                 $q->where('status','!=',0);
             })

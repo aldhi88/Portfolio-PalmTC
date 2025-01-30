@@ -92,6 +92,15 @@
                             <td class="text-right">{{ $item['total'] }}</td>
                         </tr>
                         @endforeach
+                        @foreach ($data['rooting_trans'] as $item)
+                        <tr>
+                            <td>{{ $item['created_at'] }}</td>
+                            <td>Rooting Transfer</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">{{ $item['used_stock'] }}</td>
+                            <td class="text-right">{{ $item['total'] }}</td>
+                        </tr>
+                        @endforeach
                     @endif
                 </tbody>
             </table>

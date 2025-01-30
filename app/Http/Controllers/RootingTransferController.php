@@ -141,11 +141,11 @@ class RootingTransferController extends Controller
     {
         $page = 'step2_blank';
         $data['initId'] = $request->initId;
-        
+
         $qCode = DB::raw('convert(varchar,tc_rooting_bottles.bottle_date, 103) as bottle_date_format');
         if(config('database.default') != 'sqlsrv'){
             $qCode = DB::raw('DATE_FORMAT(tc_rooting_bottles.bottle_date, "%d/%m/%Y") as bottle_date_format');
-        }      
+        }
 
         if(session()->has("rootingtrans_step2")){
             $data['bottles'] = TcRootingTransferBottle::select([
@@ -169,7 +169,7 @@ class RootingTransferController extends Controller
             $data['totalLeaf'] = (collect($dtSession)->sum('work_leaf'));
             return view('modules.rooting_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.rooting_transfer.component.'.$page,compact('data'));
     }
     public function addItemStep2(Request $request)
@@ -247,7 +247,7 @@ class RootingTransferController extends Controller
             }
             return view('modules.rooting_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.rooting_transfer.component.'.$page,compact('data'));
     }
     public function getMedStock(Request $request)
@@ -265,7 +265,7 @@ class RootingTransferController extends Controller
         $data['medStock'] = $qCollect->filter(function($value,$key){
             return $value['current_stock'] != 0;
         })->toArray();
-        
+
         $data['medStockBack'] = session('rootingtrans_step3')['medStock']['back'];
         $data['medStockNext'] = session('rootingtrans_step3')['medStock']['root2'];
         $data['medStockPicked'] = session('rootingtrans_step3')['medStock'][$request->for];
@@ -287,7 +287,7 @@ class RootingTransferController extends Controller
         }else{
             $data['allowBottle'] = false;
         }
-        
+
         return view('modules.rooting_transfer.component.medium_stock',compact('data'));
     }
     public function addStock(Request $request)
@@ -376,10 +376,10 @@ class RootingTransferController extends Controller
             if(!is_null($request->page)){
                 $page = $request->page;
             }
-            
+
             return view('modules.rooting_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.rooting_transfer.component.'.$page,compact('data'));
     }
     public function finishStep4(Request $request)
@@ -404,7 +404,7 @@ class RootingTransferController extends Controller
             session()->has('rootingtrans_step1') &&
             session()->has('rootingtrans_step2') &&
             session()->has('rootingtrans_step3') &&
-            session()->has('rootingtrans_step4') 
+            session()->has('rootingtrans_step4')
         ){
             if(
                 session('rootingtrans_step1')['page'] &&
@@ -430,7 +430,7 @@ class RootingTransferController extends Controller
                     $transferId = $q->id;
 
                     // insert ke table tc_rooting_transfer_bottle_works dan tc_rooting_lists
-                    
+
                     $dtList['tc_init_id'] =$request->tc_init_id;
                     $dtList['tc_worker_id'] = $dtStep1['tc_worker_id'];
                     $dtList['tc_rooting_transfer_id'] = $transferId;
@@ -547,7 +547,7 @@ class RootingTransferController extends Controller
                         $q = TcAclim::create($dt);
                         $aclimId = $q->id;
 
-                        for ($i=1; $i <= $toNext ; $i++) { 
+                        for ($i=1; $i <= $toNext ; $i++) {
                             $dtUse[] = [
                                 'tc_init_id' => $request->tc_init_id,
                                 'tc_aclim_id' => $aclimId,
@@ -559,9 +559,9 @@ class RootingTransferController extends Controller
                         TcAclimTree::insert($dtUse);
                     }
 
-                    
+
                 }catch(Throwable $e) {report($e);}
-                
+
                 $return = 1;
             }else{
                 $return = 0;
@@ -582,7 +582,7 @@ class RootingTransferController extends Controller
                 ],
             ]);
         }
-        
+
 
     }
 
@@ -748,7 +748,7 @@ class RootingTransferController extends Controller
         $index = 0;
         foreach ($q2 as $key => $value) {
             $loop = $value->used_stock;
-            for ($i=0; $i < $loop ; $i++) { 
+            for ($i=0; $i < $loop ; $i++) {
                 $data['transfer'][$index]['sample_number'] = $q->tc_inits->tc_samples->sample_number_display;
                 $data['transfer'][$index]['transfer_date'] = Carbon::parse($q->transfer_date)->format('d M Y');
                 $data['transfer'][$index]['alpha'] = $q->alpha;

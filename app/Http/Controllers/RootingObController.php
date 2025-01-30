@@ -84,14 +84,14 @@ class RootingObController extends Controller
                 $nextOb = TcRootingOb::where('tc_init_id',$data->id)
                     ->where('status',0)
                     ->get();
-                
+
                 if(count($nextOb)==0){
                     $q = TcRootingOb::create(['tc_init_id' => $data->id]);
                     $nextOb = $q->id;
                 }else{
                     $nextOb = $nextOb->first()->id;
                 }
-                
+
                 $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';
                 $el .= "
                     <p class='mb-0'>
@@ -121,7 +121,7 @@ class RootingObController extends Controller
             ->addColumn('sum_bottle_other_format',function($data){
                 return is_null($data->sum_bottle_other)?0:$data->sum_bottle_other;
             })
-            
+
             ->rawColumns(['sample_number_format'])
             ->toJson();
     }
@@ -160,7 +160,7 @@ class RootingObController extends Controller
                 'tc_bottles:id,code',
             ])
             ->get()->toArray();
-        
+
         $qOb = TcRootingObDetail::where('tc_rooting_ob_id',$obsId)
             ->get()->toArray();
         $dtOb = collect($qOb);
@@ -178,7 +178,7 @@ class RootingObController extends Controller
                 $reData[] = $value;
             }
         }
-               
+
         $data = collect($reData);
 
         return DataTables::of($data)
@@ -200,8 +200,8 @@ class RootingObController extends Controller
                 if($data['bottle_count'] == 0){
                     $disabled = count($q)==0?'disabled':null;
                 }
-                $el = ' 
-                    <input data-root="'.$data['type'].'" max="'.$max.'" data-alpha="'.$data['alpha'].'" data-type="1" data-explant="0" data-id="'.$data['id'].'" type="text" class="form-obs text-center text-danger pl-1 w-100" name="rooting_'.$data['id'].'" placeholder="'.$value.'" '.$disabled.'> 
+                $el = '
+                    <input data-root="'.$data['type'].'" max="'.$max.'" data-alpha="'.$data['alpha'].'" data-type="1" data-explant="0" data-id="'.$data['id'].'" type="text" class="form-obs text-center text-danger pl-1 w-100" name="rooting_'.$data['id'].'" placeholder="'.$value.'" '.$disabled.'>
                 ';
                 return $el;
             })
@@ -296,7 +296,7 @@ class RootingObController extends Controller
             $dt1 = $request->except('alpha','type','value','tc_worker_id','root');
             $dt1[$this->aryType($request->type)] = (int)round($request->value/2);
             $dt1[$this->aryType2($request->type)] = $request->value;
-            
+
             if(count($dtDetailPerBottle) == 0){ //jika data ob detail untuk bottle itu belum ada
                 if(count($dtDetailPerOb) != 0){
                     $dataSub = $dtDetailPerOb[0]['tc_rooting_bottles']['alpha'];
@@ -383,7 +383,7 @@ class RootingObController extends Controller
                     }
                 }
                 return $this->returnTemplate(0,'Error, bottle count is bigger than bottle total.');
-            } 
+            }
 
         }else{
 
@@ -392,7 +392,7 @@ class RootingObController extends Controller
             $dt1 = $request->except('alpha','type','value','tc_worker_id','root');
             $dt1[$this->aryType($request->type)] = $request->value;
             $dt1[$this->aryType2($request->type)] = $request->value;
-            
+
             if(count($dtDetailPerBottle) == 0){ //jika data ob detail untuk bottle itu belum ada
                 if(count($dtDetailPerOb) != 0){
                     $dataSub = $dtDetailPerOb[0]['tc_rooting_bottles']['alpha'];
@@ -483,7 +483,7 @@ class RootingObController extends Controller
 
         }
 
-        
+
     }
     public function returnTemplate($type,$msg)
     {
@@ -534,15 +534,15 @@ class RootingObController extends Controller
         $q = TcRootingObDetail::where('tc_rooting_ob_id',$obsId)->get();
         $data['alpha'] = $q->count()==0?null:$q[0]->tc_rooting_bottles->alpha;
         $dt = collect($q->toArray());
-        $data['total_bottle_rooting'] = $dt->sum('bottle_rooting'); 
-        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate'); 
-        $data['total_bottle_contam'] = $dt->sum('bottle_contam'); 
+        $data['total_bottle_rooting'] = $dt->sum('bottle_rooting');
+        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate');
+        $data['total_bottle_contam'] = $dt->sum('bottle_contam');
         $data['total_bottle_other'] = $dt->sum('bottle_other');
-        $data['total_leaf_rooting'] = $dt->sum('leaf_rooting'); 
-        $data['total_leaf_oxidate'] = $dt->sum('leaf_oxidate'); 
-        $data['total_leaf_contam'] = $dt->sum('leaf_contam'); 
+        $data['total_leaf_rooting'] = $dt->sum('leaf_rooting');
+        $data['total_leaf_oxidate'] = $dt->sum('leaf_oxidate');
+        $data['total_leaf_contam'] = $dt->sum('leaf_contam');
         $data['total_leaf_other'] = $dt->sum('leaf_other');
-        TcRootingOb::where('id',$obsId)->update($data); 
+        TcRootingOb::where('id',$obsId)->update($data);
     }
     public function upStatusBottle($bottleId)
     {
@@ -572,9 +572,9 @@ class RootingObController extends Controller
         $data['totalOxidate'] = $q->where('status',1)->sum('total_leaf_oxidate');
         $data['totalContam'] = $q->where('status',1)->sum('total_leaf_contam');
         $data['totalOther'] = $q->where('status',1)->sum('total_leaf_other');
-        
+
         $q = TcRootingOb::select('id')->where('status',0)->get();
-        
+
         $data['obId'] = count($q)==0? 0 : $q->first()->id;
         $data['initId'] = $id;
         $q = TcInit::where('id',$id)->first();
