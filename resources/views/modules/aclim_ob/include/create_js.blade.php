@@ -8,8 +8,8 @@
         loader(true);
         e.preventDefault();
         var formData = new FormData(this);
-        formData.append('tc_aclim_id', '{{ $data["tc_aclim_id"] }}'); 
-        formData.append('tc_init_id', '{{ $data["initId"] }}'); 
+        formData.append('tc_aclim_id', '{{ $data["tc_aclim_id"] }}');
+        formData.append('tc_init_id', '{{ $data["initId"] }}');
         $.ajax({
             type: 'POST',
             url: "{{ route('aclim-obs.store') }}",
@@ -40,6 +40,7 @@
     }
     function initDt(){
         var dtTable = $('#myTable').DataTable({
+            destroy: true,
             processing: false,serverSide: true,scrollX: true,pageLength: 100,
             order: [[1,'asc']],
             columnDefs: [
@@ -71,10 +72,10 @@
                 });
                 initFormObs();
             },
-            
+
         });
     }
-    
+
     function initFormObs(){
         $("body").on('click','input.item', function() {
             loader(true);
@@ -104,7 +105,7 @@
             });
         });
 
-        $("body").on('change','select', function() {
+        $("body table#myTable").on('change','select', function() {
             loader(true);
             var formData = {};
             formData.obsId = '{{ $data["obsId"] }}';
@@ -130,7 +131,7 @@
                     alert("Error #003, CallusObservationController - store function is invalid.");
                 }
             });
-            
+
         });
     }
 

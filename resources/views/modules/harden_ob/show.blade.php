@@ -11,7 +11,7 @@
 <span id="alert-area"></span>
 <div class="row">
     <div class="col">
-        
+
 
         <div class="card">
 
@@ -69,7 +69,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -121,7 +121,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

@@ -62,7 +62,7 @@ var dtTable = $('#myTable').DataTable({
         });
         onClickDetail();
     },
-    
+
 });
 
 function onClickDetail(){
@@ -114,7 +114,7 @@ var dtTable2 = $('#myTable2').DataTable({
         });
         initDelEvent();
     },
-    
+
 });
 
 function initDelEvent(){

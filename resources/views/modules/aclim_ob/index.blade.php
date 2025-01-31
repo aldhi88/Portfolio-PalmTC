@@ -35,7 +35,7 @@
                             <th rowspan="2">Total<br>Active</th>
                         </tr>
                         <tr>
-                            
+
                             @foreach ($data['death'] as $item)
                                 <th class="bg-warning">{{ $item['code'] }}</th>
                             @endforeach
@@ -60,7 +60,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

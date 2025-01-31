@@ -47,7 +47,7 @@
                             </div>
                         </form>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="card-body">
@@ -87,12 +87,12 @@
                                     <th class="bg-white" disable="true"></th>
                                 </tr>
                             </thead>
-                        </table>    
+                        </table>
                     </div>
                 </div>
-                
+
             </div>
-            
+
         </div>
 
     </div>

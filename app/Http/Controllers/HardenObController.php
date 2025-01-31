@@ -84,7 +84,7 @@ class HardenObController extends Controller
                     ;
                 }
             ]);
-        }   
+        }
 
         // dd($data->get()->toArray());
         return DataTables::of($data)
@@ -156,7 +156,7 @@ class HardenObController extends Controller
         if($request->filter == 1 || !isset($request->filter)){
             $data->where('tc_hardens.status','!=',0);
         }
-        
+
         $dtDeath = TcDeath::all();
         foreach ($dtDeath as $key => $value) {
             $deathId = $value->id;
@@ -165,7 +165,7 @@ class HardenObController extends Controller
                     $q->where('is_death',1)->where('tc_death_id',$deathId);
                 }
             ]);
-        }   
+        }
 
         $initId = $request->initId;
         return DataTables::of($data)
@@ -183,11 +183,11 @@ class HardenObController extends Controller
                     $obId = $q->id;
                 }else{
                     $obId = $q->first()->id;
-                }   
+                }
 
                 if($data->total_active != 0){
                     $el .= '
-                        <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="'.route('harden-obs.create',$obId).'">Obs</a> - 
+                        <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="'.route('harden-obs.create',$obId).'">Obs</a> -
                     ';
                 }
 
@@ -233,7 +233,7 @@ class HardenObController extends Controller
                     $q->where('is_death',1)->where('tc_death_id',$deathId);
                 }
             ]);
-        } 
+        }
         return DataTables::of($data)
             ->addColumn('tree_date_format',function($data){
                 return Carbon::parse($data->tc_hardens->tree_date)->format('d/m/Y');

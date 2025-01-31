@@ -2,16 +2,16 @@
 
 namespace App\Imports;
 
-use App\Models\TcAclim;
+use App\Models\TcHarden;
 use App\Models\TcInit;
-use App\Models\TcAclimOb;
-use App\Models\TcAclimObDetail;
-use App\Models\TcAclimTree;
+use App\Models\TcHardenOb;
+use App\Models\TcHardenObDetail;
+use App\Models\TcHardenTree;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
-class AclimImport implements ToCollection
+class HardenImport implements ToCollection
 {
     /**
     * @param Collection $collection
@@ -47,7 +47,7 @@ class AclimImport implements ToCollection
 
             $initID[] = $value[0];
 
-            $dtTcAclims[] = [
+            $dtTcHardens[] = [
                 'tc_init_id' => $value[0],
                 'tc_worker_id' => 99,
                 'sub' => 1,
@@ -65,10 +65,10 @@ class AclimImport implements ToCollection
                 ];
             }
 
-            $dtTcAclimTree[] = $dtTemp;
+            $dtTcHardenTree[] = $dtTemp;
             unset($dtTemp);
 
-            $dtTcAclimObs[] = [
+            $dtTcHardenObs[] = [
                 'tc_init_id' => $value[0],
                 'tc_worker_id' => 99,
                 'total_transfer' => $value[3],
@@ -76,7 +76,7 @@ class AclimImport implements ToCollection
                 'ob_date' => Carbon::createFromFormat('d/m/Y', $value[2])->format('Y-m-d'),
                 'status' => 1,
             ];
-            $dtTcAclimObsTemp[] = [
+            $dtTcHardenObsTemp[] = [
                 'tc_init_id' => $value[0],
                 'total_transfer' => 0,
                 'total_death' => 0,
@@ -85,19 +85,21 @@ class AclimImport implements ToCollection
 
 
             for ($i=0; $i < $value[3]; $i++) {
-                $dtTcAclimObDetail[$key-1][] = [
+                $dtTcHardenObDetail[$key-1][] = [
                     'tc_init_id' => $value[0],
                     'is_death' => 0,
+                    'pre_nursery' => Carbon::createFromFormat('d/m/Y', $value[2])->format('Y-m-d'),
                     'is_transfer' => 1,
                     'status' => 0,
                 ];
             }
 
             for ($i=0; $i < $value[4]; $i++) {
-                $dtTcAclimObDetail[$key-1][] = [
+                $dtTcHardenObDetail[$key-1][] = [
                     'tc_init_id' => $value[0],
                     'is_death' => 1,
                     'tc_death_id' => 1,
+                    'pre_nursery' => Carbon::createFromFormat('d/m/Y', $value[2])->format('Y-m-d'),
                     'is_transfer' => 0,
                     'status' => 0,
                 ];
@@ -112,32 +114,32 @@ class AclimImport implements ToCollection
 
         for ($i=0; $i < count($initID); $i++) {
 
-            $qTcAclims = TcAclim::create($dtTcAclims[$i]);
-            $aclimId = $qTcAclims->id;
+            $qTcHardens = TcHarden::create($dtTcHardens[$i]);
+            $hardenId = $qTcHardens->id;
 
-            foreach ($dtTcAclimTree[$i] as $key => $value) {
-                $value['tc_aclim_id'] = $aclimId;
-                $q = TcAclimTree::create($value);
+            foreach ($dtTcHardenTree[$i] as $key => $value) {
+                $value['tc_harden_id'] = $hardenId;
+                $q = TcHardenTree::create($value);
                 $treeId[$i][$key] = $q->id;
             }
 
-            $dtTcAclimObs[$i]['tc_aclim_id'] = $aclimId;
-            $qTcAclimOb = TcAclimOb::create($dtTcAclimObs[$i]);
-            $obId[] = $qTcAclimOb->id;
-            $dtTcAclimObsTemp[$i]['tc_aclim_id'] = $aclimId;
-            TcAclimOb::create($dtTcAclimObsTemp[$i]);
+            $dtTcHardenObs[$i]['tc_harden_id'] = $hardenId;
+            $qTcHardenOb = TcHardenOb::create($dtTcHardenObs[$i]);
+            $obId[] = $qTcHardenOb->id;
+            $dtTcHardenObsTemp[$i]['tc_harden_id'] = $hardenId;
+            TcHardenOb::create($dtTcHardenObsTemp[$i]);
         }
 
         // dump($obId, $treeId);
 
         for ($a=0; $a < count($obId); $a++) {
-            for ($i=0; $i < count($dtTcAclimObDetail[$a]); $i++) {
-                $dtTcAclimObDetail[$a][$i]['tc_aclim_ob_id'] = $obId[$a];
-                $dtTcAclimObDetail[$a][$i]['tc_aclim_tree_id'] = $treeId[$a][$i];
+            for ($i=0; $i < count($dtTcHardenObDetail[$a]); $i++) {
+                $dtTcHardenObDetail[$a][$i]['tc_harden_ob_id'] = $obId[$a];
+                $dtTcHardenObDetail[$a][$i]['tc_harden_tree_id'] = $treeId[$a][$i];
             }
-            // dump($dtTcAclimObDetail[$a]);
-            foreach ($dtTcAclimObDetail[$a] as $key => $value) {
-                TcAclimObDetail::create($value);
+            // dump($dtTcHardenObDetail[$a]);
+            foreach ($dtTcHardenObDetail[$a] as $key => $value) {
+                TcHardenObDetail::create($value);
             }
         }
 

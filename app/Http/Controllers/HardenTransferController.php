@@ -35,10 +35,12 @@ class HardenTransferController extends Controller
             ->whereHas('tc_harden_ob_details')
             ->withCount('tc_harden_transfers as transfer_count')
             ->withCount(['tc_harden_ob_details as transferred' => function($q){
-                $q->where('status',1);
+                $q->where('is_transfer', 1)
+                    ->where('status',1);
             }])
             ->withCount(['tc_harden_ob_details as need_transfer' => function($q){
-                $q->where('status',0);
+                $q->where('is_transfer', 1)
+                    ->where('status',0);
             }])
         ;
         // dd($data->get()->toArray());
@@ -63,8 +65,8 @@ class HardenTransferController extends Controller
         $data['desc'] = "Create new transfer harden.";
         $data['transferCount'] = TcHardenTransfer::select('id')->where('tc_init_id',$id)->get()->count();
         $q = collect(TcHardenObDetail::where('tc_init_id',$id)->get()->toArray());
-        $data['transferred'] = $q->where('status',1)->count();
-        $data['need_transfer'] = $q->where('status',0)->count();
+        $data['transferred'] = $q->where('status',1)->sum('is_transfer');
+        $data['need_transfer'] = $q->where('status',0)->sum('is_transfer');
         $data['initId'] = $id;
         $q = TcSample::select('id','sample_number')
             ->whereHas('tc_inits', function($q) use($id){
@@ -74,7 +76,7 @@ class HardenTransferController extends Controller
         $data['worker'] = TcWorker::select('id','code')->get();
         return view('modules.harden_transfer.show', compact('data'));
     }
-    
+
     public function dtShow(Request $request)
     {
         $data = TcHardenOb::select([
@@ -82,6 +84,7 @@ class HardenTransferController extends Controller
                 DB::raw('convert(varchar,tc_hardens.tree_date, 103) as tree_date_format'),
                 DB::raw('convert(varchar,ob_date, 103) as ob_date_format'),
             ])
+            ->where('tc_harden_obs.tc_init_id', $request->initId)
             ->leftJoin('tc_hardens','tc_hardens.id','=','tc_harden_obs.tc_harden_id')
             ->whereHas('tc_harden_ob_details',function($q){
                 $q->where('status',0);
@@ -144,7 +147,7 @@ class HardenTransferController extends Controller
                     })->get()->count();
                     $next = $cek == 0?true:false;
                 }
-                
+
                 if($q->to_self != 0){
                     $q3 = TcHarden::where('tc_harden_transfer_id',$data->id)->first();
                     $q3Id = $q3->id;
@@ -180,7 +183,7 @@ class HardenTransferController extends Controller
         if($request->max != ($request->to_self + $request->to_next)){
             return alert(0,'Total transfer must be '.$request->max,'alert-area-modal-transfer');
         }else{
-            
+
             $dtObs = TcHardenOb::where('id',$request->tc_harden_ob_id)->first();
             $sub = $dtObs->tc_hardens->sub;
             $type = $dtObs->tc_hardens->type;
@@ -215,7 +218,7 @@ class HardenTransferController extends Controller
                 unset($dt);
                 $hardenId = $q->id;
 
-                for ($i=1; $i <= $request->to_self ; $i++) { 
+                for ($i=1; $i <= $request->to_self ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_harden_id' => $hardenId,
@@ -241,7 +244,7 @@ class HardenTransferController extends Controller
                 $q = TcNur::create($dt);
                 $nurId = $q->id;
 
-                for ($i=1; $i <= $request->to_next ; $i++) { 
+                for ($i=1; $i <= $request->to_next ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_nur_id' => $nurId,
@@ -261,7 +264,7 @@ class HardenTransferController extends Controller
     }
 
     public function destroy($id)
-    { 
+    {
         $q = TcHardenTransfer::where('id',$id)->first();
         $obsId = $q->tc_harden_ob_id;
         $self = $next = true;
@@ -302,8 +305,8 @@ class HardenTransferController extends Controller
         }else{
             return alert(0,null,'alert-area2');
         }
-        
-        
+
+
     }
 
     public function printLabel(Request $request)
@@ -346,6 +349,6 @@ class HardenTransferController extends Controller
                 ])->get()->toArray();
             return view('modules.harden_transfer.print_label_layout2',compact('data'));
         }
-        
+
     }
 }

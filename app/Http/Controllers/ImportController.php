@@ -6,6 +6,7 @@ use App\Imports\AclimImport;
 use App\Imports\CallusImport;
 use App\Imports\EmbryoImport;
 use App\Imports\GerminImport;
+use App\Imports\HardenImport;
 use App\Imports\InitsImport;
 use App\Imports\LiquidImport;
 use App\Imports\MaturImport;
@@ -289,6 +290,37 @@ class ImportController extends Controller
                     'icon' => 'times',
                     'el' => 'alert-area',
                     'msg' => 'Import Error, '.AclimImport::$error,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been imported.',
+            ],
+        ]);
+    }
+
+    // ==================== Hardening
+    public function hardenExport()
+    {
+        return response()->download(storage_path('/app/public/form_import/form_import_harden.xlsx'));
+    }
+    public function hardenImport(Request $request)
+    {
+        Excel::import(new HardenImport, $request->file);
+        if(HardenImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.HardenImport::$error,
                 ],
             ]);
         }
