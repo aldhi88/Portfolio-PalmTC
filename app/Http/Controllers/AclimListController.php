@@ -70,7 +70,7 @@ class AclimListController extends Controller
                 }
             ])
         ;
-        
+
         return DataTables::of($data)
             ->addColumn('sample_number_format',function($data){
                 $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';

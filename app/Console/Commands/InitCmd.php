@@ -195,18 +195,24 @@ class InitCmd extends Command
 
         // tc_deaths
         unset($data);
-        $q = TcDeath::find(99);
-        if($q){
-            $q->forceDelete();
-        }
-        $data['id'] = 99;
-        $data['code'] = "XX";
-        $data['name'] = "IMPORT";
+        TcDeath::query()->forceDelete();
+        $data = [
+            [
+                'id' => 1,
+                'code' => 'Mati',
+                'name' => 'Mati',
+            ],
+            [
+                'id' => 2,
+                'code' => 'Kering',
+                'name' => 'Kering',
+            ],
+        ];
         DB::unprepared('SET IDENTITY_INSERT tc_deaths ON');
-        TcDeath::create($data);
+        TcDeath::insert($data);
         DB::unprepared('SET IDENTITY_INSERT tc_deaths OFF');
 
-        
+
         echo "Success, data require has been generated.\n";
     }
 }

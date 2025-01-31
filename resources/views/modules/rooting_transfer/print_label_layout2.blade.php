@@ -1,3 +1,8 @@
+<?php
+echo "<h1>Print Label Belum</>";
+exit();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,8 +23,8 @@
             margin: 0 !important;
             padding: 0 !important;
         }
-    
-        @media print{    
+
+        @media print{
             .no-print, .no-print *
             {
                 display: none !important;
@@ -28,18 +33,18 @@
             body{
                 width: 21cm;
                 height: 29.7cm;
-            } 
+            }
 
             .a4{
                 width: 100% !important;
                 height: 100% !important;
-            } 
+            }
         }
 
         .a4{
             width: 21cm;
             /* height: 29.7cm; */
-        } 
+        }
 
     </style>
 </head>
@@ -65,7 +70,7 @@
             @for ($i=0; $i <= ($countBottle-1); $i++)
                 <tr>
                     @for ($x=0;$x<=$col-1;$x++)
-                    
+
                         @php
                             $index = $i++;
                         @endphp
@@ -88,10 +93,10 @@
                                         </p>
                                     </div>
                                     <div class="col text-right pr-1 pl-0">
-                                        {!! 
+                                        {!!
                                             QrCode::size(75)->generate(
                                                 $data["transfer"][$index]['tc_aclims']['tc_inits']['tc_samples']['sample_number']
-                                            ); 
+                                            );
                                         !!}
                                     </div>
                                 </div>

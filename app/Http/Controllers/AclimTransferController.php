@@ -35,10 +35,12 @@ class AclimTransferController extends Controller
             ->whereHas('tc_aclim_ob_details')
             ->withCount('tc_aclim_transfers as transfer_count')
             ->withCount(['tc_aclim_ob_details as transferred' => function($q){
-                $q->where('status',1);
+                $q->where('is_transfer', 1)
+                    ->where('status',1);
             }])
             ->withCount(['tc_aclim_ob_details as need_transfer' => function($q){
-                $q->where('status',0);
+                $q->where('is_transfer', 1)
+                    ->where('status',0);
             }])
         ;
         // dd($data->get()->toArray());
@@ -63,8 +65,8 @@ class AclimTransferController extends Controller
         $data['desc'] = "Create new transfer aclim.";
         $data['transferCount'] = TcAclimTransfer::select('id')->where('tc_init_id',$id)->get()->count();
         $q = collect(TcAclimObDetail::where('tc_init_id',$id)->get()->toArray());
-        $data['transferred'] = $q->where('status',1)->count();
-        $data['need_transfer'] = $q->where('status',0)->count();
+        $data['transferred'] = $q->where('status',1)->sum('is_transfer');
+        $data['need_transfer'] = $q->where('status',0)->sum('is_transfer');
         $data['initId'] = $id;
         $q = TcSample::select('id','sample_number')
             ->whereHas('tc_inits', function($q) use($id){
@@ -74,14 +76,16 @@ class AclimTransferController extends Controller
         $data['worker'] = TcWorker::select('id','code')->get();
         return view('modules.aclim_transfer.show', compact('data'));
     }
-    
+
     public function dtShow(Request $request)
     {
+        // dd($request->all());
         $data = TcAclimOb::select([
                 'tc_aclim_obs.*',
                 DB::raw('convert(varchar,tc_aclims.tree_date, 103) as tree_date_format'),
                 DB::raw('convert(varchar,ob_date, 103) as ob_date_format'),
             ])
+            ->where('tc_aclim_obs.tc_init_id', $request->initId)
             ->leftJoin('tc_aclims','tc_aclims.id','=','tc_aclim_obs.tc_aclim_id')
             ->whereHas('tc_aclim_ob_details',function($q){
                 $q->where('status',0);
@@ -89,6 +93,7 @@ class AclimTransferController extends Controller
             ->withCount(['tc_aclim_ob_details as need_transfer' => function($q){
                 $q->where('status',0)->where('is_transfer',1);
             }])
+
             ->with([
                 'tc_workers'
             ])
@@ -180,7 +185,7 @@ class AclimTransferController extends Controller
         if($request->max != ($request->to_self + $request->to_next)){
             return alert(0,'Total transfer must be '.$request->max,'alert-area-modal-transfer');
         }else{
-            
+
             $dtObs = TcAclimOb::where('id',$request->tc_aclim_ob_id)->first();
             $sub = $dtObs->tc_aclims->sub;
             $type = $dtObs->tc_aclims->type;
@@ -215,7 +220,7 @@ class AclimTransferController extends Controller
                 unset($dt);
                 $aclimId = $q->id;
 
-                for ($i=1; $i <= $request->to_self ; $i++) { 
+                for ($i=1; $i <= $request->to_self ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_aclim_id' => $aclimId,
@@ -241,7 +246,7 @@ class AclimTransferController extends Controller
                 $q = TcHarden::create($dt);
                 $hardenId = $q->id;
 
-                for ($i=1; $i <= $request->to_next ; $i++) { 
+                for ($i=1; $i <= $request->to_next ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_harden_id' => $hardenId,
@@ -261,7 +266,7 @@ class AclimTransferController extends Controller
     }
 
     public function destroy($id)
-    { 
+    {
         $q = TcAclimTransfer::where('id',$id)->first();
         $obsId = $q->tc_aclim_ob_id;
         $self = $next = true;
@@ -302,8 +307,8 @@ class AclimTransferController extends Controller
         }else{
             return alert(0,null,'alert-area2');
         }
-        
-        
+
+
     }
 
     public function printLabel(Request $request)
@@ -346,6 +351,6 @@ class AclimTransferController extends Controller
                 ])->get()->toArray();
             return view('modules.aclim_transfer.print_label_layout2',compact('data'));
         }
-        
+
     }
 }

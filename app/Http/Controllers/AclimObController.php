@@ -22,7 +22,7 @@ class AclimObController extends Controller
     {
         $data['title'] = "Acclimatization (Per Sample)";
         $data['desc'] = "Display all observation summary by sample data";
-        $data['death'] = TcDeath::all();
+        $data['death'] = TcDeath::where('code', '!=','XX')->get();
         return view('modules.aclim_ob.index',compact('data'));
     }
     public function dt(Request $request)
@@ -191,9 +191,11 @@ class AclimObController extends Controller
                     ';
                 }
 
-                // $el .= '
-                //     <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="#'.$data->id.'">Detail</a>
-                // ';
+                $el .= ' - ';
+
+                $el .= '
+                    <a class="text-primary detail fs-13" data-date="'.$data->tree_date_format.'" data-id="'.$data->id.'" href="#'.$data->id.'">Detail</a>
+                ';
                 return $el;
             })
             ->rawColumns(['tree_date_action'])

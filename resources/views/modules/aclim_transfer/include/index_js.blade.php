@@ -18,7 +18,7 @@
             { data: 'transfer_count', name: 'transfer_count', orderable:true, searchable:true},
             { data: 'transferred', name: 'transferred', orderable:true, searchable:true},
             { data: 'need_transfer', name: 'need_transfer', orderable:true, searchable:true},
-            
+
         ],
         initComplete: function () {
                 $('#header-filter th').each(function() {

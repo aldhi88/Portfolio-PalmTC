@@ -124,6 +124,8 @@ Route::name('import.')->group(function () {
         Route::post('germinImport', [ImportController::class, 'germinImport'])->name('germinImport');
         Route::get('rootingExport', [ImportController::class, 'rootingExport'])->name('rootingExport');
         Route::post('rootingImport', [ImportController::class, 'rootingImport'])->name('rootingImport');
+        Route::get('aclimExport', [ImportController::class, 'aclimExport'])->name('aclimExport');
+        Route::post('aclimImport', [ImportController::class, 'aclimImport'])->name('aclimImport');
     });
 });
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\AclimImport;
 use App\Imports\CallusImport;
 use App\Imports\EmbryoImport;
 use App\Imports\GerminImport;
@@ -257,6 +258,37 @@ class ImportController extends Controller
                     'icon' => 'times',
                     'el' => 'alert-area',
                     'msg' => 'Import Error, '.RootingImport::$error,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been imported.',
+            ],
+        ]);
+    }
+
+    // ==================== Aclimatization
+    public function aclimExport()
+    {
+        return response()->download(storage_path('/app/public/form_import/form_import_aclim.xlsx'));
+    }
+    public function aclimImport(Request $request)
+    {
+        Excel::import(new AclimImport, $request->file);
+        if(AclimImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.AclimImport::$error,
                 ],
             ]);
         }
