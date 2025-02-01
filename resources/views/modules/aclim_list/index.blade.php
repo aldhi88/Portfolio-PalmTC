@@ -25,7 +25,7 @@
                         </button>
                         <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
                             <li class="dropdown-item"><a href="#!" data-toggle="modal" data-target="#importModal"><span><i class="feather icon-upload"></i> Upload Data Excel</span></a></li>
-                            <li class="dropdown-item"><a href="{{ route('import.aclimExport') }}"><span><i class="feather icon-download"></i> Download Excel Template</span></a>
+                            <li class="dropdown-item"><a href="{{ route('import.fieldExport') }}"><span><i class="feather icon-download"></i> Download Excel Template</span></a>
                             </li>
                         </ul>
                     </div>

@@ -132,6 +132,8 @@ Route::name('import.')->group(function () {
         Route::post('hardenImport', [ImportController::class, 'hardenImport'])->name('hardenImport');
         Route::get('nurExport', [ImportController::class, 'nurExport'])->name('nurExport');
         Route::post('nurImport', [ImportController::class, 'nurImport'])->name('nurImport');
+        Route::get('fieldExport', [ImportController::class, 'fieldExport'])->name('fieldExport');
+        Route::post('fieldImport', [ImportController::class, 'fieldImport'])->name('fieldImport');
     });
 });
 

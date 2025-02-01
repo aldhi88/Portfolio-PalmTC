@@ -21,8 +21,8 @@
             font-size: 17px;
             line-height: 20px;
         }
-    
-        @media print{    
+
+        @media print{
             .no-print, .no-print *
             {
                 display: none !important;
@@ -31,18 +31,18 @@
             body{
                 width: 18.8cm;
                 height: 15.49cm;
-            } 
+            }
 
             .a4{
                 width: 100% !important;
                 height: 100% !important;
-            } 
+            }
         }
 
         .a4{
             width: 25cm;
             /* height: 29.7cm; */
-        } 
+        }
 
         thead > tr > td{
             padding: 0px;
@@ -85,7 +85,7 @@
             @for ($i=0; $i <= ($countBottle-1); $i++)
                 <tr>
                     @for ($x=0;$x<=$col-1;$x++)
-                    
+
                         @php
                             $index = $i++;
                         @endphp

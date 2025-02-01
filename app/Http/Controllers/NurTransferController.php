@@ -37,17 +37,18 @@ class NurTransferController extends Controller
             ->whereHas('tc_nur_ob_details')
             ->withCount('tc_nur_transfers as transfer_count')
             ->withCount(['tc_nur_ob_details as transferred' => function($q){
-                $q->where('status',1);
+                $q->where('is_transfer', 1)
+                    ->where('status',1);
             }])
             ->withCount(['tc_nur_ob_details as need_transfer_nursery' => function($q){
-                $q->where('status',0)->whereHas('tc_nur_obs',function($q2){
+                $q->where('status',0)->where('is_transfer', 1)->whereHas('tc_nur_obs',function($q2){
                     $q2->whereHas('tc_nurs',function($q3){
                         $q3->where('category',1);
                     });
                 });
             }])
             ->withCount(['tc_nur_ob_details as need_transfer_estate' => function($q){
-                $q->where('status',0)->whereHas('tc_nur_obs',function($q2){
+                $q->where('status',0)->where('is_transfer', 1)->whereHas('tc_nur_obs',function($q2){
                     $q2->whereHas('tc_nurs',function($q3){
                         $q3->where('category',2);
                     });
@@ -76,8 +77,8 @@ class NurTransferController extends Controller
         $data['desc'] = "Create new transfer nur.";
         $data['transferCount'] = TcNurTransfer::select('id')->where('tc_init_id',$id)->get()->count();
         $q = collect(TcNurObDetail::where('tc_init_id',$id)->get()->toArray());
-        $data['transferred'] = $q->where('status',1)->count();
-        $data['need_transfer'] = $q->where('status',0)->count();
+        $data['transferred'] = $q->where('status',1)->sum('is_transfer');
+        $data['need_transfer'] = $q->where('status',0)->sum('is_transfer');
         $data['initId'] = $id;
         $q = TcSample::select('id','sample_number')
             ->whereHas('tc_inits', function($q) use($id){
@@ -88,7 +89,7 @@ class NurTransferController extends Controller
         $data['plant'] = TcPlantation::all();
         return view('modules.nur_transfer.show', compact('data'));
     }
-    
+
     public function dtShow(Request $request)
     {
         $data = TcNurOb::select([
@@ -97,6 +98,7 @@ class NurTransferController extends Controller
                 DB::raw('convert(varchar,ob_date, 103) as ob_date_format'),
                 DB::raw("IIF(tc_nurs.category=1, 'Nursery', 'Estate') as cat"),
             ])
+            ->where('tc_nur_obs.tc_init_id', $request->initId)
             ->leftJoin('tc_nurs','tc_nurs.id','=','tc_nur_obs.tc_nur_id')
             ->whereHas('tc_nur_ob_details',function($q){
                 $q->where('status',0);
@@ -170,7 +172,7 @@ class NurTransferController extends Controller
                     })->get()->count();
                     $next = $cek == 0?true:false;
                 }
-                
+
                 if($q->to_self != 0){
                     $q3 = TcNur::where('tc_nur_transfer_id',$data->id)->first();
                     $q3Id = $q3->id;
@@ -199,7 +201,7 @@ class NurTransferController extends Controller
                 if($self && $next){
                     $el .= '<a href="#delModal" data-toggle="modal" data-target="#delModal" class="btn btn-sm btn-danger py-0" data-id="'.$data->id.'" data-attr="'.$data->transfer_date_format.'">Delete</a>';
                 }
-                
+
                 $el .= '</div>';
                 return $el;
             })
@@ -212,7 +214,7 @@ class NurTransferController extends Controller
         if($request->max != ($request->to_self + $request->to_self2 + $request->to_next)){
             return alert(0,'Total transfer must be '.$request->max,'alert-area-modal-transfer');
         }else{
-            
+
             $dtObs = TcNurOb::where('id',$request->tc_nur_ob_id)->first();
             $sub = $dtObs->tc_nurs->sub;
             $type = $dtObs->tc_nurs->type;
@@ -248,7 +250,7 @@ class NurTransferController extends Controller
                 unset($dt);
                 $nurId = $q->id;
 
-                for ($i=1; $i <= $request->to_self ; $i++) { 
+                for ($i=1; $i <= $request->to_self ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_nur_id' => $nurId,
@@ -280,7 +282,7 @@ class NurTransferController extends Controller
                 unset($dt);
                 $nurId = $q->id;
 
-                for ($i=1; $i <= $request->to_self2 ; $i++) { 
+                for ($i=1; $i <= $request->to_self2 ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_nur_id' => $nurId,
@@ -310,7 +312,7 @@ class NurTransferController extends Controller
                 $q = TcField::create($dt);
                 $fieldId = $q->id;
 
-                for ($i=1; $i <= $request->to_next ; $i++) { 
+                for ($i=1; $i <= $request->to_next ; $i++) {
                     $dtUse[] = [
                         'tc_init_id' => $initId,
                         'tc_field_id' => $fieldId,
@@ -330,7 +332,7 @@ class NurTransferController extends Controller
     }
 
     public function destroy($id)
-    { 
+    {
         $q = TcNurTransfer::where('id',$id)->first();
         $obsId = $q->tc_nur_ob_id;
         $self = $self2 = $next = true;
@@ -388,8 +390,8 @@ class NurTransferController extends Controller
         }else{
             return alert(0,null,'alert-area2');
         }
-        
-        
+
+
     }
 
     public function printLabel(Request $request)
@@ -449,6 +451,6 @@ class NurTransferController extends Controller
                 ])->get()->toArray();
             return view('modules.nur_transfer.print_label_layout2',compact('data'));
         }
-        
+
     }
 }

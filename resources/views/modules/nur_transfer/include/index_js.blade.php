@@ -19,7 +19,7 @@
             { data: 'transferred', name: 'transferred', orderable:false, searchable:false},
             { data: 'need_transfer_nursery', name: 'need_transfer_nursery', orderable:false, searchable:false},
             { data: 'need_transfer_estate', name: 'need_transfer_estate', orderable:false, searchable:false},
-            
+
         ],
         initComplete: function () {
                 $('#header-filter th').each(function() {

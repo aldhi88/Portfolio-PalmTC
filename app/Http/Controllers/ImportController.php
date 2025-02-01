@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\AclimImport;
 use App\Imports\CallusImport;
 use App\Imports\EmbryoImport;
+use App\Imports\FieldImport;
 use App\Imports\GerminImport;
 use App\Imports\HardenImport;
 use App\Imports\InitsImport;
@@ -352,6 +353,37 @@ class ImportController extends Controller
                     'icon' => 'times',
                     'el' => 'alert-area',
                     'msg' => 'Import Error, '.NurImport::$error,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been imported.',
+            ],
+        ]);
+    }
+
+    // ==================== Field
+    public function fieldExport()
+    {
+        return response()->download(storage_path('/app/public/form_import/form_import_field.xlsx'));
+    }
+    public function fieldImport(Request $request)
+    {
+        Excel::import(new FieldImport, $request->file);
+        if(FieldImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.FieldImport::$error,
                 ],
             ]);
         }

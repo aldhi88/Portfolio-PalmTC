@@ -183,7 +183,7 @@
                     </a>
                     <ul class="pcoded-submenu">
                         <li><a href="{{ route('field-lists.index') }}">Bottle List</a></li>
-                        <li><a href="{{ route('field-obs.index') }}">Observation</a></li>
+                        {{-- <li><a href="{{ route('field-obs.index') }}">Observation</a></li> --}}
                     </ul>
                 </li>
 
