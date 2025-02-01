@@ -89,19 +89,18 @@
         scrollX: true,
         pageLength: 25,
         order: [
-            [5, 'desc'],
+            [0, 'asc'],
         ],
         columnDefs: [
             { className: 'text-center', targets: [1] },
         ],
         ajax: '{!! route('samples.dt') !!}',
         columns: [
-            { data: 'id', name: 'id', orderable:false, searchable:false},
+            { data: 'custom_name', name: 'sample_number', orderable:true, searchable:true},
             { data: 'resample_display', name: 'resample', orderable:false, searchable:false},
             { data: 'year', name: 'year', orderable:false, searchable:false},
             { data: 'month', name: 'month', orderable:false, searchable:false},
             { data: 'weekOfYear', name: 'weekOfYear', orderable:false, searchable:false},
-            { data: 'custom_name', name: 'sample_number', orderable:true, searchable:true},
             { data: 'master_treefile.noseleksi', name: 'master_treefile.noseleksi', orderable:true, searchable:true},
             { data: 'master_treefile.family', name: 'master_treefile.family', orderable: true },
             { data: 'master_treefile.indukbet', name: 'master_treefile.indukbet', orderable: true },
@@ -112,6 +111,21 @@
             { data: 'master_treefile.tahuntanam', name: 'master_treefile.tahuntanam', orderable: true },
             { data: 'master_treefile.tipe', name: 'master_treefile.tipe', orderable: true },
             { data: 'program', name: 'program', orderable: true },
-        ]
+        ],
+        initComplete: function () {
+                $('#header-filter th').each(function() {
+                    var title = $(this).text();
+                    var disable = $(this).attr("disable");
+                    if(disable!="true"){
+                        $(this).html('<input placeholder="'+title+'" type="text" class="form-control column-search px-1 form-control-sm"/>');
+                    }
+                });
+                $('#header-filter').on('keyup', ".column-search",function () {
+                    dtTable
+                        .column( $(this).parent().index() )
+                        .search( this.value )
+                        .draw();
+                });
+            }
     });
 </script>

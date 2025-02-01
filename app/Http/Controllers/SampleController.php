@@ -178,6 +178,7 @@ class SampleController extends Controller
                 return $el;
             })
             ->rawColumns(['custom_name', 'resample_display'])
+            ->smart(false)
             ->toJson();
     }
 

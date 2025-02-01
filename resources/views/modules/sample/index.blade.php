@@ -110,12 +110,11 @@
                     <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th style="min-width: 100px">Sample Number</th>
                                 <th class="text-center">Resampling</th>
                                 <th>Year</th>
                                 <th>Month</th>
                                 <th>Week</th>
-                                <th>Sampling</th>
                                 <th>Cross</th>
                                 <th>Family</th>
                                 <th>Female Genitor</th>
@@ -126,6 +125,25 @@
                                 <th>Planting Year</th>
                                 <th>Type</th>
                                 <th>Program</th>
+                            </tr>
+                        </thead>
+                        <thead id="header-filter" class="bg-white">
+                            <tr>
+                                <th class="bg-white">No.</th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
+                                <th class="bg-white" disable="true"></th>
                             </tr>
                         </thead>
                         <tbody></tbody>

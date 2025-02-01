@@ -27,6 +27,9 @@ class InitsImport implements ToCollection
         $tcInitData = [];
         $tcCallusObsData = [];
         $tcInitBottleData = [];
+        $dtSample = TcSample::query()
+            ->select('id', 'sample_number')
+            ->get();
 
         // Step 1: Prepare TcInit and TcCallusOb data
         foreach ($rows as $key => $value) {
@@ -44,6 +47,14 @@ class InitsImport implements ToCollection
             }
 
             $currentId++;
+
+            $cek = $dtSample->firstWhere('sample_number', $value[0]);
+            if($cek){
+                $sampleId = $cek['id'];
+            }else{
+                self::$error = "Sample Number ".$value[0]." tidak ditemukan. Cek baris ke- " . ($key + 1);
+                return;
+            }
 
             $tcInitData[] = [
                 'id' => $currentId,
