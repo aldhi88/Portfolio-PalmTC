@@ -167,6 +167,36 @@ class InitCmd extends Command
         TcPlantation::create($data);
         DB::unprepared('SET IDENTITY_INSERT tc_plantations OFF');
 
+        // tc_plantations
+        unset($data);
+        TcPlantation::query()->forceDelete();
+        $data = [
+            [
+                'id' => 1,
+                'code' => 'AL',
+                'name' => 'Aek Loba',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'id' => 2,
+                'code' => 'BB',
+                'name' => 'Bangun Bandar',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'id' => 3,
+                'code' => 'SSPL',
+                'name' => 'SSPL',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+        ];
+        DB::unprepared('SET IDENTITY_INSERT tc_plantations ON');
+        TcPlantation::insert($data);
+        DB::unprepared('SET IDENTITY_INSERT tc_plantations OFF');
+
         // tc_rooms
         unset($data);
         $q = TcRoom::find(99);
@@ -201,11 +231,15 @@ class InitCmd extends Command
                 'id' => 1,
                 'code' => 'Mati',
                 'name' => 'Mati',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ],
             [
                 'id' => 2,
                 'code' => 'Kering',
                 'name' => 'Kering',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ],
         ];
         DB::unprepared('SET IDENTITY_INSERT tc_deaths ON');

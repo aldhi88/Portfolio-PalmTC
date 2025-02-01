@@ -128,6 +128,10 @@ Route::name('import.')->group(function () {
         Route::post('aclimImport', [ImportController::class, 'aclimImport'])->name('aclimImport');
         Route::get('hardenExport', [ImportController::class, 'hardenExport'])->name('hardenExport');
         Route::post('hardenImport', [ImportController::class, 'hardenImport'])->name('hardenImport');
+        Route::get('hardenExport', [ImportController::class, 'hardenExport'])->name('hardenExport');
+        Route::post('hardenImport', [ImportController::class, 'hardenImport'])->name('hardenImport');
+        Route::get('nurExport', [ImportController::class, 'nurExport'])->name('nurExport');
+        Route::post('nurImport', [ImportController::class, 'nurImport'])->name('nurImport');
     });
 });
 

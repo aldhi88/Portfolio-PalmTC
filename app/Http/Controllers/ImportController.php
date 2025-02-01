@@ -10,6 +10,7 @@ use App\Imports\HardenImport;
 use App\Imports\InitsImport;
 use App\Imports\LiquidImport;
 use App\Imports\MaturImport;
+use App\Imports\NurImport;
 use App\Imports\RootingImport;
 use App\Imports\SampleForImport;
 use Illuminate\Http\Request;
@@ -321,6 +322,36 @@ class ImportController extends Controller
                     'icon' => 'times',
                     'el' => 'alert-area',
                     'msg' => 'Import Error, '.HardenImport::$error,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been imported.',
+            ],
+        ]);
+    }
+    // ==================== Nursery
+    public function nurExport()
+    {
+        return response()->download(storage_path('/app/public/form_import/form_import_nur.xlsx'));
+    }
+    public function nurImport(Request $request)
+    {
+        Excel::import(new NurImport, $request->file);
+        if(NurImport::$error != false){
+            return response()->json([
+                'status' => 'error',
+                'data' => [
+                    'type' => 'danger',
+                    'icon' => 'times',
+                    'el' => 'alert-area',
+                    'msg' => 'Import Error, '.NurImport::$error,
                 ],
             ]);
         }
