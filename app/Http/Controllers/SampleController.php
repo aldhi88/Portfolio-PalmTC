@@ -7,6 +7,8 @@ use App\Http\Requests\SampleCreate;
 use App\Http\Requests\SampleEdit;
 use App\Models\MasterTreefile;
 use App\Models\TcSample;
+use App\Models\TcSampleFile;
+use App\Models\TcSampleImage;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
@@ -205,8 +207,7 @@ class SampleController extends Controller
     }
     public function store(SampleCreate $request)
     {
-        $TcSample = new TcSample();
-        $data = $request->except('_token', 'no_seleksi','baris');
+        $data = $request->except('_token', 'no_seleksi','baris','file','img');
         $cekResample = TcSample::where('master_treefile_id',$request->master_treefile_id)
             ->whereNull('resample')
             ->get();
@@ -214,7 +215,25 @@ class SampleController extends Controller
             $data['resample'] = $cekResample->first()->id;
         }
         $data['program'] = Str::upper($data['program']);
-        TcSample::create($data);
+        $q = TcSample::create($data);
+        $dtMedia['tc_sample_id'] = $q->id;
+
+        if ($request->hasFile('file')) {
+            foreach ($request->file('file') as $file) {
+                $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('media/sample/file', $fileName);
+                $dtMedia['name'] = $fileName;
+                TcSampleFile::create($dtMedia);
+            }
+        }
+        if ($request->hasFile('img')) {
+            foreach ($request->file('img') as $img) {
+                $fileName = Str::uuid() . '.' . $img->getClientOriginalExtension();
+                $img->storeAs('media/sample/img', $imgName);
+                $dtMedia['name'] = $imgName;
+                TcSampleImage::create($dtMedia);
+            }
+        }
         return response()->json([
             'status' => 'success',
             'data' => [

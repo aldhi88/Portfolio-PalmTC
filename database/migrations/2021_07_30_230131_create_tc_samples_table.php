@@ -20,6 +20,7 @@ class CreateTcSamplesTable extends Migration
             $table->bigInteger('resample')->nullable();
             $table->text('program')->nullable();
             $table->text('desc')->nullable();
+            $table->text('comment')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

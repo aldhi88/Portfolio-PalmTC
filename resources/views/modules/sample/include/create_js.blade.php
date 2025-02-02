@@ -31,7 +31,7 @@
     $('#formCreateModal input[name="created_at"]').on('change', function(){
         getWeek();
     })
-    
+
     function clearValidationCreate(){
         $('#formCreateModal input').removeClass('is-invalid');
         $('span.msg').text('');
@@ -81,6 +81,45 @@
         }
         e.preventDefault();
         return false;
+    });
+
+    let fileCount = 1; // Mulai dari 1 karena sudah ada satu input file
+
+    $('#addFileButton').click(function(e) {
+        e.preventDefault(); // Mencegah form submit
+
+        fileCount++; // Increment file count
+
+        // Buat elemen input file baru
+        const newFileInput = `
+            <div class="form-group">
+                <label><strong>File ${fileCount}</strong></label>
+                <input name="file[]" type="file" class="form-control form-control-sm">
+                <small><span class="file text-danger msg"></span></small>
+            </div>
+        `;
+
+        // Sisipkan elemen input file baru sebelum tombol "Add Another File"
+        $(newFileInput).insertBefore('hr.file-hr');
+    });
+
+    let imgCount = 1; // Mulai dari 1 karena sudah ada satu input img
+
+    $('#addImgButton').click(function(e) {
+        e.preventDefault(); // Mencegah form submit
+
+        imgCount++; // Increment img count
+
+        // Buat elemen input img baru
+        const newImgInput = `
+            <div class="form-group">
+                <label><strong>Image ${imgCount}</strong></label>
+                <input name="img[]" type="file" class="form-control form-control-sm">
+            </div>
+        `;
+
+        // Sisipkan elemen input file baru sebelum tombol "Add Another File"
+        $(newImgInput).insertBefore('hr.img-hr');
     });
 </script>
 

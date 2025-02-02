@@ -15,7 +15,7 @@
         <a href="{{ route('samples.index') }}" class="btn btn-warning btn-sm d-none d-sm-inline"><i class="feather mr-2 icon-skip-back"></i>Back to Sample Data</a>
         <a href="{{ route('samples.index') }}" class="btn btn-warning btn-sm btn-block d-sm-none"><i class="feather mr-2 icon-skip-back"></i>Back to Sample Data</a>
     </div>
-    
+
     <form id="formCreateModal"> @csrf
         <div class="card-body">
             <div class="row">
@@ -80,6 +80,52 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <h5 class="mb-3">Images - Files - Comments</h5>
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Comment</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">File</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Image</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                            <textarea name="comment" class="form-control form-control-sm border" rows="8"></textarea>
+                        </div>
+                        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                            <div class="form-group">
+                                <label><strong>File 1</strong></label>
+                                <input name="file[]" type="file" class="form-control form-control-sm">
+                            </div>
+
+                            <hr class="file-hr">
+                            <button class="btn btn-info btn-sm" type="button" id="addFileButton">
+                                <i class="feather mr-2 icon-plus"></i> Add Another File
+                            </button>
+                        </div>
+                        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                            <div class="form-group">
+                                <label><strong>Image 1</strong></label>
+                                <input name="img[]" type="file" class="form-control form-control-sm">
+                            </div>
+
+                            <hr class="img-hr">
+                            <button class="btn btn-info btn-sm" type="button" id="addImgButton">
+                                <i class="feather mr-2 icon-plus"></i> Add Another Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -23,10 +23,16 @@ class TcSample extends Model
     ];
 
     // relationship
+    public function tc_sample_files(){
+        return $this->hasMany(TcSampleFile::class,'tc_sample_id','id');
+    }
+    public function tc_sample_images(){
+        return $this->hasMany(TcSampleImage::class,'tc_sample_id','id');
+    }
     public function tc_inits(){
         return $this->hasOne('App\Models\TcInit','tc_sample_id','id');
     }
-    
+
     public function getWeekOfYearAttribute(){
         return Carbon::parse($this->created_at)->weekOfYear;
     }
@@ -34,7 +40,7 @@ class TcSample extends Model
         return $this->select('id', 'sample_number')
                     ->latest('id')
                     ->first();
-        
+
     }
     public function getResampleFormatAttribute(){
         if(is_null($this->resample)){
@@ -75,7 +81,7 @@ class TcSample extends Model
             // dd($stopCheck);
             return $el;
         }
-        
+
         // if(is_null($this->resample)){
         //     return '<label class="badge badge-light-primary">New</label>';
         // }else{

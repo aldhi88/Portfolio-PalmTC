@@ -156,19 +156,6 @@ class InitCmd extends Command
 
         // tc_plantations
         unset($data);
-        $q = TcPlantation::find(99);
-        if($q){
-            $q->forceDelete();
-        }
-        $data['id'] = 99;
-        $data['code'] = "XX";
-        $data['name'] = "IMPORT";
-        DB::unprepared('SET IDENTITY_INSERT tc_plantations ON');
-        TcPlantation::create($data);
-        DB::unprepared('SET IDENTITY_INSERT tc_plantations OFF');
-
-        // tc_plantations
-        unset($data);
         TcPlantation::query()->forceDelete();
         $data = [
             [
