@@ -250,6 +250,9 @@ Route::resource('plantations', PlantationController::class)->except(['create', '
 Route::name('samples.')->group(function () {
     Route::prefix('samples')->group(function(){
         Route::get('dt', [SampleController::class, 'dt'])->name('dt');
+        Route::get('dtComment', [SampleController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [SampleController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [SampleController::class, 'commentDestroy'])->name('commentDestroy');
         Route::get('get-data/{id}', [SampleController::class, 'getData'])->name('getData');
         Route::get('dt-treefile', [SampleController::class, 'dtTreefile'])->name('dtTreefile');
         Route::get('dt-sample', [SampleController::class, 'dtSample'])->name('dtSample');

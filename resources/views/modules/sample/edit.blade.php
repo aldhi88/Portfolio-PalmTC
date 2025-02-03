@@ -19,7 +19,7 @@
         <input type="hidden" name="id" value="{{ $data['data_edit']->id }}">
         <div class="card-body">
             <div class="row">
-                
+
                 <div class="col-md-7">
                     <div class="row">
 
@@ -81,6 +81,41 @@
                     </div>
                 </div>
 
+
+
+                <div class="col-12 mt-5">
+                    <div class="row">
+                        <div class="col">
+                            <h5>Comments - Files - Images</h5>
+                        </div>
+                        <div class="col text-right">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addCommentModal" data-id="{{$data['data_edit']->id}}">Add New</button>
+                        </div>
+                    </div>
+                    <table id="DTComment" class="table table-striped table-bordered nowrap table-xs w-100">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Date</th>
+                                <th>Comment</th>
+                                <th>File List</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <thead id="header-filter" class="text-center">
+                            <th class="bg-white" disable="true"></th>
+                            <th class="bg-white" disable="true"></th>
+                            <th class="bg-white"></th>
+                            <th class="bg-white" disable="true"></th>
+                            <th class="bg-white" disable="true"></th>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+
+
+
             </div>
 
         </div>
@@ -100,5 +135,8 @@
         <div class="modal-content"></div>
     </div>
 </div>
+
+@include('modules.sample.comment_create',['data' => $data])
+@include('modules.sample.comment_delete',['data' => $data])
 @endsection
 

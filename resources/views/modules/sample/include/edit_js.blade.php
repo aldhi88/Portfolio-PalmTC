@@ -57,5 +57,50 @@
         e.preventDefault();
         return false;
     });
+
+    var dtComment = $('#DTComment').DataTable({
+        processing: true,serverSide: true,pageLength: 10,
+        order: [[0, 'desc']],
+        columnDefs: [
+            { className: 'text-center', targets: ['_all'] },
+        ],
+        ajax: {
+            url: '{{ route("samples.dtComment") }}',
+            data: function(d){ // note !
+                d.id = '{{$data["data_edit"]->id}}';
+            }
+        },
+        columns: [
+            { data: 'action', name: 'created_at', orderable: true, searchable:false },
+            { data: 'created_at_format', name: 'created_at', orderable: true, searchable:false },
+            { data: 'comment', name: 'comment', orderable: false, searchable:true },
+            { data: 'image_file', name: 'file', orderable: false, searchable:true },
+            { data: 'image_format', name: 'image', orderable: false, searchable:false },
+        ],
+        initComplete: function(settings){
+            $('#header-filter th').each(function() {
+                var title = $(this).text();
+                var disable = $(this).attr("disable");
+                if(disable!="true"){
+                    $(this).html('<input placeholder="'+title+'" type="text" class="form-control column-search px-1 form-control-sm"/>');
+                }
+            });
+            $('#header-filter').on('keyup', ".column-search",function () {
+                dtTable
+                    .column( $(this).parent().index() )
+                    .search( this.value )
+                    .draw();
+            });
+        }
+    });
+
+    $("#deleteCommentModal").on("show.bs.modal", function(e) {
+        let button = $(e.relatedTarget);
+        let jsonData = button.attr("data-json");
+        let firstParse = JSON.parse(jsonData);
+        let data = JSON.parse(firstParse);
+        $('p.comment').text(data.comment);
+        $('input[name="id"]').val(data.id);
+    });
 </script>
 

@@ -7,6 +7,7 @@ use App\Http\Requests\SampleCreate;
 use App\Http\Requests\SampleEdit;
 use App\Models\MasterTreefile;
 use App\Models\TcSample;
+use App\Models\TcSampleComment;
 use App\Models\TcSampleFile;
 use App\Models\TcSampleImage;
 use Carbon\Carbon;
@@ -215,25 +216,8 @@ class SampleController extends Controller
             $data['resample'] = $cekResample->first()->id;
         }
         $data['program'] = Str::upper($data['program']);
-        $q = TcSample::create($data);
-        $dtMedia['tc_sample_id'] = $q->id;
+        TcSample::create($data);
 
-        if ($request->hasFile('file')) {
-            foreach ($request->file('file') as $file) {
-                $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('media/sample/file', $fileName);
-                $dtMedia['name'] = $fileName;
-                TcSampleFile::create($dtMedia);
-            }
-        }
-        if ($request->hasFile('img')) {
-            foreach ($request->file('img') as $img) {
-                $fileName = Str::uuid() . '.' . $img->getClientOriginalExtension();
-                $img->storeAs('media/sample/img', $imgName);
-                $dtMedia['name'] = $imgName;
-                TcSampleImage::create($dtMedia);
-            }
-        }
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -254,6 +238,109 @@ class SampleController extends Controller
         $data['data_edit'] = $TcSample->selByCol('id', $id)->first();
         $data['data_edit']['created_at_edit'] = Carbon::parse($data['data_edit']->created_at)->format('Y-m-d');
         return view('modules.sample.edit', compact('data'));
+    }
+
+    public function dtComment(Request $request)
+    {
+        $data = TcSampleComment::select([
+            'tc_sample_comments.*',
+            DB::raw('convert(varchar,created_at, 103) as created_at_format'), //note*
+        ])
+            ->where('tc_sample_id',$request->id)
+            // ->with(['tck_acclims:id'])
+        ;
+        // if($request->filter==1){
+        //     $data->whereNull('file')->whereNull('image');
+        // }else if($request->filter==2){
+        //     $data->whereNull('image');
+        // }else if($request->filter==3){
+        //     $data->whereNull('file');
+        // }
+        return Datatables::of($data)
+            ->addColumn('action', function($data){
+                // $el = '
+                //     <a class="text-primary fs-13" data-id="'.$data->id.'" href="#" data-toggle="modal" data-target="#editCommentModal">Edit</a>
+                // ';
+                $dtJson['comment'] = $data->comment;
+                $dtJson['id'] = $data->id;
+                $json = json_encode($dtJson);
+                $el = '
+                    <br> <a class="text-danger fs-13" data-json=\''.htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8').'\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
+                ';
+                return $el;
+            })
+            ->filterColumn('created_at_format', function($query, $keyword){
+                $sql = 'convert(varchar,created_at, 103) like ?';
+                $query->whereRaw($sql, ["{$keyword}"]);
+            })
+            ->addColumn('image_file', function($data){
+                $el = null;
+                if(!is_null($data->file)){
+                    $el = '
+                        <a href="'.asset("storage/media/sample/file").'/'.$data->file.'">
+                            <h5><i class="feather mr-2 icon-file"></i>Download</h5>
+                        </a>
+                    ';
+                }
+
+                return $el;
+            })
+            ->addColumn('image_format', function($data){
+                $el = null;
+                if(!is_null($data->image)){
+                    $el = '
+                        <a href="'.asset("storage/media/sample/image").'/'.$data->image.'" target="_blank">
+                        <img src="'.asset("storage/media/sample/image").'/'.$data->image.'" class="img-thumbnail" width="70">
+                        </a>
+                    ';
+                }
+                return $el;
+            })
+            ->rawColumns(['image_format','image_file','action'])
+            ->smart(false)->toJson();
+    }
+
+
+    public function commentStore(Request $request)
+    {
+        $dt = $request->except('_token','file','image');
+        if ($request->hasFile('file')) {
+            $dt['file'] = Str::uuid() . '.' . ($request->file('file'))->getClientOriginalExtension();
+            ($request->file('file'))->storeAs('public/media/sample/file', $dt['file']);
+        }
+        if ($request->hasFile('image')) {
+            $dt['image'] = Str::uuid() . '.' . ($request->file('image'))->getClientOriginalExtension();
+            ($request->file('image'))->storeAs('public/media/sample/image', $dt['image']);
+        }
+
+        TcSampleComment::create($dt);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been added.',
+            ],
+        ]);
+    }
+
+    public function commentDestroy(Request $request)
+    {
+        $data = TcSampleComment::find($request->id);
+        Storage::delete('public/media/sample/file/'.$data->file);
+        Storage::delete('public/media/sample/image/'.$data->image);
+        TcSampleComment::find($request->id)->delete();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, data has been deleted.',
+            ],
+        ]);
     }
 
 

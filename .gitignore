@@ -1,6 +1,7 @@
 /node_modules
 /storage/app/public/excel_temp
 /storage/app/public/pdf_temp
+/storage/app/public/media
 /vendor
 .env
 .env.backup

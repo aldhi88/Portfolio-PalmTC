@@ -58,6 +58,7 @@
 <script src="{{ asset('assets/js/pcoded.min.js') }}"></script>
 <script src="{{ asset('assets/mine/myscript.js') }}"></script>
 @yield('js')
+@stack('pushJs')
 {{-- @livewireScripts --}}
 </body>
 

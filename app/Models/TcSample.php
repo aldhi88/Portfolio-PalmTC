@@ -23,11 +23,8 @@ class TcSample extends Model
     ];
 
     // relationship
-    public function tc_sample_files(){
-        return $this->hasMany(TcSampleFile::class,'tc_sample_id','id');
-    }
-    public function tc_sample_images(){
-        return $this->hasMany(TcSampleImage::class,'tc_sample_id','id');
+    public function tc_sample_comments(){
+        return $this->hasMany(TcSampleComment::class,'tc_sample_id','id');
     }
     public function tc_inits(){
         return $this->hasOne('App\Models\TcInit','tc_sample_id','id');
