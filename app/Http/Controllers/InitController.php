@@ -7,6 +7,7 @@ use App\Models\TcCallusOb;
 use App\Models\TcCallusObDetail;
 use App\Models\TcInit;
 use App\Models\TcInitBottle;
+use App\Models\TcInitComment;
 use App\Models\TcLaminar;
 use App\Models\TcMediumStock;
 use App\Models\TcRoom;
@@ -17,6 +18,9 @@ use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class InitController extends Controller
 {
@@ -72,12 +76,16 @@ class InitController extends Controller
                         <p class='mb-0'><a class='text-primary' data-id='".$data->id."' href='#' data-toggle='modal' data-target='#activeModal'>Active</a></p>
                     ";
                 }
-                
+
                 if(count($data->tc_init_bottles) != 0){
                     $el .= "
                             <p class='mb-0'><a class='text-primary' data-id='".$data->id."' href='".route('inits.show',$data->id)."'>View Detail</a></p>
                         ";
                 }
+
+                $el .= "
+                            <p class='mb-0'><a class='text-primary' data-id='".$data->id."' href='".route('inits.comment',$data->id)."'>Comment</a></p>
+                        ";
                 $el .= "
                         <p class='mb-0'><a class='text-danger' data-id='".$data->id."' href='#' data-toggle='modal' data-target='#deleteInitModal'>Delete</a></p>
                     ";
@@ -95,7 +103,7 @@ class InitController extends Controller
                             <a class='text-primary' href='".route("inits.indexPrintBottle",$data->id)."'>Print</a><br>
                     ";
                 }
-                
+
                 $el .= '</p>';
                 return $el;
             })
@@ -165,7 +173,7 @@ class InitController extends Controller
             }
             return view('modules.init.create.'.$step1,compact('data','dtStep1'));
         }
-            
+
         return view('modules.init.create.'.$step1,compact('data'));
     }
     public function submitStep1(Request $request)
@@ -227,7 +235,7 @@ class InitController extends Controller
         $data = $data->toArray();
         $dtStep2['form'] = session('session_init_step2')['form'];
         $dtStep2['data'] = $data;
-        
+
         session(['session_init_step2' => $dtStep2]);
     }
     public function finishStep2(Request $request)
@@ -271,7 +279,7 @@ class InitController extends Controller
             $step3 = $dtStep3['form'];
             $data['session'] = $dtStep3;
             $data["medium_stocks"] = TcMediumStock::with("tc_mediums")
-                ->orderBy("created_at","desc")  
+                ->orderBy("created_at","desc")
                 ->where('id','!=',0)
                 ->get();
 
@@ -339,7 +347,7 @@ class InitController extends Controller
         $data = $data->toArray();
         $dtStep3['form'] = session('session_init_step3')['form'];
         $dtStep3['data'] = $data;
-        
+
         session(['session_init_step3' => $dtStep3]);
     }
     public function finishStep3(Request $request)
@@ -347,7 +355,7 @@ class InitController extends Controller
         $dataStep3 = collect(session('session_init_step3')['data']);
         $numOfBottle = session('session_init_step1')['number_of_block'] * session('session_init_step1')['number_of_bottle'];
         $usedStock = $dataStep3->sum('used_stock');
-        
+
         if($numOfBottle != $usedStock){
             return response()->json([
                 'status' => 'error',
@@ -375,7 +383,7 @@ class InitController extends Controller
         if(
             $dtSessionStep1['form'] != 'step1_read' ||
             $dtSessionStep2['form'] != 'step2_read' ||
-            $dtSessionStep3['form'] != 'step3_read' 
+            $dtSessionStep3['form'] != 'step3_read'
         ){
             return response()->json([
                 'status' => 'error',
@@ -387,7 +395,7 @@ class InitController extends Controller
                 ],
             ]);
         }
-        
+
         // insert ke table tc_inits
         $dtInit['tc_sample_id'] = $dtSessionStep1['tc_sample_id'];
         $dtInit['tc_room_id'] = $dtSessionStep1['tc_room_id'];
@@ -412,7 +420,7 @@ class InitController extends Controller
         $workerIndex = 0;
         $workerCount = $dtSessionStep2['read']['numOfWorker'];
 
-        for ($i=1; $i <= $dtInit['number_of_block'] ; $i++) { 
+        for ($i=1; $i <= $dtInit['number_of_block'] ; $i++) {
             $blockNumber = $i;
             $data[] = [
                 'tc_init_id' => $initId,
@@ -437,7 +445,7 @@ class InitController extends Controller
         $indexStock = 0;
         $stockLoad = $dtSessionStep3['data'][$indexStock]['used_stock'];
         foreach ($dataOrder as $key => $value) {
-            for ($i=$dtInit['number_of_bottle']; $i > 0 ; $i--) { 
+            for ($i=$dtInit['number_of_bottle']; $i > 0 ; $i--) {
                 if($stockLoad < $index){
                     $indexStock +=1;
                     $stockLoad = $stockLoad+($dtSessionStep3['data'][$indexStock]['used_stock']);
@@ -454,7 +462,7 @@ class InitController extends Controller
                     'updated_at' => Carbon::now()
                 ];
                 $index++;
-            }           
+            }
 
             try {
                 TcInitBottle::insert($dt480);
@@ -473,7 +481,7 @@ class InitController extends Controller
             }
         }
         unset($dataOrder);
-        
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -506,7 +514,7 @@ class InitController extends Controller
         $dtWorker = collect($dtWorker);
         $dtWorker = $dtWorker->groupBy('tc_worker_id')->sortBy('block_number')->toArray();
         $dtWorker = array_values($dtWorker);
-        
+
         $data['block_total'] = 0; $data['bottle_total'] = 0; $data['explant_total'] = 0;
         foreach ($dtWorker as $key => $value) {
             $value[0]['block_load'] = collect($value)->groupBy('block_number')->count();
@@ -676,7 +684,7 @@ class InitController extends Controller
         $dtWorker = collect($dtWorker);
         $dtWorker = $dtWorker->groupBy('tc_worker_id')->toArray();
         $dtWorker = array_values($dtWorker);
-        
+
         $data['block_total'] = 0; $data['bottle_total'] = 0; $data['explant_total'] = 0;
         foreach ($dtWorker as $key => $value) {
             $value[0]['block_load'] = collect($value)->groupBy('block_number')->count();
@@ -712,7 +720,7 @@ class InitController extends Controller
         $data['status'] = 1;
         $nextNumber = TcInitBottle::getLastBottleNumber($data['tc_init_id']);
         $loopBottle = $request->number_of_bottle;
-        for ($i=1; $i <= $loopBottle ; $i++) { 
+        for ($i=1; $i <= $loopBottle ; $i++) {
             $data['bottle_number'] = $nextNumber+$i;
             TcInitBottle::create($data);
         }
@@ -779,7 +787,7 @@ class InitController extends Controller
             ->orderBy('block_number','desc')
             ->first()
             ->getAttribute('block_number');
-            
+
         $data['workers'] = TcInitBottle::select('tc_worker_id','bottle_number')
             ->orderBy('bottle_number','asc')
             ->with('tc_workers:id,code')
@@ -791,7 +799,7 @@ class InitController extends Controller
             $dtAry[] = $value[0];
         }
         $data['workers'] = $dtAry;
-        
+
         return view('modules.init.print_botol', compact('data'));
     }
     public function printByBottleNumber(Request $request){
@@ -846,7 +854,7 @@ class InitController extends Controller
             ->where("id",$initId)
             ->first();
         $data["date_of_work"] = Carbon::parse($q->date_work)->format("d F Y");
-        
+
         return view("modules.init.print.print_label_botol_layout", compact('data'));
     }
     public function printByWorker(Request $request){
@@ -901,9 +909,9 @@ class InitController extends Controller
     public function checkBottlePrint(Request $request){
         $bottleId = $request->bottleId;
         $status = $request->status;
-        
+
         $dataAry = session('data_bottle');
-                
+
         if($status==1){
             $data = $dataAry;
             if(is_null($data)){
@@ -931,14 +939,14 @@ class InitController extends Controller
         }else{
             $data["print_bottle_custom"] = null;
         }
-        
+
         return view("modules.init.print_bottle_list", compact("data"));
     }
     public function dataPrintCustomUncheckAll(){
         session()->forget("data_bottle");
     }
     public function checkBeforePrintCheck(Request $request){
-        if( 
+        if(
             is_null(session("data_bottle")) ||
             !$request->session()->has('data_bottle')
         ){
@@ -966,7 +974,7 @@ class InitController extends Controller
     public function triggerPrintCheck(Request $request){
         $data['title'] = "Print Label";
         $data['desc'] = "Print Label By Bottle Number";
-        
+
         $idBottle = [];
         foreach (session("data_bottle") as $key => $value) {
             array_push($idBottle,$value);
@@ -981,12 +989,123 @@ class InitController extends Controller
                 });
             })
             ->get();
-            
+
         $q = TcInit::select("date_work")
             ->where("id",$initId)
             ->first();
         $data["date_of_work"] = Carbon::parse($q->date_work)->format("d F Y");
-        
+
         return view("modules.init.print.print_label_botol_layout", compact('data'));
+    }
+
+    public function comment($id)
+    {
+        $data['title'] = "Initiation Comments - Files - Images";
+        $data['desc'] = "Manage data comment, file and image";
+        $data['initId'] = $id;
+        return view('modules.init.comment', compact('data'));
+    }
+
+    public function dtComment(Request $request)
+    {
+        $data = TcInitComment::select([
+            'tc_init_comments.*',
+            DB::raw('convert(varchar,created_at, 103) as created_at_format'), //note*
+        ])
+            ->where('tc_init_id',$request->id)
+            // ->with(['tck_acclims:id'])
+        ;
+        // if($request->filter==1){
+        //     $data->whereNull('file')->whereNull('image');
+        // }else if($request->filter==2){
+        //     $data->whereNull('image');
+        // }else if($request->filter==3){
+        //     $data->whereNull('file');
+        // }
+        return Datatables::of($data)
+            ->addColumn('action', function($data){
+                // $el = '
+                //     <a class="text-primary fs-13" data-id="'.$data->id.'" href="#" data-toggle="modal" data-target="#editCommentModal">Edit</a>
+                // ';
+                $dtJson['comment'] = $data->comment;
+                $dtJson['id'] = $data->id;
+                $json = json_encode($dtJson);
+                $el = '
+                    <a class="text-danger fs-13" data-json=\''.htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8').'\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
+                ';
+                return $el;
+            })
+            ->filterColumn('created_at_format', function($query, $keyword){
+                $sql = 'convert(varchar,created_at, 103) like ?';
+                $query->whereRaw($sql, ["{$keyword}"]);
+            })
+            ->addColumn('image_file', function($data){
+                $el = null;
+                if(!is_null($data->file)){
+                    $el = '
+                        <a href="'.asset("storage/media/init/file").'/'.$data->file.'">
+                            <h5><i class="feather mr-2 icon-file"></i>Download</h5>
+                        </a>
+                    ';
+                }
+
+                return $el;
+            })
+            ->addColumn('image_format', function($data){
+                $el = null;
+                if(!is_null($data->image)){
+                    $el = '
+                        <a href="'.asset("storage/media/init/image").'/'.$data->image.'" target="_blank">
+                        <img src="'.asset("storage/media/init/image").'/'.$data->image.'" class="img-thumbnail" width="70">
+                        </a>
+                    ';
+                }
+                return $el;
+            })
+            ->rawColumns(['image_format','image_file','action'])
+            ->smart(false)->toJson();
+    }
+
+
+    public function commentStore(Request $request)
+    {
+        $dt = $request->except('_token','file','image');
+        if ($request->hasFile('file')) {
+            $dt['file'] = Str::uuid() . '.' . ($request->file('file'))->getClientOriginalExtension();
+            ($request->file('file'))->storeAs('public/media/init/file', $dt['file']);
+        }
+        if ($request->hasFile('image')) {
+            $dt['image'] = Str::uuid() . '.' . ($request->file('image'))->getClientOriginalExtension();
+            ($request->file('image'))->storeAs('public/media/init/image', $dt['image']);
+        }
+
+        TcInitComment::create($dt);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been added.',
+            ],
+        ]);
+    }
+
+    public function commentDestroy(Request $request)
+    {
+        $data = TcInitComment::find($request->id);
+        Storage::delete('public/media/init/file/'.$data->file);
+        Storage::delete('public/media/init/image/'.$data->image);
+        TcInitComment::find($request->id)->delete();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, data has been deleted.',
+            ],
+        ]);
     }
 }

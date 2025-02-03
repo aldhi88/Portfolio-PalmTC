@@ -8,8 +8,6 @@ use App\Http\Requests\SampleEdit;
 use App\Models\MasterTreefile;
 use App\Models\TcSample;
 use App\Models\TcSampleComment;
-use App\Models\TcSampleFile;
-use App\Models\TcSampleImage;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
@@ -265,7 +263,7 @@ class SampleController extends Controller
                 $dtJson['id'] = $data->id;
                 $json = json_encode($dtJson);
                 $el = '
-                    <br> <a class="text-danger fs-13" data-json=\''.htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8').'\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
+                    <a class="text-danger fs-13" data-json=\''.htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8').'\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
                 ';
                 return $el;
             })

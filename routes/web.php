@@ -309,6 +309,12 @@ Route::name('inits.')->group(function () {
         Route::get('getDataDelete', [InitController::class, 'getDataDelete'])->name('getDataDelete');
         Route::post('nonActive', [InitController::class, 'nonActive'])->name('nonActive');
         Route::post('active', [InitController::class, 'active'])->name('active');
+
+        // comment
+        Route::get('comment/{id}', [InitController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [InitController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [InitController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [InitController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('inits', InitController::class);

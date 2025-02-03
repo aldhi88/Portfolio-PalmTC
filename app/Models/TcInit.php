@@ -11,8 +11,11 @@ class TcInit extends Model
     use HasFactory;
     use SoftDeletes;
     protected $guarded = [];
-    
+
     // relationship
+    public function tc_init_comments(){
+        return $this->hasMany(TcInitComment::class,'tc_init_id', 'id');
+    }
     public function tc_field_obs(){
         return $this->hasMany(TcFieldOb::class,'tc_init_id');
     }
@@ -151,7 +154,7 @@ class TcInit extends Model
     public function tc_init_bottles(){
         return $this->hasMany('App\Models\TcInitBottle','tc_init_id','id');
     }
-    
+
 
     public static function getMediumStock($initId){
         $q = TcInitBottle::select('tc_medium_stock_id')
