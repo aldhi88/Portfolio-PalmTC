@@ -11,7 +11,7 @@
 <span id="alert-area"></span>
 <div class="row">
     <div class="col">
-        
+
 
         <div class="card">
 
@@ -73,7 +73,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -105,7 +105,7 @@
                             <th>Worker</th>
                             <th>Last<br>Total</th>
                         </tr>
-                        
+
                     </thead>
                     <thead id="header-filter2" class="bg-white">
                         <tr>
@@ -124,7 +124,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

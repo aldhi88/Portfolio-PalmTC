@@ -54,7 +54,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -73,7 +73,7 @@
                         <input name="file" type="file" class="form-control form-control-sm">
                         <small><span class="file text-danger msg"></span></small>
                     </div>
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>

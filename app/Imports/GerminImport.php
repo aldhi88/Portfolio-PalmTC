@@ -52,7 +52,7 @@ class GerminImport implements ToCollection
                 'tc_laminar_id' => 99,
                 'tc_bottle_id' => $value[1],
                 'sub' => 1,
-                'type' => 'Suspension',
+                'type' => $value[8],
                 'alpha' => 'A',
                 'bottle_count' => $value[2],
                 'status' => 1,
