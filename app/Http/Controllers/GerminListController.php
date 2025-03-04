@@ -176,10 +176,10 @@ class GerminListController extends Controller
             ->addColumn('type',function($data){
                 if(!is_null($data->tc_embryo_transfer_id)){
                     return "Direct";
-                }else if(!is_null($data->tc_matur_transfer_id)){
+                }else if(!is_null($data->tc_matur_transfer_id) || !is_null($data->tc_germin_transfer_id)){
                     return "Liquid";
-                }else if(!is_null($data->tc_germin_transfer_id)){
-                    return "Germination";
+                // }else if(!is_null($data->tc_germin_transfer_id)){
+                //     return "Germination";
                 }else{
                     return $data->type;
                 }

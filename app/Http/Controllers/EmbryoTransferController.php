@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class EmbryoTransferController extends Controller
-{
+    {
     public function index()
     {
         $data['title'] = "Embryogenesis Transfer (View Per Sample)";
@@ -636,7 +636,7 @@ class EmbryoTransferController extends Controller
                 // DB::raw('(bottle_embryo-bottle_left) as transferred')
             ])
             ->where('tc_embryo_transfer_bottles.tc_init_id',$request->initId)
-            ->where('bottle_left','!=',0)
+            // ->where('bottle_left','!=',0)
             ->with([
                 'tc_embryo_obs',
                 'tc_embryo_bottles',

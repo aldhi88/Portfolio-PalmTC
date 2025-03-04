@@ -19,6 +19,9 @@ class TcLiquidTransferBottle extends Model
     public function tc_liquid_obs(){
         return $this->belongsTo(TcLiquidOb::class,'tc_liquid_ob_id');
     }
+    public function tc_liquid_transfer_bottle_works(){
+        return $this->hasMany(TcLiquidTransferBottleWork::class,'tc_liquid_transfer_bottle_id');
+    }
     public function tc_liquid_transfer_bottle_work(){
         return $this->hasMany(TcLiquidTransferBottleWork::class,'tc_liquid_transfer_bottle_id');
     }

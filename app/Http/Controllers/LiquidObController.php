@@ -8,6 +8,7 @@ use App\Models\TcLiquidOb;
 use App\Models\TcLiquidObDetail;
 use App\Models\TcLiquidTransaction;
 use App\Models\TcLiquidTransferBottle;
+use App\Models\TcLiquidTransferBottleWork;
 use App\Models\TcWorker;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -94,9 +95,13 @@ class LiquidObController extends Controller
                 $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';
                 $el .= "
                     <p class='mb-0'>
-                        <a class='text-primary' href='".route('liquid-obs.show',$data->id)."'>View</a> -
-                        <a class='text-primary' href='".route('liquid-obs.create',$nextOb)."'>Observation</a>
+                        <a class='text-primary' href='".route('liquid-obs.show',$data->id)."'>View</a>
                 ";
+                // $el .= "
+                //     <p class='mb-0'>
+                //         <a class='text-primary' href='".route('liquid-obs.show',$data->id)."'>View</a> -
+                //         <a class='text-primary' href='".route('liquid-obs.create',$nextOb)."'>Observation</a>
+                // ";
                 $el .= '</p>';
                 return $el;
             })
@@ -129,6 +134,18 @@ class LiquidObController extends Controller
             ->with('tc_inits.tc_samples')
             ->first();
         $data['initId'] = $qObs->tc_init_id;
+        $sumTransfer = TcLiquidTransferBottle::where('tc_init_id',$data['initId'])->sum('bottle_left');
+        $allowObs = TcLiquidTransferBottle::where('tc_init_id', $data['initId'])->sum('bottle_left') == 0?true:false;
+        $isLastId = TcLiquidOb::find($initId)
+            ->whereNotNull('tc_worker_id')
+            ->whereNotNull('ob_date')
+            ->orderByDesc('id')
+            ->limit(1)
+            ->value('id') == $initId
+        ;
+        if(!$allowObs && $isLastId==false){
+            return redirect()->route('liquid-obs.show', $data['initId']);
+        }
         $data['sample'] = $qObs->tc_inits->tc_samples->sample_number_display;
         $data['worker_now'] = $qObs->tc_worker_id;
         $data['date_ob'] = is_null($qObs->ob_date)?false:Carbon::parse($qObs->ob_date)->format('Y-m-d');
@@ -285,6 +302,7 @@ class LiquidObController extends Controller
         );
 
         $stokAwal = TcLiquidBottle::firstStock($request->tc_liquid_bottle_id);
+        $stokAkhir = TcLiquidBottle::lastStock($request->tc_liquid_bottle_id);
         $dt1 = $request->except('alpha','cycle','type','value','tc_worker_id');
         $dt1[$this->aryType($request->type)] = $request->value;
 
@@ -296,7 +314,7 @@ class LiquidObController extends Controller
                 }
             }
             if($request->value != 0){ //hanya proses jika yg diinput tidak 0
-                if($stokAwal >= $request->value){
+                if($stokAkhir >= $request->value){
                     TcLiquidObDetail::create($dt1);
                     if($request->type == 1){
                         $dt1['bottle_left'] = $request->value;
@@ -304,8 +322,8 @@ class LiquidObController extends Controller
                     }
 
                     $dt2 = $request->except('alpha','cycle','type','value');
-                    $dt2['first_total'] = $stokAwal;
-                    $dt2['last_total'] = $request->type==1?$stokAwal:($stokAwal-$request->value);
+                    $dt2['first_total'] = $stokAkhir;
+                    $dt2['last_total'] = $request->type==1?$stokAkhir:($stokAkhir-$request->value);
                     TcLiquidTransaction::storeList($dt2,'in');
 
                     $this->upTotalInOb($request->tc_liquid_ob_id);
@@ -356,6 +374,7 @@ class LiquidObController extends Controller
                     }
                     $usedStok = TcLiquidObDetail::where('id',$detailId)
                         ->select(DB::raw('(bottle_oxidate+bottle_contam+bottle_other) as usedStok'))
+                        ->orderBy('id', 'desc')
                         ->first()->getAttribute('usedStok');
                     $dt3 = $dt1;
                     $dt3['tc_worker_id'] = $request->tc_worker_id;
@@ -448,6 +467,8 @@ class LiquidObController extends Controller
         $data['initId'] = $id;
         $q = TcInit::where('id',$id)->first();
         $data['sampleNumber'] = $q->tc_samples->sample_number_display;
+        $sumTransfer = TcLiquidTransferBottle::where('tc_init_id',$data['initId'])->sum('bottle_left');
+        $data['allowObs'] = $sumTransfer == 0;
         return view('modules.liquid_ob.show',compact('data'));
     }
     public function dtShow(Request $request)
@@ -512,10 +533,16 @@ class LiquidObController extends Controller
                 $query->whereRaw($sql, ["{$keyword}"]);
             })
             ->addColumn('first_total',function($data){
-                return TcLiquidObDetail::firstTotal($data->tc_init_id,$data->tc_liquid_ob_id,$data->tc_liquid_bottle_id);
+                $dt['obsId'] = $data->tc_liquid_ob_id;
+                $dt['bottleId'] = $data->tc_liquid_bottle_id;
+                return TcLiquidTransaction::select('first_total')->where('tc_liquid_ob_id',$dt['obsId'])
+                    ->where('tc_liquid_bottle_id',$dt['bottleId'])->first()->getAttribute('first_total');
             })
             ->addColumn('last_total',function($data){
-                return TcLiquidObDetail::lastTotal($data->tc_init_id,$data->tc_liquid_ob_id,$data->tc_liquid_bottle_id);
+                $obsId = $data->tc_liquid_ob_id;
+                $bottleId = $data->tc_liquid_bottle_id;
+                return TcLiquidTransaction::select('last_total')->where('tc_liquid_ob_id',$obsId)
+                    ->where('tc_liquid_bottle_id',$bottleId)->first()->getAttribute('last_total');
             })
             ->smart(false)
             ->rawColumns([])

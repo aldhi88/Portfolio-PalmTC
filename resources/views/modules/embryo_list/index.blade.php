@@ -31,7 +31,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
                     <thead>
@@ -51,7 +51,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -71,7 +71,7 @@
                         <input name="file" type="file" class="form-control form-control-sm">
                         <small><span class="file text-danger msg"></span></small>
                     </div>
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>

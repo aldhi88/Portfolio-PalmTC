@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class TcLiquidBottle extends Model
 {
@@ -30,9 +31,18 @@ class TcLiquidBottle extends Model
     public static function firstStock($bottleId){
         $return = TcLiquidBottle::where('id',$bottleId)->first()->getAttribute('bottle_count');
         $q = TcLiquidTransaction::where('tc_liquid_bottle_id',$bottleId)
-            ->orderBy('tc_liquid_ob_id','desc')->get();
+            ->orderBy('id','desc')->get();
         if(count($q) > 0){
             $return = $q->first()->first_total;
+        }
+        return $return;
+    }
+    public static function lastStock($bottleId){
+        $return = TcLiquidBottle::where('id',$bottleId)->first()->getAttribute('bottle_count');
+        $q = TcLiquidTransaction::where('tc_liquid_bottle_id',$bottleId)
+            ->orderBy('id','desc')->get();
+        if(count($q) > 0){
+            $return = $q->first()->last_total;
         }
         return $return;
     }
@@ -41,10 +51,19 @@ class TcLiquidBottle extends Model
         $minBottleOb = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
         // transfer back
         $minBottleTransfer = 0;
-        $q = TcLiquidTransferBottle::where('tc_liquid_bottle_id',$bottleId)->get();
-        foreach ($q as $key => $value) {
-            $minBottleTransfer += ($value['bottle_liquid']-$value['bottle_left']);
+        // $q = TcLiquidTransferBottle::where('tc_liquid_bottle_id',$bottleId)->get();
+        $q = TcLiquidTransferBottle::select('id')->where('tc_liquid_bottle_id',$bottleId)
+            ->withCount(['tc_liquid_transfer_bottle_works as total_transfer' => function($q){
+                $q->select(DB::raw('sum(total_work) - sum(back_bottle)'));
+            }])->get();
+        if(count($q)!=0){
+            foreach ($q as $key => $value) {
+                $minBottleTransfer += $value->total_transfer;
+            }
         }
+        // foreach ($q as $key => $value) {
+        //     $minBottleTransfer += ($value['bottle_liquid']-$value['bottle_left']);
+        // }
 
         $return = $minBottleOb + $minBottleTransfer;
         return $return;

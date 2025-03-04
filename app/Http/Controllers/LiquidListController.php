@@ -44,19 +44,19 @@ class LiquidListController extends Controller
             ])
             ->withCount([
                 'tc_liquid_bottles as first_total' => function($q){
-                    $q->select(DB::raw('SUM(bottle_count)'))->where('status','!=',0);
+                    $q->select(DB::raw('SUM(bottle_count)'));
                 }
             ])
             ->withCount([
                 'tc_liquid_bottles as first_total_column1' => function($q) use($aryBottleCol1){
                     $q->select(DB::raw('SUM(bottle_count)'))->whereIn('tc_bottle_id',$aryBottleCol1)
-                        ->where('status','!=',0);
+                        ;
                 }
             ])
             ->withCount([
                 'tc_liquid_bottles as first_total_column2' => function($q) use($aryBottleCol2){
                     $q->select(DB::raw('SUM(bottle_count)'))->whereIn('tc_bottle_id',$aryBottleCol2)
-                        ->where('status','!=',0);
+                        ;
                 }
             ])
         ;
@@ -157,7 +157,7 @@ class LiquidListController extends Controller
                 ])
                 ->whereIn('tc_bottle_id',$bottleList)
                 ->where('tc_init_id',$request->initId)
-                ->where('status',1)
+                // ->where('status',1)
                 ->with([
                     'tc_inits',
                     'tc_inits.tc_samples',
@@ -220,9 +220,9 @@ class LiquidListController extends Controller
                 'tc_workers:id,code',
             ])
             ->where('tc_liquid_transactions.tc_init_id',$request->initId)
-            ->whereHas('tc_liquid_bottles',function(Builder $q){
-                $q->where('status','!=',0);
-            })
+            // ->whereHas('tc_liquid_bottles',function(Builder $q){
+            //     $q->where('status','!=',0);
+            // })
         ;
         return DataTables::of($data)
             ->filterColumn('bottle_date_format', function($query, $keyword) use($qCode) {

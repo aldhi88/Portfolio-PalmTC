@@ -32,6 +32,14 @@ class TcEmbryoBottle extends Model
         $return = TcEmbryoBottle::where('id',$bottleId)->first()->getAttribute('number_of_bottle');
         $q = TcEmbryoList::where('tc_embryo_bottle_id',$bottleId)->orderBy('id','desc')->get();
         if(count($q) > 0){
+            $return = $q->first()->first_total;
+        }
+        return $return;
+    }
+    public static function lastStock($bottleId){
+        $return = TcEmbryoBottle::where('id',$bottleId)->first()->getAttribute('number_of_bottle');
+        $q = TcEmbryoList::where('tc_embryo_bottle_id',$bottleId)->orderBy('id','desc')->get();
+        if(count($q) > 0){
             $return = $q->first()->last_total;
         }
         return $return;
@@ -41,16 +49,19 @@ class TcEmbryoBottle extends Model
         $minBottleOb = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
         // transfer back
         $minBottleTransfer = 0;
-        $q = TcEmbryoTransferBottle::where('tc_embryo_bottle_id',$bottleId)->get();
+        // $q = TcEmbryoTransferBottle::where('tc_embryo_bottle_id',$bottleId)->get();
         $q = TcEmbryoTransferBottle::select('id')->where('tc_embryo_bottle_id',$bottleId)
             ->withCount(['tc_embryo_transfer_bottle_works as total_transfer' => function($q){
                 $q->select(DB::raw('sum(total_work) - sum(back_bottle)'));
             }])->get();
         if(count($q)!=0){
-            $minBottleTransfer += $q->first()->total_transfer;
+            foreach ($q as $key => $value) {
+                $minBottleTransfer += $value->total_transfer;
+            }
         }
-        
-        $return = $minBottleOb + $minBottleTransfer;  
+
+        $return = $minBottleOb + $minBottleTransfer;
+        // dd($minBottleOb);
         return $return;
     }
     public static function usedBottleByInit($initId){
@@ -73,8 +84,8 @@ class TcEmbryoBottle extends Model
             $bottleMinus = $totalWork - $backBottle;
         }
 
-        $return = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other') + $bottleMinus;  
+        $return = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other') + $bottleMinus;
         return $return;
     }
-    
+
 }

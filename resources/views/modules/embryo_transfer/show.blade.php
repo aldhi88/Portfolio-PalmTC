@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <div class="row">
                     <div class="col">
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
             </div>
         </div>
@@ -103,8 +103,8 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-3"><h5 class="mt-2"><i class="feather icon-file-text"></i> All Transfer Data</h5></div>
-                   
-                    
+
+
                     @if ($data['allowTransfer'])
                     <div class="col text-right">
                         <a href="{{ route('embryo-transfers.create',$data['initId']) }}" class="btn btn-sm btn-primary"><i class="fas fa-exchange-alt"></i> New Transfer</a>
@@ -132,12 +132,12 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>
 </div>
-    
+
 <div class="row">
     <div class="col">
         <span id="alert-area-sample"></span>
@@ -175,7 +175,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>

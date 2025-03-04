@@ -26,7 +26,7 @@
                             <th>Sample</th>
                             <th>Program</th>
                             <th>Transfer<br>Count</th>
-                            <th>Bottle<br>Matur</th>
+                            <th>Bottle<br>Germin</th>
                             <th>Already<br>Transferred</th>
                             <th>Not<br>Transferred</th>
                         </tr>
@@ -44,7 +44,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

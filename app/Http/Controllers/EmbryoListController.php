@@ -34,7 +34,8 @@ class EmbryoListController extends Controller
             ])
             ->withCount([
                 'tc_embryo_bottles as first_total' => function($q){
-                    $q->select(DB::raw('SUM(number_of_bottle) as first_total'))->where('status','!=',0);
+                    $q->select(DB::raw('SUM(number_of_bottle) as first_total'));//status nya di hilangkan
+                    // $q->select(DB::raw('SUM(number_of_bottle) as first_total'))->where('status','!=',0);
                 }
             ])
         ;
@@ -84,9 +85,9 @@ class EmbryoListController extends Controller
             ])
         ;
 
-        if($request->filter != 1 || isset($request->filter)){
-            $data->where('status',1);
-        }
+        // if($request->filter == 1 || !isset($request->filter)){
+        //     $data->where('status',1);
+        // }
 
         return DataTables::of($data)
             ->filterColumn('bottle_date_format', function($query, $keyword) {
@@ -118,9 +119,9 @@ class EmbryoListController extends Controller
                 'tc_workers:id,code',
             ])
             ->where('tc_embryo_lists.tc_init_id',$request->initId)
-            ->whereHas('tc_embryo_bottles',function(Builder $q){
-                $q->where('status','!=',0);
-            })
+            // ->whereHas('tc_embryo_bottles',function(Builder $q){
+            //     $q->where('status','!=',0);
+            // })
         ;
         return DataTables::of($data)
             ->filterColumn('bottle_date_format', function($query, $keyword) use($qCode) {

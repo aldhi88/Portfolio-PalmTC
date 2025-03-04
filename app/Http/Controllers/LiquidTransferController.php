@@ -142,11 +142,11 @@ class LiquidTransferController extends Controller
     {
         $page = 'step2_blank';
         $data['initId'] = $request->initId;
-        
+
         $qCode = DB::raw('convert(varchar,tc_liquid_bottles.bottle_date, 103) as bottle_date_format');
         if(config('database.default') != 'sqlsrv'){
             $qCode = DB::raw('DATE_FORMAT(tc_liquid_bottles.bottle_date, "%d/%m/%Y") as bottle_date_format');
-        }      
+        }
 
         if(session()->has("liqtrans_step2")){
             $data['bottles'] = TcLiquidTransferBottle::select([
@@ -168,7 +168,7 @@ class LiquidTransferController extends Controller
             $data['total'] = (collect($dtSession)->sum('work_bottle'));
             return view('modules.liquid_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.liquid_transfer.component.'.$page,compact('data'));
     }
     public function addItemStep2(Request $request)
@@ -230,7 +230,7 @@ class LiquidTransferController extends Controller
             }
             return view('modules.liquid_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.liquid_transfer.component.'.$page,compact('data'));
     }
     public function getMedStock(Request $request)
@@ -248,7 +248,7 @@ class LiquidTransferController extends Controller
         $data['medStock'] = $qCollect->filter(function($value,$key){
             return $value['current_stock'] != 0;
         })->toArray();
-        
+
         $data['medStockBack'] = session('liqtrans_step3')['medStock']['back'];
         $data['medStockNext'] = session('liqtrans_step3')['medStock']['next'];
         $data['medStockPicked'] = session('liqtrans_step3')['medStock'][$request->for];
@@ -358,10 +358,10 @@ class LiquidTransferController extends Controller
             if(!is_null($request->page)){
                 $page = $request->page;
             }
-            
+
             return view('modules.liquid_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.liquid_transfer.component.'.$page,compact('data'));
     }
     public function finishStep4(Request $request)
@@ -384,7 +384,7 @@ class LiquidTransferController extends Controller
             session()->has('liqtrans_step1') &&
             session()->has('liqtrans_step2') &&
             session()->has('liqtrans_step3') &&
-            session()->has('liqtrans_step4') 
+            session()->has('liqtrans_step4')
         ){
             if(
                 session('liqtrans_step1')['page'] &&
@@ -407,7 +407,7 @@ class LiquidTransferController extends Controller
                     $transferId = $q->id;
 
                     // insert ke table tc_liquid_transfer_bottle_work dan tc_liquid_lists
-                    
+
                     $dtList['tc_init_id'] =$request->tc_init_id;
                     $dtList['tc_worker_id'] = $dtStep1['tc_worker_id'];
                     $dtList['tc_liquid_transfer_id'] = $transferId;
@@ -428,7 +428,7 @@ class LiquidTransferController extends Controller
                             'total_work' => $value['work_bottle'],
                             'back_bottle' => $value['back_bottle'],
                         ];
-                        TcLiquidTransferBottle::where('id',$value['id'])->decrement('bottle_left',($value['work_bottle']-$value['back_bottle']));
+                        TcLiquidTransferBottle::where('id',$value['id'])->decrement('bottle_left',($value['work_bottle']));
                     }
                     TcLiquidTransferBottleWork::insert($dt2);
 
@@ -495,7 +495,7 @@ class LiquidTransferController extends Controller
                     }
 
                 }catch(Throwable $e) {report($e);}
-                
+
                 $return = 1;
             }else{
                 $return = 0;
@@ -515,7 +515,7 @@ class LiquidTransferController extends Controller
                 ],
             ]);
         }
-        
+
 
     }
 
@@ -563,7 +563,7 @@ class LiquidTransferController extends Controller
                 'tc_liquid_transfer_bottles.*',
             ])
             ->where('tc_liquid_transfer_bottles.tc_init_id',$request->initId)
-            ->where('bottle_left','!=',0)
+            // ->where('bottle_left','!=',0)
             ->with([
                 'tc_liquid_obs',
                 'tc_liquid_bottles',
@@ -670,7 +670,7 @@ class LiquidTransferController extends Controller
         $index = 0;
         foreach ($q2 as $key => $value) {
             $loop = $value->used_stock;
-            for ($i=0; $i < $loop ; $i++) { 
+            for ($i=0; $i < $loop ; $i++) {
                 $data['transfer'][$index]['sample_number'] = $q->tc_inits->tc_samples->sample_number_display;
                 $data['transfer'][$index]['transfer_date'] = Carbon::parse($q->transfer_date)->format('d M Y');
                 $data['transfer'][$index]['alpha'] = $q->alpha;

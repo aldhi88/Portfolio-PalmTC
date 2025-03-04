@@ -20,9 +20,9 @@
             { data: 'tc_liquid_bottles.cycle', name: 'tc_liquid_bottles.cycle', orderable:false, searchable:false},
             { data: 'bottle_liquid', name: 'bottle_liquid', orderable:false, searchable:false},
             { data: 'transferred', name: 'transferred', orderable:false, searchable:false},
-            { data: 'bottle_left', name: 'bottle_left', orderable:false, searchable:false},
             { data: 'bottle_back', name: 'bottle_back', orderable:false, searchable:false},
             { data: 'bottle_out', name: 'bottle_out', orderable:false, searchable:false},
+            { data: 'bottle_left', name: 'bottle_left', orderable:false, searchable:false},
         ]
     });
 
@@ -50,7 +50,7 @@
             { data: 'action', name: 'action', orderable:false, searchable:false},
         ]
     });
-    
+
 
 $("#myTable2").on("click","button.printByTransfer", function(){
     var transferId = $(this).attr('transfer-id');

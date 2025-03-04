@@ -48,7 +48,7 @@
             { data: 'action', name: 'action', orderable:false, searchable:false},
         ]
     });
-    
+
 
     $("#myTable2").on("click","button.printByTransfer", function(){
         var transferId = $(this).attr('transfer-id');

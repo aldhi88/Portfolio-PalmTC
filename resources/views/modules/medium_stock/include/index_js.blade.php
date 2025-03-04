@@ -18,8 +18,8 @@
                 }
             },
             columns: [
-                { data: 'custom_id', name: 'id', orderable: true, searchable: true },
-                { data: 'custom_name', name: 'tc_mediums.name', orderable: true, searchable: true },
+                // { data: 'custom_id', name: 'id', orderable: true, searchable: true },
+                { data: 'custom_name', name: 'id', orderable: true, searchable: true },
                 { data: 'created_at_long_format', name: 'created_at', orderable: true, searchable: false },
                 { data: 'composition', name: 'composition', orderable: false, searchable: false },
                 { data: 'tc_workers.code', name: 'tc_workers.code', orderable: false, searchable: true },

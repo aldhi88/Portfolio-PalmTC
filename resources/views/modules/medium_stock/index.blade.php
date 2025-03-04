@@ -43,10 +43,10 @@
                     <table id="myTable" class="table table-xs table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                {{-- <th>#</th> --}}
                                 <th>Name</th>
                                 <th>Created<br>Date</th>
-                                <th>Ingredient</th>
+                                <th>Bottles</th>
                                 <th>Worker</th>
                                 <th>Age(days)</th>
                                 <th>Added<br>Stock</th>

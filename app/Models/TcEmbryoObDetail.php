@@ -40,13 +40,13 @@ class TcEmbryoObDetail extends Model
             $dt = collect($q->toArray());
             $usedOb = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
         }
-        
+
         $q = TcEmbryoTransferBottle::select('id')->where('tc_embryo_bottle_id',$bottleId)->get()->toArray();
         $idTransBottle = array_column($q,'id');
         $q = TcEmbryoTransferBottleWork::whereIn('tc_embryo_transfer_bottle_id',$idTransBottle)->get()->toArray();
         $dt = collect($q);
         $usedTransfer = $dt->sum('total_work') - $dt->sum('back_bottle');
-        
+
         $return = $stokAwal - $usedOb - $usedTransfer;
         return $return;
     }
@@ -68,7 +68,7 @@ class TcEmbryoObDetail extends Model
         $q = TcEmbryoTransferBottleWork::whereIn('tc_embryo_transfer_bottle_id',$idTransBottle)->get()->toArray();
         $dt = collect($q);
         $usedTransfer = $dt->sum('total_work') - $dt->sum('back_bottle');
-        
+
         $return = $stokAwal - $usedOb - $usedTransfer;
         return $return;
     }
