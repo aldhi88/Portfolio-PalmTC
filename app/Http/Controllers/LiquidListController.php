@@ -44,19 +44,19 @@ class LiquidListController extends Controller
             ])
             ->withCount([
                 'tc_liquid_bottles as first_total' => function($q){
-                    $q->select(DB::raw('SUM(bottle_count)'));
+                    $q->select(DB::raw('SUM(bottle_count)'))->where('status','!=',0);
                 }
             ])
             ->withCount([
                 'tc_liquid_bottles as first_total_column1' => function($q) use($aryBottleCol1){
                     $q->select(DB::raw('SUM(bottle_count)'))->whereIn('tc_bottle_id',$aryBottleCol1)
-                        ;
+                    ->where('status','!=',0);
                 }
             ])
             ->withCount([
                 'tc_liquid_bottles as first_total_column2' => function($q) use($aryBottleCol2){
                     $q->select(DB::raw('SUM(bottle_count)'))->whereIn('tc_bottle_id',$aryBottleCol2)
-                        ;
+                    ->where('status','!=',0);
                 }
             ])
         ;
@@ -72,12 +72,16 @@ class LiquidListController extends Controller
                 return $el;
             })
             ->addColumn('column1',function($data){
+                if (is_null($data->first_total_column1)) {
+                    return 0;
+                }
                 $q = TcBottleInitDetail::select('tc_bottle_id')
                     ->whereHas('tc_bottle_inits',function(Builder $q){
                         $q->where('keyword','liquid_column1');
                     })->get()->toArray();
                 $aryBottleId = array_column($q, 'tc_bottle_id');
                 $q = TcLiquidBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
                     ->whereIn('tc_bottle_id',$aryBottleId)->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
@@ -86,6 +90,9 @@ class LiquidListController extends Controller
                 return $data->first_total_column1 - $usedBottle;
             })
             ->addColumn('column2',function($data){
+                if (is_null($data->first_total_column2)) {
+                    return 0;
+                }
                 $q = TcBottleInitDetail::select('tc_bottle_id')
                     ->whereHas('tc_bottle_inits',function(Builder $q){
                         $q->where('keyword','liquid_column2');
@@ -93,6 +100,7 @@ class LiquidListController extends Controller
                 $aryBottleId = array_column($q, 'tc_bottle_id');
 
                 $q = TcLiquidBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
                     ->whereIn('tc_bottle_id',$aryBottleId)->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
@@ -101,7 +109,13 @@ class LiquidListController extends Controller
                 return $data->first_total_column2 - $usedBottle;
             })
             ->addColumn('total_bottle_active',function($data){
-                $q = TcLiquidBottle::select('id')->where('tc_init_id',$data->id)->get();
+                if (is_null($data->first_total)) {
+                    return 0;
+                }
+                $q = TcLiquidBottle::select('id')
+                    ->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
+                    ->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
                     $usedBottle += TcLiquidBottle::usedBottle($value->id);
@@ -157,7 +171,7 @@ class LiquidListController extends Controller
                 ])
                 ->whereIn('tc_bottle_id',$bottleList)
                 ->where('tc_init_id',$request->initId)
-                // ->where('status',1)
+                ->where('status',1)
                 ->with([
                     'tc_inits',
                     'tc_inits.tc_samples',
@@ -220,9 +234,9 @@ class LiquidListController extends Controller
                 'tc_workers:id,code',
             ])
             ->where('tc_liquid_transactions.tc_init_id',$request->initId)
-            // ->whereHas('tc_liquid_bottles',function(Builder $q){
-            //     $q->where('status','!=',0);
-            // })
+            ->whereHas('tc_liquid_bottles',function(Builder $q){
+                $q->where('status','!=',0);
+            })
         ;
         return DataTables::of($data)
             ->filterColumn('bottle_date_format', function($query, $keyword) use($qCode) {

@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <div class="row">
                     <div class="col">
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
             </div>
         </div>
@@ -99,12 +99,12 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>
 </div>
-    
+
 <div class="row">
     <div class="col">
         <span id="alert-area-sample"></span>
@@ -131,10 +131,10 @@
                                     <th>Obs <br> Date</th>
                                     <th>Alpha</th>
                                     <th>First<br>Total</th>
-                                    <th>Has Been<br>Transfer</th>
-                                    <th>Bottle<br>Ready</th>
+                                    <th>Bottle<br>Processed</th>
                                     <th>Bottle<br>Back</th>
                                     <th>Bottle<br>Out</th>
+                                    <th>Bottle<br>Ready</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -142,7 +142,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>

@@ -27,6 +27,6 @@ class TcMaturOb extends Model
     public function getAlphaAttribute($value){
         return str_replace(' ','',$value);
     }
-    
-    
+
+
 }

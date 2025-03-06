@@ -140,11 +140,11 @@ class MaturTransferController extends Controller
     {
         $page = 'step2_blank';
         $data['initId'] = $request->initId;
-        
+
         $qCode = DB::raw('convert(varchar,tc_matur_bottles.bottle_date, 103) as bottle_date_format');
         if(config('database.default') != 'sqlsrv'){
             $qCode = DB::raw('DATE_FORMAT(tc_matur_bottles.bottle_date, "%d/%m/%Y") as bottle_date_format');
-        }      
+        }
 
         if(session()->has("maturtrans_step2")){
             $data['bottles'] = TcMaturTransferBottle::select([
@@ -166,7 +166,7 @@ class MaturTransferController extends Controller
             $data['total'] = (collect($dtSession)->sum('work_bottle'));
             return view('modules.matur_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.matur_transfer.component.'.$page,compact('data'));
     }
     public function addItemStep2(Request $request)
@@ -236,7 +236,7 @@ class MaturTransferController extends Controller
             }
             return view('modules.matur_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.matur_transfer.component.'.$page,compact('data'));
     }
     public function getMedStock(Request $request)
@@ -254,7 +254,7 @@ class MaturTransferController extends Controller
         $data['medStock'] = $qCollect->filter(function($value,$key){
             return $value['current_stock'] != 0;
         })->toArray();
-        
+
         $data['medStockBack'] = session('maturtrans_step3')['medStock']['back'];
         $data['medStockNext'] = session('maturtrans_step3')['medStock']['next'];
         $data['medStockPicked'] = session('maturtrans_step3')['medStock'][$request->for];
@@ -364,10 +364,10 @@ class MaturTransferController extends Controller
             if(!is_null($request->page)){
                 $page = $request->page;
             }
-            
+
             return view('modules.matur_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.matur_transfer.component.'.$page,compact('data'));
     }
     public function finishStep4(Request $request)
@@ -390,13 +390,13 @@ class MaturTransferController extends Controller
             session()->has('maturtrans_step1') &&
             session()->has('maturtrans_step2') &&
             session()->has('maturtrans_step3') &&
-            session()->has('maturtrans_step4') 
+            session()->has('maturtrans_step4')
         ){
             if(
                 session('maturtrans_step1')['page'] &&
                 session('maturtrans_step2')['page'] &&
                 session('maturtrans_step3')['page'] &&
-                session('maturtrans_step4')['page']
+                session('maturtrans_step4')['data']
             ){
                 $dtStep1 = collect(session('maturtrans_step1')['data']);
                 $dtStep2 = collect(session('maturtrans_step2')['data']);
@@ -413,7 +413,7 @@ class MaturTransferController extends Controller
                     $transferId = $q->id;
 
                     // insert ke table tc_matur_transfer_bottle_works dan tc_matur_lists
-                    
+
                     $dtList['tc_init_id'] =$request->tc_init_id;
                     $dtList['tc_worker_id'] = $dtStep1['tc_worker_id'];
                     $dtList['tc_matur_transfer_id'] = $transferId;
@@ -504,7 +504,7 @@ class MaturTransferController extends Controller
                     }
 
                 }catch(Throwable $e) {report($e);}
-                
+
                 $return = 1;
             }else{
                 $return = 0;
@@ -524,7 +524,7 @@ class MaturTransferController extends Controller
                 ],
             ]);
         }
-        
+
 
     }
 
@@ -572,7 +572,7 @@ class MaturTransferController extends Controller
                 'tc_matur_transfer_bottles.*',
             ])
             ->where('tc_matur_transfer_bottles.tc_init_id',$request->initId)
-            ->where('bottle_left','!=',0)
+            // ->where('bottle_left','!=',0)
             ->with([
                 'tc_matur_obs',
                 'tc_matur_bottles',
@@ -604,6 +604,7 @@ class MaturTransferController extends Controller
         $data = TcMaturTransfer::select([
                 'tc_matur_transfers.*',
             ])
+            ->where('tc_matur_transfers.tc_init_id',$request->initId)
             ->with([
                 'tc_workers:id,code',
                 'tc_laminars:id,code',
@@ -677,7 +678,7 @@ class MaturTransferController extends Controller
         $index = 0;
         foreach ($q2 as $key => $value) {
             $loop = $value->used_stock;
-            for ($i=0; $i < $loop ; $i++) { 
+            for ($i=0; $i < $loop ; $i++) {
                 $data['transfer'][$index]['sample_number'] = $q->tc_inits->tc_samples->sample_number_display;
                 $data['transfer'][$index]['transfer_date'] = Carbon::parse($q->transfer_date)->format('d M Y');
                 $data['transfer'][$index]['alpha'] = $q->alpha;

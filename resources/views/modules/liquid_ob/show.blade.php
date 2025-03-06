@@ -15,7 +15,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="col">
-                    <h5><i class="fas fa-align-justify"></i> Summary</h5>
+                    <a href="{{ route('liquid-obs.index') }}" class="btn btn-warning btn-sm rounded-0"><i class="fas fa-backward mr-2"></i>Back</a>
                 </div>
                 <div class="col text-right">
                     <h5>Sample:</h5>

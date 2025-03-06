@@ -114,16 +114,10 @@ class EmbryoObController extends Controller
             ->with('tc_inits.tc_samples')
             ->first();
         $data['initId'] = $qObs->tc_init_id;
-        $allowObs = TcEmbryoTransferBottle::where('tc_init_id', $data['initId'])->sum('bottle_left') == 0?true:false;
-        $isLastId = TcEmbryoOb::find($id)
-            ->whereNotNull('tc_worker_id')
-            ->whereNotNull('work_date')
-            ->orderByDesc('id')
-            ->limit(1)
-            ->value('id') == $id
-        ;
 
-        if(!$allowObs && $isLastId==false){
+        $allowEditObs = TcEmbryoTransferBottle::where('tc_embryo_ob_id',$id)
+            ->whereRaw('bottle_embryo > bottle_left')->get()->count() == 0;
+        if($allowEditObs==false){
             return redirect()->route('embryo-obs.show', $data['initId']);
         }
         $data['sample'] = $qObs->tc_inits->tc_samples->sample_number_display;
@@ -303,7 +297,7 @@ class EmbryoObController extends Controller
                     $dt2['last_total'] = $request->type==1?$stokAkhir:($stokAkhir-$request->value);
                     TcEmbryoList::storeList($dt2,'in');
 
-                    $this->upTotalInOb($request->tc_embryo_ob_id);
+                    $this->upTotalInOb($request->tc_embryo_ob_id, $request->tc_embryo_bottle_id);
                     $this->upStatusBottle($request->tc_embryo_bottle_id);
                     return $this->returnTemplate(1,'Success, data has been processed.');
                 }
@@ -322,6 +316,7 @@ class EmbryoObController extends Controller
                     // $this->upTotalInOb($request->tc_embryo_ob_id); //gak cocok karena gak set jadi 0 di embryo_obs
                     TcEmbryoOb::where('id', $request->tc_embryo_ob_id)
                         ->update([
+                            'tc_embryo_bottle_id' => $request->tc_embryo_bottle_id,
                             'sub' => null,
                             'total_bottle_embryo' => 0,
                             'total_bottle_oxidate' => 0,
@@ -370,7 +365,7 @@ class EmbryoObController extends Controller
                     // dump($request->all(), $usedStok, $cek);
                     $dt3['last_total'] = $stokAwal - ($usedStok-$cek['bottle_embryo']);
                     TcEmbryoList::storeList($dt3,'up');
-                    $this->upTotalInOb($request->tc_embryo_ob_id);
+                    $this->upTotalInOb($request->tc_embryo_ob_id, $request->tc_embryo_bottle_id);
                     $this->upStatusBottle($request->tc_embryo_bottle_id);
                     return $this->returnTemplate(1,'Success, data has been processed.');
                 }
@@ -413,11 +408,12 @@ class EmbryoObController extends Controller
         ];
         return $aryType[$type];
     }
-    public function upTotalInOb($obsId)
+    public function upTotalInOb($obsId, $tc_embryo_bottle_id)
     {
         $q = TcEmbryoObDetail::where('tc_embryo_ob_id',$obsId)->get();
         $data['sub'] = $q->count()==0?null:$q[0]->tc_embryo_bottles->sub;
         $dt = collect($q->toArray());
+        $data['tc_embryo_bottle_id'] = $tc_embryo_bottle_id;
         $data['total_bottle_embryo'] = $dt->sum('bottle_embryo');
         $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate');
         $data['total_bottle_contam'] = $dt->sum('bottle_contam');

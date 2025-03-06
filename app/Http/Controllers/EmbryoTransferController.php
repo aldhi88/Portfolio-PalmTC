@@ -414,7 +414,7 @@ class EmbryoTransferController extends Controller
                 session('embtrans_step1')['page'] &&
                 session('embtrans_step2')['page'] &&
                 session('embtrans_step3')['page'] &&
-                session('embtrans_step4')['page']
+                session('embtrans_step4')['data']
             ){
                 $dtStep1 = collect(session('embtrans_step1')['data']);
                 $dtStep2 = collect(session('embtrans_step2')['data']);
@@ -676,6 +676,7 @@ class EmbryoTransferController extends Controller
         $data = TcEmbryoTransfer::select([
                 'tc_embryo_transfers.*',
             ])
+            ->where('tc_embryo_transfers.tc_init_id',$request->initId)
             ->with([
                 'tc_workers:id,code',
                 'tc_laminars:id,code',

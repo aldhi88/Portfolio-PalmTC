@@ -390,7 +390,7 @@ class LiquidTransferController extends Controller
                 session('liqtrans_step1')['page'] &&
                 session('liqtrans_step2')['page'] &&
                 session('liqtrans_step3')['page'] &&
-                session('liqtrans_step4')['page']
+                session('liqtrans_step4')['data']
             ){
                 $dtStep1 = collect(session('liqtrans_step1')['data']);
                 $dtStep2 = collect(session('liqtrans_step2')['data']);
@@ -595,6 +595,7 @@ class LiquidTransferController extends Controller
         $data = TcLiquidTransfer::select([
                 'tc_liquid_transfers.*',
             ])
+            ->where('tc_liquid_transfers.tc_init_id',$request->initId)
             ->with([
                 'tc_workers:id,code',
                 'tc_laminars:id,code',

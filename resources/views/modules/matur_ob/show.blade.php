@@ -15,7 +15,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="col">
-                    <h5><i class="fas fa-align-justify"></i> Summary</h5>
+                    <a href="{{ route('matur-obs.index') }}" class="btn btn-warning btn-sm rounded-0"><i class="fas fa-backward mr-2"></i>Back</a>
                 </div>
                 <div class="col text-right">
                     <h5>Sample:</h5>
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
             </div>
         </div>
@@ -82,14 +82,27 @@
                     <div class="col">
                         <h5><i class="feather icon-file-text"></i> Summary Per Observation Date</h5>
                     </div>
-                    <div class="col text-right">
+                    {{-- <div class="col text-right">
                         <a href="{{ route('matur-obs.index') }}" class="btn btn-warning btn-sm rounded-0"><i class="fas fa-backward mr-2"></i>Back</a>
                         <a href="{{ route('matur-obs.create',$data['obId']) }}" class="btn btn-primary btn-sm rounded-0"><i class="feather mr-2 icon-plus"></i>New Observation</a>
+                    </div> --}}
+                    <div class="col text-right">
+                        @if ($data['allowObs'])
+                            <a href="{{ route('matur-obs.create',$data['obId']) }}" class="btn btn-primary btn-sm rounded-0"><i class="feather mr-2 icon-plus"></i>New Observation</a>
+                        @endif
+                        <a href="{{ route('matur-transfers.create', $data['initId']) }}" class="btn btn-danger btn-sm rounded-0">
+                            <i class="fas fa-share mr-2"></i>Transfer
+                        </a>
                     </div>
                 </div>
             </div>
             <div class="card-body">
                 <span id="alert-area"></span>
+                @if (!$data['allowObs'])
+                <div class="alert alert-danger text-center">
+                    <p class="m-0 p-0"><i class="fa fa-times fa-fw"></i> Tidak bisa melakukan observasi baru sebelum proses transfer.</p>
+                </div>
+                @endif
                 <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
                     <thead>
                         <tr>
@@ -116,7 +129,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -129,10 +142,6 @@
                 <div class="row">
                     <div class="col">
                         <h5><i class="feather icon-file-text"></i> Summary Per Bottle Date</h5>
-                    </div>
-                    <div class="col text-right">
-                        <a href="{{ route('matur-obs.index') }}" class="btn btn-warning btn-sm rounded-0"><i class="fas fa-backward mr-2"></i>Back</a>
-                        <a href="{{ route('matur-obs.create',$data['obId']) }}" class="btn btn-primary btn-sm rounded-0"><i class="feather mr-2 icon-plus"></i>New Observation</a>
                     </div>
                 </div>
             </div>
@@ -178,7 +187,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

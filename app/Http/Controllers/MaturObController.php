@@ -83,20 +83,24 @@ class MaturObController extends Controller
                 $nextOb = TcMaturOb::where('tc_init_id',$data->id)
                     ->where('status',0)
                     ->get();
-                
+
                 if(count($nextOb)==0){
                     $q = TcMaturOb::create(['tc_init_id' => $data->id]);
                     $nextOb = $q->id;
                 }else{
                     $nextOb = $nextOb->first()->id;
                 }
-                
+
                 $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';
                 $el .= "
                     <p class='mb-0'>
-                        <a class='text-primary' href='".route('matur-obs.show',$data->id)."'>View</a> -
-                        <a class='text-primary' href='".route('matur-obs.create',$nextOb)."'>Observation</a>
+                        <a class='text-primary' href='".route('matur-obs.show',$data->id)."'>View</a>
                 ";
+                // $el .= "
+                //     <p class='mb-0'>
+                //         <a class='text-primary' href='".route('matur-obs.show',$data->id)."'>View</a> -
+                //         <a class='text-primary' href='".route('matur-obs.create',$nextOb)."'>Observation</a>
+                // ";
                 $el .= '</p>';
                 return $el;
             })
@@ -112,7 +116,7 @@ class MaturObController extends Controller
             ->addColumn('sum_bottle_other_format',function($data){
                 return is_null($data->sum_bottle_other)?0:$data->sum_bottle_other;
             })
-            
+
             ->rawColumns(['sample_number_format'])
             ->toJson();
     }
@@ -129,6 +133,12 @@ class MaturObController extends Controller
             ->with('tc_inits.tc_samples')
             ->first();
         $data['initId'] = $qObs->tc_init_id;
+        $allowEditObs = TcMaturTransferBottle::where('tc_matur_ob_id',$initId)
+            ->whereRaw('bottle_matur > bottle_left')->get()->count() == 0;
+        if($allowEditObs==false){
+            return redirect()->route('matur-obs.show', $data['initId']);
+        }
+
         $data['sample'] = $qObs->tc_inits->tc_samples->sample_number_display;
         $data['worker_now'] = $qObs->tc_worker_id;
         $data['date_ob'] = is_null($qObs->ob_date)?false:Carbon::parse($qObs->ob_date)->format('Y-m-d');
@@ -155,7 +165,7 @@ class MaturObController extends Controller
                 'tc_bottles:id,code',
             ])
             ->get()->toArray();
-        
+
         $qOb = TcMaturObDetail::where('tc_matur_ob_id',$obsId)
             ->get()->toArray();
         $dtOb = collect($qOb);
@@ -173,7 +183,7 @@ class MaturObController extends Controller
                 $reData[] = $value;
             }
         }
-               
+
         $data = collect($reData);
 
         return DataTables::of($data)
@@ -281,6 +291,7 @@ class MaturObController extends Controller
         );
 
         $stokAwal = TcMaturBottle::firstStock($request->tc_matur_bottle_id);
+        $stokAkhir = TcMaturBottle::lastStock($request->tc_matur_bottle_id);
         $dt1 = $request->except('alpha','type','value','tc_worker_id');
         $dt1[$this->aryType($request->type)] = $request->value;
 
@@ -292,7 +303,7 @@ class MaturObController extends Controller
                 }
             }
             if($request->value != 0){ //hanya proses jika yg diinput tidak 0
-                if($stokAwal >= $request->value){
+                if($stokAkhir >= $request->value){
                     TcMaturObDetail::create($dt1);
                     if($request->type == 1){
                         $dt1['bottle_left'] = $request->value;
@@ -300,8 +311,8 @@ class MaturObController extends Controller
                     }
 
                     $dt2 = $request->except('alpha','type','value');
-                    $dt2['first_total'] = $stokAwal;
-                    $dt2['last_total'] = $request->type==1?$stokAwal:($stokAwal-$request->value);
+                    $dt2['first_total'] = $stokAkhir;
+                    $dt2['last_total'] = $request->type==1?$stokAkhir:($stokAkhir-$request->value);
                     TcMaturTransaction::storeList($dt2,'in');
 
                     $this->upTotalInOb($request->tc_matur_ob_id);
@@ -363,7 +374,7 @@ class MaturObController extends Controller
                 }
             }
             return $this->returnTemplate(0,'Error, bottle count is bigger than bottle total.');
-        } 
+        }
     }
     public function returnTemplate($type,$msg)
     {
@@ -403,11 +414,11 @@ class MaturObController extends Controller
         $q = TcMaturObDetail::where('tc_matur_ob_id',$obsId)->get();
         $data['alpha'] = $q->count()==0?null:$q[0]->tc_matur_bottles->alpha;
         $dt = collect($q->toArray());
-        $data['total_bottle_matur'] = $dt->sum('bottle_matur'); 
-        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate'); 
-        $data['total_bottle_contam'] = $dt->sum('bottle_contam'); 
+        $data['total_bottle_matur'] = $dt->sum('bottle_matur');
+        $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate');
+        $data['total_bottle_contam'] = $dt->sum('bottle_contam');
         $data['total_bottle_other'] = $dt->sum('bottle_other');
-        TcMaturOb::where('id',$obsId)->update($data); 
+        TcMaturOb::where('id',$obsId)->update($data);
     }
     public function upStatusBottle($bottleId)
     {
@@ -433,15 +444,17 @@ class MaturObController extends Controller
         $data['totalOxidate'] = $q->where('status',1)->sum('total_bottle_oxidate');
         $data['totalContam'] = $q->where('status',1)->sum('total_bottle_contam');
         $data['totalOther'] = $q->where('status',1)->sum('total_bottle_other');
-        
+
         $q = TcMaturOb::select('id')
             ->where('status',0)
             ->get();
-        
+
         $data['obId'] = count($q)==0? 0 : $q->first()->id;
         $data['initId'] = $id;
         $q = TcInit::where('id',$id)->first();
         $data['sampleNumber'] = $q->tc_samples->sample_number_display;
+        $sumTransfer = TcMaturTransferBottle::where('tc_init_id',$data['initId'])->sum('bottle_left');
+        $data['allowObs'] = $sumTransfer == 0;
         return view('modules.matur_ob.show',compact('data'));
     }
     public function dtShow(Request $request)
@@ -506,10 +519,16 @@ class MaturObController extends Controller
                 $query->whereRaw($sql, ["{$keyword}"]);
             })
             ->addColumn('first_total',function($data){
-                return TcMaturObDetail::firstTotal($data->tc_init_id,$data->tc_matur_ob_id,$data->tc_matur_bottle_id);
+                $dt['obsId'] = $data->tc_matur_ob_id;
+                $dt['bottleId'] = $data->tc_matur_bottle_id;
+                return TcMaturTransaction::select('first_total')->where('tc_matur_ob_id',$dt['obsId'])
+                    ->where('tc_matur_bottle_id',$dt['bottleId'])->first()->getAttribute('first_total');
             })
             ->addColumn('last_total',function($data){
-                return TcMaturObDetail::lastTotal($data->tc_init_id,$data->tc_matur_ob_id,$data->tc_matur_bottle_id);
+                $obsId = $data->tc_matur_ob_id;
+                $bottleId = $data->tc_matur_bottle_id;
+                return TcMaturTransaction::select('last_total')->where('tc_matur_ob_id',$obsId)
+                    ->where('tc_matur_bottle_id',$bottleId)->first()->getAttribute('last_total');
             })
             ->smart(false)
             ->rawColumns([])

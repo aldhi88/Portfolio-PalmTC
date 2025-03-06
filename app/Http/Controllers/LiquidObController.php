@@ -134,16 +134,9 @@ class LiquidObController extends Controller
             ->with('tc_inits.tc_samples')
             ->first();
         $data['initId'] = $qObs->tc_init_id;
-        $sumTransfer = TcLiquidTransferBottle::where('tc_init_id',$data['initId'])->sum('bottle_left');
-        $allowObs = TcLiquidTransferBottle::where('tc_init_id', $data['initId'])->sum('bottle_left') == 0?true:false;
-        $isLastId = TcLiquidOb::find($initId)
-            ->whereNotNull('tc_worker_id')
-            ->whereNotNull('ob_date')
-            ->orderByDesc('id')
-            ->limit(1)
-            ->value('id') == $initId
-        ;
-        if(!$allowObs && $isLastId==false){
+        $allowEditObs = TcLiquidTransferBottle::where('tc_liquid_ob_id',$initId)
+            ->whereRaw('bottle_liquid > bottle_left')->get()->count() == 0;
+        if($allowEditObs==false){
             return redirect()->route('liquid-obs.show', $data['initId']);
         }
         $data['sample'] = $qObs->tc_inits->tc_samples->sample_number_display;

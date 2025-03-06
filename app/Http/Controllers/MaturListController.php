@@ -71,12 +71,17 @@ class MaturListController extends Controller
                 return $el;
             })
             ->addColumn('column1',function($data){
+                if (is_null($data->first_total_column1)) {
+                    return 0;
+                }
+
                 $q = TcBottleInitDetail::select('tc_bottle_id')
                     ->whereHas('tc_bottle_inits',function(Builder $q){
                         $q->where('keyword','matur_column1');
                     })->get()->toArray();
                 $aryBottleId = array_column($q, 'tc_bottle_id');
                 $q = TcMaturBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
                     ->whereIn('tc_bottle_id',$aryBottleId)->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
@@ -85,6 +90,9 @@ class MaturListController extends Controller
                 return $data->first_total_column1 - $usedBottle;
             })
             ->addColumn('column2',function($data){
+                if (is_null($data->first_total_column2)) {
+                    return 0;
+                }
                 $q = TcBottleInitDetail::select('tc_bottle_id')
                     ->whereHas('tc_bottle_inits',function(Builder $q){
                         $q->where('keyword','matur_column2');
@@ -92,6 +100,7 @@ class MaturListController extends Controller
                 $aryBottleId = array_column($q, 'tc_bottle_id');
 
                 $q = TcMaturBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
                     ->whereIn('tc_bottle_id',$aryBottleId)->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
@@ -100,11 +109,18 @@ class MaturListController extends Controller
                 return $data->first_total_column2 - $usedBottle;
             })
             ->addColumn('total_bottle_active',function($data){
-                $q = TcMaturBottle::select('id')->where('tc_init_id',$data->id)->get();
+                if (is_null($data->first_total)) {
+                    return 0;
+                }
+                $q = TcMaturBottle::select('id')
+                    ->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
+                    ->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
                     $usedBottle += TcMaturBottle::usedBottle($value->id);
                 }
+
                 return $data->first_total - $usedBottle;
             })
             ->rawColumns(['sample_number_format'])

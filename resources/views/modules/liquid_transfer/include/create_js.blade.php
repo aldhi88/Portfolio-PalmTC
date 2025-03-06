@@ -73,8 +73,9 @@ $('#finishTransfer').submit(function (e) {
         success: (a) => {
             if(a.status == 'error'){
                 showAlert(a.data.type, a.data.icon, a.data.el, a.data.msg);
+            }else{
+                window.location.replace(a.data.redirect);
             }
-            window.location.replace(a.data.redirect);
             loader(false);
         },
         error: (a) => {
