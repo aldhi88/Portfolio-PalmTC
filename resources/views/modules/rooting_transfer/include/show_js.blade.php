@@ -18,10 +18,15 @@
             { data: 'work_date_format', name: 'tc_rooting_obs.ob_date', orderable:true, searchable:false},
             { data: 'tc_rooting_bottles.alpha', name: 'tc_rooting_bottles.alpha', orderable:false, searchable:false},
             { data: 'bottle_rooting', name: 'bottle_rooting', orderable:false, searchable:false},
-            { data: 'transferred', name: 'transferred', orderable:false, searchable:false},
-            { data: 'bottle_left', name: 'bottle_left', orderable:false, searchable:false},
+            { data: 'leaf_rooting', name: 'leaf_rooting', orderable:false, searchable:false},
+            { data: 'bottle_transferred', name: 'bottle_transferred', orderable:false, searchable:false},
+            { data: 'leaf_transferred', name: 'leaf_transferred', orderable:false, searchable:false},
             { data: 'bottle_back', name: 'bottle_back', orderable:false, searchable:false},
+            { data: 'leaf_back', name: 'leaf_back', orderable:false, searchable:false},
             { data: 'bottle_out', name: 'bottle_out', orderable:false, searchable:false},
+            { data: 'leaf_out', name: 'leaf_out', orderable:false, searchable:false},
+            { data: 'bottle_left', name: 'bottle_left', orderable:false, searchable:false},
+            { data: 'leaf_left', name: 'leaf_left', orderable:false, searchable:false},
         ]
     });
 
@@ -50,7 +55,7 @@
             { data: 'action', name: 'action', orderable:false, searchable:false},
         ]
     });
-    
+
 
 $("#myTable2").on("click","button.printByTransfer", function(){
     var transferId = $(this).attr('transfer-id');

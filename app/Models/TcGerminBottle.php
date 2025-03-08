@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class TcGerminBottle extends Model
 {
@@ -29,9 +30,18 @@ class TcGerminBottle extends Model
     public static function firstStock($bottleId){
         $return = TcGerminBottle::where('id',$bottleId)->first()->getAttribute('bottle_count');
         $q = TcGerminTransaction::where('tc_germin_bottle_id',$bottleId)
-            ->orderBy('tc_germin_ob_id','desc')->get();
+            ->orderBy('id','desc')->get();
         if(count($q) > 0){
             $return = $q->first()->first_total;
+        }
+        return $return;
+    }
+    public static function lastStock($bottleId){
+        $return = TcGerminBottle::where('id',$bottleId)->first()->getAttribute('bottle_count');
+        $q = TcGerminTransaction::where('tc_germin_bottle_id',$bottleId)
+            ->orderBy('id','desc')->get();
+        if(count($q) > 0){
+            $return = $q->first()->last_total;
         }
         return $return;
     }
@@ -40,12 +50,16 @@ class TcGerminBottle extends Model
         $minBottleOb = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
         // transfer back
         $minBottleTransfer = 0;
-        $q = TcGerminTransferBottle::where('tc_germin_bottle_id',$bottleId)->get();
-        foreach ($q as $key => $value) {
-            $minBottleTransfer += ($value['bottle_germin']-$value['bottle_left']); 
+        $q = TcGerminTransferBottle::select('id')->where('tc_germin_bottle_id',$bottleId)
+            ->withCount(['tc_germin_transfer_bottle_works as total_transfer' => function($q){
+                $q->select(DB::raw('sum(total_work) - sum(back_bottle)'));
+            }])->get();
+        if(count($q)!=0){
+            foreach ($q as $key => $value) {
+                $minBottleTransfer += $value->total_transfer;
+            }
         }
-        
-        $return = $minBottleOb + $minBottleTransfer;  
+        $return = $minBottleOb + $minBottleTransfer;
         return $return;
     }
 
@@ -56,5 +70,5 @@ class TcGerminBottle extends Model
     public function getAlphaAttribute($value){
         return str_replace(' ','',$value);
     }
-    
+
 }

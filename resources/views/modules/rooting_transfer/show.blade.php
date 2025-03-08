@@ -22,7 +22,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <div class="row">
                     <div class="col">
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
             </div>
         </div>
@@ -103,12 +103,12 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>
 </div>
-    
+
 <div class="row">
     <div class="col">
         <span id="alert-area-sample"></span>
@@ -131,14 +131,26 @@
                         <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
                             <thead>
                                 <tr>
-                                    <th>Bottle <br>Date</th>
-                                    <th>Obs <br> Date</th>
-                                    <th>Alpha</th>
-                                    <th>First<br>Total</th>
-                                    <th>Has Been<br>Transfer</th>
-                                    <th>Bottle<br>Ready</th>
-                                    <th>Bottle<br>Back</th>
-                                    <th>Bottle<br>Out</th>
+                                    <th rowspan="2">Bottle <br>Date</th>
+                                    <th rowspan="2">Obs <br> Date</th>
+                                    <th rowspan="2">Alpha</th>
+                                    <th colspan="2" class="text-center">First Total</th>
+                                    <th colspan="2" class="text-center">Processed</th>
+                                    <th colspan="2" class="text-center">Back</th>
+                                    <th colspan="2" class="text-center">Out</th>
+                                    <th colspan="2" class="text-center">Ready</th>
+                                </tr>
+                                <tr>
+                                    <th><i class="fas fa-vials"></i></th>
+                                    <th><i class="fas fa-seedling"></i></th>
+                                    <th><i class="fas fa-vials"></i></th>
+                                    <th><i class="fas fa-seedling"></i></th>
+                                    <th><i class="fas fa-vials"></i></th>
+                                    <th><i class="fas fa-seedling"></i></th>
+                                    <th><i class="fas fa-vials"></i></th>
+                                    <th><i class="fas fa-seedling"></i></th>
+                                    <th><i class="fas fa-vials"></i></th>
+                                    <th><i class="fas fa-seedling"></i></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -146,7 +158,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </div>

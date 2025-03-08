@@ -31,15 +31,20 @@ class TcRootingObDetail extends Model
             ->where('tc_rooting_ob_id','<',$obsId)
             ->orderBy('tc_rooting_ob_id','desc')
             ->get();
-        if(count($q)==0){
-            $return = $stokAwal;
-        }else{
+        $usedOb = $usedTransfer = 0;
+
+        if(count($q)!=0){
             $dt = collect($q->toArray());
-            $usedStok = $dt->sum('leaf_oxidate') + $dt->sum('leaf_contam') + $dt->sum('leaf_other');
-            // transfer back
-            $backBottle = 0;
-            $return = $stokAwal - $usedStok + $backBottle;
+            $usedOb = $dt->sum('leaf_oxidate') + $dt->sum('leaf_contam') + $dt->sum('leaf_other');
         }
+
+        $q = TcRootingTransferBottle::select('id')->where('tc_rooting_bottle_id',$bottleId)->get()->toArray();
+        $idTransBottle = array_column($q,'id');
+        $q = TcRootingTransferBottleWork::whereIn('tc_rooting_transfer_bottle_id',$idTransBottle)->get()->toArray();
+        $dt = collect($q);
+        $usedTransfer = $dt->sum('leaf_work') - $dt->sum('back_leaf');
+
+        $return = $stokAwal - $usedOb - $usedTransfer;
         return $return;
     }
     public static function firstTotal($initId,$obsId,$bottleId){
@@ -49,15 +54,20 @@ class TcRootingObDetail extends Model
             ->where('tc_rooting_ob_id','<',$obsId)
             ->orderBy('tc_rooting_ob_id','desc')
             ->get();
-        if(count($q)==0){
-            $return = $stokAwal;
-        }else{
+        $usedOb = $usedTransfer = 0;
+
+        if(count($q)!=0){
             $dt = collect($q->toArray());
-            $usedStok = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
-            // transfer back
-            $backBottle = 0;
-            $return = $stokAwal - $usedStok + $backBottle;
+            $usedOb = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
         }
+
+        $q = TcRootingTransferBottle::select('id')->where('tc_rooting_bottle_id',$bottleId)->get()->toArray();
+        $idTransBottle = array_column($q,'id');
+        $q = TcRootingTransferBottleWork::whereIn('tc_rooting_transfer_bottle_id',$idTransBottle)->get()->toArray();
+        $dt = collect($q);
+        $usedTransfer = $dt->sum('total_work') - $dt->sum('back_bottle');
+
+        $return = $stokAwal - $usedOb - $usedTransfer;
         return $return;
     }
     public static function lastTotal($initId,$obsId,$bottleId){
@@ -67,30 +77,62 @@ class TcRootingObDetail extends Model
             ->where('tc_rooting_ob_id','<=',$obsId)
             ->orderBy('tc_rooting_ob_id','desc')
             ->get();
-        if(count($q)==0){
-            $return = $stokAwal;
-        }else{
+        $usedOb = $usedTransfer = 0;
+        if(count($q)!=0){
             $dt = collect($q->toArray());
-            $usedStok = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
-            // transfer back
-            $backBottle = 0;
-            $return = $stokAwal - $usedStok + $backBottle;
+            $usedOb = $dt->sum('bottle_oxidate') + $dt->sum('bottle_contam') + $dt->sum('bottle_other');
         }
+        $q = TcRootingTransferBottle::select('id')->where('tc_rooting_bottle_id',$bottleId)->get()->toArray();
+        $idTransBottle = array_column($q,'id');
+        $q = TcRootingTransferBottleWork::whereIn('tc_rooting_transfer_bottle_id',$idTransBottle)->get()->toArray();
+        $dt = collect($q);
+        $usedTransfer = $dt->sum('total_work') - $dt->sum('back_bottle');
+
+        $return = $stokAwal - $usedOb - $usedTransfer;
         return $return;
     }
     public static function lastTotalLeaf($initId,$obsId,$bottleId){
         $stokAwal = TcRootingBottle::where('id',$bottleId)->first()->getAttribute('leaf_count');
-        $q = TcRootingObDetail::where('tc_init_id',$initId)->where('tc_rooting_bottle_id',$bottleId)
-            ->where('tc_rooting_ob_id','<=',$obsId)->orderBy('tc_rooting_ob_id','desc')->get();
-        if(count($q)==0){
-            $return = $stokAwal;
-        }else{
+        $q = TcRootingObDetail::where('tc_init_id',$initId)
+            ->where('tc_rooting_bottle_id',$bottleId)
+            ->where('tc_rooting_ob_id','<=',$obsId)
+            ->orderBy('tc_rooting_ob_id','desc')
+            ->get();
+        $usedOb = $usedTransfer = 0;
+        if(count($q)!=0){
             $dt = collect($q->toArray());
-            $usedStok = $dt->sum('leaf_oxidate') + $dt->sum('leaf_contam') + $dt->sum('leaf_other');
-            // transfer back
-            $backBottle = 0;
-            $return = $stokAwal - $usedStok + $backBottle;
+            $usedOb = $dt->sum('leaf_oxidate') + $dt->sum('leaf_contam') + $dt->sum('leaf_other');
         }
+        $q = TcRootingTransferBottle::select('id')->where('tc_rooting_bottle_id',$bottleId)->get()->toArray();
+        $idTransBottle = array_column($q,'id');
+        $q = TcRootingTransferBottleWork::whereIn('tc_rooting_transfer_bottle_id',$idTransBottle)->get()->toArray();
+        $dt = collect($q);
+        $usedTransfer = $dt->sum('leaf_work') - $dt->sum('back_leaf');
+
+        $return = $stokAwal - $usedOb - $usedTransfer;
+        return $return;
+    }
+    public static function lastTotalLeafObs($initId,$obsId,$bottleId){
+
+        $stokAwal = TcRootingBottle::where('id',$bottleId)->first()->getAttribute('leaf_count');
+        $q = TcRootingObDetail::where('tc_init_id',$initId)
+            ->where('tc_rooting_bottle_id',$bottleId)
+            ->where('tc_rooting_ob_id','<=',$obsId)
+            ->orderBy('tc_rooting_ob_id','desc')
+            ->get();
+        $usedOb = $usedTransfer = 0;
+        if(count($q)!=0){
+            $dt = collect($q->toArray());
+            $usedOb = $dt->sum('leaf_oxidate') + $dt->sum('leaf_contam') + $dt->sum('leaf_other');
+        }
+        $q = TcRootingTransferBottle::select('id')->where('tc_rooting_bottle_id',$bottleId)->get()->toArray();
+        $idTransBottle = array_column($q,'id');
+        $q = TcRootingTransferBottleWork::whereIn('tc_rooting_transfer_bottle_id',$idTransBottle)->get()->toArray();
+        $dt = collect($q);
+        $usedTransfer = $dt->sum('leaf_work') - $dt->sum('back_leaf');
+
+        $return = $stokAwal - $usedOb - $usedTransfer;
+        // dump($obsId, $stokAwal, $usedOb, $usedTransfer);
         return $return;
     }
 }

@@ -637,6 +637,7 @@ class RootingTransferController extends Controller
             ])
             // ->where('bottle_left','>',0)
         ;
+        // dd($a);
          return DataTables::of($data)
             ->addColumn('bottle_date_format',function($data){
                 return Carbon::parse($data->tc_rooting_bottles->bottle_date)->format('d/m/Y');
@@ -644,14 +645,31 @@ class RootingTransferController extends Controller
             ->addColumn('work_date_format',function($data){
                 return Carbon::parse($data->tc_rooting_obs->ob_date)->format('d/m/Y');
             })
-            ->addColumn('transferred',function($data){
-                return $data->bottle_rooting - $data->bottle_left;
+            ->addColumn('bottle_transferred',function($data){
+                // dd($data->tc_rooting_transfer_bottle_works);
+                return (collect($data->tc_rooting_transfer_bottle_works))->sum('total_work');
+                // return $data->bottle_rooting - $data->bottle_left;
+            })
+            ->addColumn('leaf_transferred',function($data){
+                // dd($data->tc_rooting_transfer_bottle_works);
+                return (collect($data->tc_rooting_transfer_bottle_works))->sum('leaf_work');
+                // return $data->bottle_rooting - $data->bottle_left;
             })
             ->addColumn('bottle_back',function($data){
                 return (collect($data->tc_rooting_transfer_bottle_works))->sum('back_bottle');
             })
+            ->addColumn('leaf_back',function($data){
+                return (collect($data->tc_rooting_transfer_bottle_works))->sum('back_leaf');
+            })
             ->addColumn('bottle_out',function($data){
-                return ($data->bottle_rooting - $data->bottle_left)-(collect($data->tc_rooting_transfer_bottle_works))->sum('back_bottle');
+                return (collect($data->tc_rooting_transfer_bottle_works))->sum('total_work') -
+                    (collect($data->tc_rooting_transfer_bottle_works))->sum('back_bottle');
+                // return ($data->bottle_rooting - $data->bottle_left)-(collect($data->tc_rooting_transfer_bottle_works))->sum('back_bottle');
+            })
+            ->addColumn('leaf_out',function($data){
+                return (collect($data->tc_rooting_transfer_bottle_works))->sum('leaf_work') -
+                    (collect($data->tc_rooting_transfer_bottle_works))->sum('back_leaf');
+                // return ($data->leaf_rooting - $data->leaf_left)-(collect($data->tc_rooting_transfer_bottle_works))->sum('back_leaf');
             })
             ->smart(false)
             ->toJson();

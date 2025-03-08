@@ -78,6 +78,7 @@ class GerminListController extends Controller
                     })->get()->toArray();
                 $aryBottleId = array_column($q, 'tc_bottle_id');
                 $q = TcGerminBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
                     ->whereIn('tc_bottle_id',$aryBottleId)->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
@@ -93,6 +94,7 @@ class GerminListController extends Controller
                 $aryBottleId = array_column($q, 'tc_bottle_id');
 
                 $q = TcGerminBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
                     ->whereIn('tc_bottle_id',$aryBottleId)->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
@@ -101,7 +103,9 @@ class GerminListController extends Controller
                 return $data->first_total_column2 - $usedBottle;
             })
             ->addColumn('total_bottle_active',function($data){
-                $q = TcGerminBottle::select('id')->where('tc_init_id',$data->id)->get();
+                $q = TcGerminBottle::select('id')->where('tc_init_id',$data->id)
+                    ->where('status','!=',0)
+                    ->get();
                 $usedBottle = 0;
                 foreach ($q as $key => $value) {
                     $usedBottle += TcGerminBottle::usedBottle($value->id);
@@ -176,13 +180,16 @@ class GerminListController extends Controller
             ->addColumn('type',function($data){
                 if(!is_null($data->tc_embryo_transfer_id)){
                     return "Direct";
-                }else if(!is_null($data->tc_matur_transfer_id) || !is_null($data->tc_germin_transfer_id)){
+                }
+
+                if(!is_null($data->tc_matur_transfer_id)){
                     return "Liquid";
-                // }else if(!is_null($data->tc_germin_transfer_id)){
-                //     return "Germination";
-                }else{
+                }
+
+                if(!is_null($data->tc_germin_transfer_id)){
                     return $data->type;
                 }
+
             })
             ->addColumn('last_total',function($data){
                 return $data->bottle_count - TcGerminBottle::usedBottle($data->id);

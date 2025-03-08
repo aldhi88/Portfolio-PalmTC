@@ -60,11 +60,6 @@ class TcMaturBottle extends Model
                 $minBottleTransfer += $value->total_transfer;
             }
         }
-        // $q = TcMaturTransferBottle::where('tc_matur_bottle_id',$bottleId)->get();
-        // foreach ($q as $key => $value) {
-        //     $minBottleTransfer += ($value['bottle_matur']-$value['bottle_left']);
-        // }
-
         $return = $minBottleOb + $minBottleTransfer;
         return $return;
     }

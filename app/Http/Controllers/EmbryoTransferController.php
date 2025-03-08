@@ -506,6 +506,7 @@ class EmbryoTransferController extends Controller
                                 'tc_laminar_id' => $dt1['tc_laminar_id'],
                                 'tc_bottle_id' => $medBottleId,
                                 'sub' => $dt1['sub'],
+                                'type' => 'Direct',
                                 'alpha' => $nextAlpha,
                                 'bottle_count' => $value['used_stock'],
                                 'bottle_date' => $dt1['transfer_date'],

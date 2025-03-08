@@ -490,7 +490,7 @@ class MaturTransferController extends Controller
                                 'tc_laminar_id' => $dt1['tc_laminar_id'],
                                 'tc_bottle_id' => $medBottleId,
                                 'sub' => $dtStep2[0]['sub'],
-                                'type' => $dtStep2[0]['type'],
+                                'type' => 'Liquid',
                                 'alpha' => $dt1['alpha'],
                                 'bottle_count' => $value['used_stock'],
                                 'bottle_date' => $dt1['transfer_date'],

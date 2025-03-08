@@ -49,7 +49,8 @@ class LiquidObController extends Controller
             ])
             ->withCount([
                 'tc_liquid_bottles as sum_bottle' => function($q){
-                    $q->select(DB::raw('sum(bottle_count)'))->where('status','!=',0);
+                    $q->select(DB::raw('sum(bottle_count)'));
+                    // $q->select(DB::raw('sum(bottle_count)'))->where('status','!=',0);
                 }
             ])
             ->withCount([

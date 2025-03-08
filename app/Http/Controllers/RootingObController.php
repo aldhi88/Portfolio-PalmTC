@@ -44,12 +44,14 @@ class RootingObController extends Controller
             ])
             ->withCount([
                 'tc_rooting_bottles as sum_bottle' => function($q){
-                    $q->select(DB::raw('sum(bottle_count)'))->where('status','!=',0);
+                    $q->select(DB::raw('sum(bottle_count)'));
+                    // $q->select(DB::raw('sum(bottle_count)'))->where('status','!=',0);
                 }
             ])
             ->withCount([
                 'tc_rooting_bottles as first_total_leaf' => function($q){
-                    $q->select(DB::raw('SUM(leaf_count)'))->where('status','!=',0);
+                    $q->select(DB::raw('SUM(leaf_count)'));
+                    // $q->select(DB::raw('SUM(leaf_count)'))->where('status','!=',0);
                 }
             ])
             ->withCount([
@@ -95,9 +97,13 @@ class RootingObController extends Controller
                 $el = '<p class="mb-0"><strong>'.$data->tc_samples->sample_number_display.'</strong></p>';
                 $el .= "
                     <p class='mb-0'>
-                        <a class='text-primary' href='".route('rooting-obs.show',$data->id)."'>View</a> -
-                        <a class='text-primary' href='".route('rooting-obs.create',$nextOb)."'>Observation</a>
+                        <a class='text-primary' href='".route('rooting-obs.show',$data->id)."'>View</a>
                 ";
+                // $el .= "
+                //     <p class='mb-0'>
+                //         <a class='text-primary' href='".route('rooting-obs.show',$data->id)."'>View</a> -
+                //         <a class='text-primary' href='".route('rooting-obs.create',$nextOb)."'>Observation</a>
+                // ";
                 $el .= '</p>';
                 return $el;
             })
@@ -134,6 +140,11 @@ class RootingObController extends Controller
         $data['workers'] = TcWorker::where('status',1)->get();
         $qObs = TcRootingOb::where('id',$initId)->with('tc_inits')->with('tc_inits.tc_samples')->first();
         $data['initId'] = $qObs->tc_init_id;
+        $allowEditObs = TcRootingTransferBottle::where('tc_rooting_ob_id',$initId)
+            ->whereRaw('bottle_rooting > bottle_left')->get()->count() == 0;
+        if($allowEditObs==false){
+            return redirect()->route('rooting-obs.show', $data['initId']);
+        }
         $data['sample'] = $qObs->tc_inits->tc_samples->sample_number_display;
         $data['worker_now'] = $qObs->tc_worker_id;
         $data['date_ob'] = is_null($qObs->ob_date)?false:Carbon::parse($qObs->ob_date)->format('Y-m-d');
@@ -186,7 +197,8 @@ class RootingObController extends Controller
                 return Carbon::parse($data['bottle_date'])->format('d//m/Y');
             })
             ->addColumn('first_total',function($data) use($initId,$obsId){
-                return $data["leaf_count"];
+                // return $data["leaf_count"];
+                return TcRootingObDetail::firstTotalLeaf($initId,$obsId,$data['id']);
                 // return TcRootingObDetail::firstTotal($initId,$obsId,$data['id']).'<br>'.$data["leaf_count"];
             })
             ->addColumn('form_rooting',function($data) use($obsId,$initId){
@@ -292,7 +304,9 @@ class RootingObController extends Controller
         if($request->root == 1){
 
             $stokAwal = TcRootingBottle::firstStock($request->tc_rooting_bottle_id);
+            $stokAkhir = TcRootingBottle::lastStock($request->tc_rooting_bottle_id);
             $stokAwalLeaf = TcRootingBottle::firstStockLeaf($request->tc_rooting_bottle_id);
+            $stokAkhirLeaf = TcRootingBottle::lastStockLeaf($request->tc_rooting_bottle_id);
             $dt1 = $request->except('alpha','type','value','tc_worker_id','root');
             $dt1[$this->aryType($request->type)] = (int)round($request->value/2);
             $dt1[$this->aryType2($request->type)] = $request->value;
@@ -305,7 +319,7 @@ class RootingObController extends Controller
                     }
                 }
                 if($request->value != 0){ //hanya proses jika yg diinput tidak 0
-                    if($stokAwalLeaf >= $request->value){
+                    if($stokAkhirLeaf >= $request->value){
                         TcRootingObDetail::create($dt1);
                         if($request->type == 1){
                             $dt1['bottle_left'] = (int)round($request->value/2);
@@ -314,10 +328,10 @@ class RootingObController extends Controller
                         }
 
                         $dt2 = $request->except('alpha','type','value','root');
-                        $dt2['first_total'] = $stokAwal;
-                        $dt2['first_leaf'] = $stokAwalLeaf;
-                        $dt2['last_total'] = $request->type==1?$stokAwal:($stokAwal-((int)round($request->value/2)));
-                        $dt2['last_leaf'] = $request->type==1?$stokAwalLeaf:($stokAwalLeaf-$request->value);
+                        $dt2['first_total'] = $stokAkhir;
+                        $dt2['first_leaf'] = $stokAkhirLeaf;
+                        $dt2['last_total'] = $request->type==1?$stokAkhir:($stokAkhir-((int)round($request->value/2)));
+                        $dt2['last_leaf'] = $request->type==1?$stokAkhirLeaf:($stokAkhirLeaf-$request->value);
                         TcRootingTransaction::storeList($dt2,'in');
 
                         $this->upTotalInOb($request->tc_rooting_ob_id);
@@ -579,6 +593,8 @@ class RootingObController extends Controller
         $data['initId'] = $id;
         $q = TcInit::where('id',$id)->first();
         $data['sampleNumber'] = $q->tc_samples->sample_number_display;
+        $sumTransfer = TcRootingTransferBottle::where('tc_init_id',$data['initId'])->sum('bottle_left');
+        $data['allowObs'] = $sumTransfer == 0;
         return view('modules.rooting_ob.show',compact('data'));
     }
     public function dtShow(Request $request)
@@ -643,10 +659,18 @@ class RootingObController extends Controller
                 $query->whereRaw($sql, ["{$keyword}"]);
             })
             ->addColumn('first_total',function($data){
-                return TcRootingObDetail::firstTotalLeaf($data->tc_init_id,$data->tc_rooting_ob_id,$data->tc_rooting_bottle_id);
+                $dt['obsId'] = $data->tc_rooting_ob_id;
+                $dt['bottleId'] = $data->tc_rooting_bottle_id;
+                return TcRootingTransaction::select('first_total')->where('tc_rooting_ob_id',$dt['obsId'])
+                    ->where('tc_rooting_bottle_id',$dt['bottleId'])->first()->getAttribute('first_total');
+                // return TcRootingObDetail::firstTotalLeaf($data->tc_init_id,$data->tc_rooting_ob_id,$data->tc_rooting_bottle_id);
             })
             ->addColumn('last_total',function($data){
-                return TcRootingObDetail::lastTotalLeaf($data->tc_init_id,$data->tc_rooting_ob_id,$data->tc_rooting_bottle_id);
+                $obsId = $data->tc_rooting_ob_id;
+                $bottleId = $data->tc_rooting_bottle_id;
+                return TcRootingTransaction::select('last_leaf')->where('tc_rooting_ob_id',$obsId)
+                    ->where('tc_rooting_bottle_id',$bottleId)->first()->getAttribute('last_leaf');
+                // return TcRootingObDetail::lastTotalLeafObs($data->tc_init_id,$data->tc_rooting_ob_id,$data->tc_rooting_bottle_id);
             })
             ->smart(false)
             ->rawColumns([])

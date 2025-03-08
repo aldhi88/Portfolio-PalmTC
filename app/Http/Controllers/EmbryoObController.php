@@ -40,7 +40,8 @@ class EmbryoObController extends Controller
             ])
             ->withCount([
                 'tc_embryo_bottles as sum_bottle' => function($q){
-                    $q->select(DB::raw('sum(number_of_bottle)'))->where('status','!=',0);
+                    $q->select(DB::raw('sum(number_of_bottle)'));
+                    // $q->select(DB::raw('sum(number_of_bottle)'))->where('status','!=',0);
                 }
             ])
             ->withCount([
@@ -316,7 +317,6 @@ class EmbryoObController extends Controller
                     // $this->upTotalInOb($request->tc_embryo_ob_id); //gak cocok karena gak set jadi 0 di embryo_obs
                     TcEmbryoOb::where('id', $request->tc_embryo_ob_id)
                         ->update([
-                            'tc_embryo_bottle_id' => $request->tc_embryo_bottle_id,
                             'sub' => null,
                             'total_bottle_embryo' => 0,
                             'total_bottle_oxidate' => 0,
@@ -413,7 +413,6 @@ class EmbryoObController extends Controller
         $q = TcEmbryoObDetail::where('tc_embryo_ob_id',$obsId)->get();
         $data['sub'] = $q->count()==0?null:$q[0]->tc_embryo_bottles->sub;
         $dt = collect($q->toArray());
-        $data['tc_embryo_bottle_id'] = $tc_embryo_bottle_id;
         $data['total_bottle_embryo'] = $dt->sum('bottle_embryo');
         $data['total_bottle_oxidate'] = $dt->sum('bottle_oxidate');
         $data['total_bottle_contam'] = $dt->sum('bottle_contam');

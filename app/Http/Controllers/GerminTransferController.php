@@ -141,11 +141,11 @@ class GerminTransferController extends Controller
     {
         $page = 'step2_blank';
         $data['initId'] = $request->initId;
-        
+
         $qCode = DB::raw('convert(varchar,tc_germin_bottles.bottle_date, 103) as bottle_date_format');
         if(config('database.default') != 'sqlsrv'){
             $qCode = DB::raw('DATE_FORMAT(tc_germin_bottles.bottle_date, "%d/%m/%Y") as bottle_date_format');
-        }      
+        }
 
         if(session()->has("germintrans_step2")){
             $data['bottles'] = TcGerminTransferBottle::select([
@@ -167,7 +167,7 @@ class GerminTransferController extends Controller
             $data['total'] = (collect($dtSession)->sum('work_bottle'));
             return view('modules.germin_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.germin_transfer.component.'.$page,compact('data'));
     }
     public function addItemStep2(Request $request)
@@ -237,7 +237,7 @@ class GerminTransferController extends Controller
             }
             return view('modules.germin_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.germin_transfer.component.'.$page,compact('data'));
     }
     public function getMedStock(Request $request)
@@ -255,7 +255,7 @@ class GerminTransferController extends Controller
         $data['medStock'] = $qCollect->filter(function($value,$key){
             return $value['current_stock'] != 0;
         })->toArray();
-        
+
         $data['medStockBack'] = session('germintrans_step3')['medStock']['back'];
         $data['medStockNext'] = session('germintrans_step3')['medStock']['next'];
         $data['medStockPicked'] = session('germintrans_step3')['medStock'][$request->for];
@@ -363,10 +363,10 @@ class GerminTransferController extends Controller
             if(!is_null($request->page)){
                 $page = $request->page;
             }
-            
+
             return view('modules.germin_transfer.component.'.$page,compact('data','dtSession'));
         }
-        
+
         return view('modules.germin_transfer.component.'.$page,compact('data'));
     }
     public function finishStep4(Request $request)
@@ -389,7 +389,7 @@ class GerminTransferController extends Controller
             session()->has('germintrans_step1') &&
             session()->has('germintrans_step2') &&
             session()->has('germintrans_step3') &&
-            session()->has('germintrans_step4') 
+            session()->has('germintrans_step4')
         ){
             if(
                 session('germintrans_step1')['page'] &&
@@ -413,7 +413,7 @@ class GerminTransferController extends Controller
                     $transferId = $q->id;
 
                     // insert ke table tc_germin_transfer_bottle_works dan tc_germin_lists
-                    
+
                     $dtList['tc_init_id'] =$request->tc_init_id;
                     $dtList['tc_worker_id'] = $dtStep1['tc_worker_id'];
                     $dtList['tc_germin_transfer_id'] = $transferId;
@@ -507,7 +507,7 @@ class GerminTransferController extends Controller
                     }
 
                 }catch(Throwable $e) {report($e);}
-                
+
                 $return = 1;
             }else{
                 $return = 0;
@@ -527,7 +527,7 @@ class GerminTransferController extends Controller
                 ],
             ]);
         }
-        
+
 
     }
 
@@ -575,7 +575,7 @@ class GerminTransferController extends Controller
                 'tc_germin_transfer_bottles.*',
             ])
             ->where('tc_germin_transfer_bottles.tc_init_id',$request->initId)
-            ->where('bottle_left','!=',0)
+            // ->where('bottle_left','!=',0)
             ->with([
                 'tc_germin_obs',
                 'tc_germin_bottles',
@@ -680,7 +680,7 @@ class GerminTransferController extends Controller
         $index = 0;
         foreach ($q2 as $key => $value) {
             $loop = $value->used_stock;
-            for ($i=0; $i < $loop ; $i++) { 
+            for ($i=0; $i < $loop ; $i++) {
                 $data['transfer'][$index]['sample_number'] = $q->tc_inits->tc_samples->sample_number_display;
                 $data['transfer'][$index]['transfer_date'] = Carbon::parse($q->transfer_date)->format('d M Y');
                 $data['transfer'][$index]['alpha'] = $q->alpha;
