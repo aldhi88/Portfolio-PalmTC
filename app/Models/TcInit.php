@@ -13,8 +13,38 @@ class TcInit extends Model
     protected $guarded = [];
 
     // relationship
+    public function tc_field_comments(){
+        return $this->hasMany(TcFieldComment::class,'tc_init_id', 'id');
+    }
+    public function tc_nur_comments(){
+        return $this->hasMany(TcNurComment::class,'tc_init_id', 'id');
+    }
+    public function tc_harden_comments(){
+        return $this->hasMany(TcHardenComment::class,'tc_init_id', 'id');
+    }
+    public function tc_aclim_comments(){
+        return $this->hasMany(TcAclimComment::class,'tc_init_id', 'id');
+    }
+    public function tc_rooting_comments(){
+        return $this->hasMany(TcRootingComment::class,'tc_init_id', 'id');
+    }
+    public function tc_germin_comments(){
+        return $this->hasMany(TcGerminComment::class,'tc_init_id', 'id');
+    }
+    public function tc_matur_comments(){
+        return $this->hasMany(TcMaturComment::class,'tc_init_id', 'id');
+    }
+    public function tc_liquid_comments(){
+        return $this->hasMany(TcLiquidComment::class,'tc_init_id', 'id');
+    }
+    public function tc_embryo_comments(){
+        return $this->hasMany(TcEmbryoComment::class,'tc_init_id', 'id');
+    }
     public function tc_init_comments(){
         return $this->hasMany(TcInitComment::class,'tc_init_id', 'id');
+    }
+    public function tc_callus_comments(){
+        return $this->hasMany(TcCallusComment::class,'tc_init_id', 'id');
     }
     public function tc_field_obs(){
         return $this->hasMany(TcFieldOb::class,'tc_init_id');

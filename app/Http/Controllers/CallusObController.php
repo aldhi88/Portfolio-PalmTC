@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TcCallusComment;
 use App\Models\TcCallusOb;
 use App\Models\TcCallusObDetail;
 use App\Models\TcContamination;
@@ -11,6 +12,9 @@ use App\Models\TcWorker;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CallusObController extends Controller
 {
@@ -47,9 +51,17 @@ class CallusObController extends Controller
                         <a class='text-primary' href='" . route('callus-obs.show', $data->id) . "'>View</a>
                 ";
 
+                // $el .= "
+                //             <p class='mb-0'><a class='text-primary' data-id='".$data->id."' href='".route('inits.comment',$data->id)."'>Comment</a></p>
+                //         ";
+
                 $el .= "
                         <span class='text-muted mx-1'>-</span>
                         <a class='text-link' href='" . route('callus-obs.create', $q->id) . "'>Observation</a>
+                    ";
+                $el .= "
+                        <span class='text-muted mx-1'>-</span>
+                        <a class='text-primary' data-id='".$data->id."' href='".route('callus-obs.comment',$data->id)."'>Comment</a>
                     ";
                 $el .= '</p>';
                 return $el;
@@ -617,5 +629,116 @@ class CallusObController extends Controller
         //     $data['totalRow'] = ($request->page * 27) - 2;
         // }
         return view('modules.callus_ob.print.form_obs', compact('data'));
+    }
+
+    public function comment($id)
+    {
+        $data['title'] = "Callus Comments - Files - Images";
+        $data['desc'] = "Manage data comment, file and image";
+        $data['initId'] = $id;
+        return view('modules.callus_ob.comment', compact('data'));
+    }
+
+    public function dtComment(Request $request)
+    {
+        $data = TcCallusComment::select([
+            'tc_callus_comments.*',
+            DB::raw('convert(varchar,created_at, 103) as created_at_format'), //note*
+        ])
+            ->where('tc_init_id',$request->id)
+            // ->with(['tck_acclims:id'])
+        ;
+        // if($request->filter==1){
+        //     $data->whereNull('file')->whereNull('image');
+        // }else if($request->filter==2){
+        //     $data->whereNull('image');
+        // }else if($request->filter==3){
+        //     $data->whereNull('file');
+        // }
+        return Datatables::of($data)
+            ->addColumn('action', function($data){
+                // $el = '
+                //     <a class="text-primary fs-13" data-id="'.$data->id.'" href="#" data-toggle="modal" data-target="#editCommentModal">Edit</a>
+                // ';
+                $dtJson['comment'] = $data->comment;
+                $dtJson['id'] = $data->id;
+                $json = json_encode($dtJson);
+                $el = '
+                    <a class="text-danger fs-13" data-json=\''.htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8').'\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
+                ';
+                return $el;
+            })
+            ->filterColumn('created_at_format', function($query, $keyword){
+                $sql = 'convert(varchar,created_at, 103) like ?';
+                $query->whereRaw($sql, ["{$keyword}"]);
+            })
+            ->addColumn('image_file', function($data){
+                $el = null;
+                if(!is_null($data->file)){
+                    $el = '
+                        <a href="'.asset("storage/media/callus/file").'/'.$data->file.'">
+                            <h5><i class="feather mr-2 icon-file"></i>Download</h5>
+                        </a>
+                    ';
+                }
+
+                return $el;
+            })
+            ->addColumn('image_format', function($data){
+                $el = null;
+                if(!is_null($data->image)){
+                    $el = '
+                        <a href="'.asset("storage/media/callus/image").'/'.$data->image.'" target="_blank">
+                        <img src="'.asset("storage/media/callus/image").'/'.$data->image.'" class="img-thumbnail" width="70">
+                        </a>
+                    ';
+                }
+                return $el;
+            })
+            ->rawColumns(['image_format','image_file','action'])
+            ->smart(false)->toJson();
+    }
+
+
+    public function commentStore(Request $request)
+    {
+        $dt = $request->except('_token','file','image');
+        if ($request->hasFile('file')) {
+            $dt['file'] = Str::uuid() . '.' . ($request->file('file'))->getClientOriginalExtension();
+            ($request->file('file'))->storeAs('public/media/callus/file', $dt['file']);
+        }
+        if ($request->hasFile('image')) {
+            $dt['image'] = Str::uuid() . '.' . ($request->file('image'))->getClientOriginalExtension();
+            ($request->file('image'))->storeAs('public/media/callus/image', $dt['image']);
+        }
+
+        TcCallusComment::create($dt);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, new data has been added.',
+            ],
+        ]);
+    }
+
+    public function commentDestroy(Request $request)
+    {
+        $data = TcCallusComment::find($request->id);
+        Storage::delete('public/media/callus/file/'.$data->file);
+        Storage::delete('public/media/callus/image/'.$data->image);
+        TcCallusComment::find($request->id)->delete();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'type' => 'success',
+                'icon' => 'check',
+                'el' => 'alert-area',
+                'msg' => 'Success, data has been deleted.',
+            ],
+        ]);
     }
 }

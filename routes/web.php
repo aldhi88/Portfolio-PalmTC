@@ -330,6 +330,12 @@ Route::name('callus-obs.')->group(function () {
         Route::get('dtDetailObs', [CallusObController::class, 'dtDetailObs'])->name('dtDetailObs');
         Route::get('printObsForm', [CallusObController::class, 'printObsForm'])->name('printObsForm');
 
+        // comment
+        Route::get('comment/{id}', [CallusObController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [CallusObController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [CallusObController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [CallusObController::class, 'commentDestroy'])->name('commentDestroy');
+
     });
 });
 Route::resource('callus-obs', CallusObController::class)->except(['edit','update','destroy','create']);
@@ -366,6 +372,7 @@ Route::name('callus-transfers.')->group(function () {
         Route::get('getDateList', [CallusTransferController::class, 'getDateList'])->name('getDateList');
         Route::get('printByGroup', [CallusTransferController::class, 'printByGroup'])->name('printByGroup');
         Route::get('printByTransfer', [CallusTransferController::class, 'printByTransfer'])->name('printByTransfer');
+
     });
 });
 Route::resource('callus-transfers', CallusTransferController::class)->except(['create']);
@@ -404,6 +411,12 @@ Route::name('embryo-lists.')->group(function () {
         Route::get('showSubtraction', [EmbryoListController::class, 'showSubtraction'])->name('showSubtraction');
         Route::delete('destroySubtraction', [EmbryoListController::class, 'destroySubtraction'])->name('destroySubtraction');
         // Route::get('dtListBottle', [EmbryoListController::class, 'dtListBottle'])->name('dtListBottle');
+
+        // comment
+        Route::get('comment/{id}', [EmbryoListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [EmbryoListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [EmbryoListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [EmbryoListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('embryo-lists', EmbryoListController::class)->except(['create','store','edit','update','destroy']);
@@ -452,6 +465,12 @@ Route::name('liquid-lists.')->group(function () {
 
         Route::get('dtShow', [LiquidListController::class, 'dtShow'])->name('dtShow');
         Route::get('dtShow2', [LiquidListController::class, 'dtShow2'])->name('dtShow2');
+
+        // comment
+        Route::get('comment/{id}', [LiquidListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [LiquidListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [LiquidListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [LiquidListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('liquid-lists', LiquidListController::class)->except(['create','store','edit','update','destroy']);
@@ -513,6 +532,12 @@ Route::name('matur-lists.')->group(function () {
 
         Route::get('dtShow', [MaturListController::class, 'dtShow'])->name('dtShow');
         Route::get('dtShow2', [MaturListController::class, 'dtShow2'])->name('dtShow2');
+
+        // comment
+        Route::get('comment/{id}', [MaturListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [MaturListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [MaturListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [MaturListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('matur-lists', MaturListController::class)->except(['create','store','edit','update','destroy']);
@@ -574,6 +599,12 @@ Route::name('germin-lists.')->group(function () {
 
         Route::get('dtShow', [GerminListController::class, 'dtShow'])->name('dtShow');
         Route::get('dtShow2', [GerminListController::class, 'dtShow2'])->name('dtShow2');
+
+        // comment
+        Route::get('comment/{id}', [GerminListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [GerminListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [GerminListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [GerminListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('germin-lists', GerminListController::class)->except(['create','store','edit','update','destroy']);
@@ -634,6 +665,12 @@ Route::name('rooting-lists.')->group(function () {
         Route::get('dt', [RootingListController::class, 'dt'])->name('dt');
         Route::get('dtShow', [RootingListController::class, 'dtShow'])->name('dtShow');
         Route::get('dtShow2', [RootingListController::class, 'dtShow2'])->name('dtShow2');
+
+        // comment
+        Route::get('comment/{id}', [RootingListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [RootingListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [RootingListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [RootingListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('rooting-lists', RootingListController::class)->except(['create','store','edit','update','destroy']);
@@ -697,6 +734,12 @@ Route::name('aclim-lists.')->group(function () {
         Route::get('dtShow2', [AclimListController::class, 'dtShow2'])->name('dtShow2');
         Route::post('changeStatus', [AclimListController::class, 'changeStatus'])->name('changeStatus');
         Route::post('changeSkorAkar', [AclimListController::class, 'changeSkorAkar'])->name('changeSkorAkar');
+
+        // comment
+        Route::get('comment/{id}', [AclimListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [AclimListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [AclimListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [AclimListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('aclim-lists', AclimListController::class)->except(['create','store','edit','update','destroy']);
@@ -739,6 +782,12 @@ Route::name('harden-lists.')->group(function () {
         Route::get('dtShow2', [HardenListController::class, 'dtShow2'])->name('dtShow2');
         Route::post('changeStatus', [HardenListController::class, 'changeStatus'])->name('changeStatus');
         Route::post('changeSkorAkar', [HardenListController::class, 'changeSkorAkar'])->name('changeSkorAkar');
+
+        // comment
+        Route::get('comment/{id}', [HardenListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [HardenListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [HardenListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [HardenListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('harden-lists', HardenListController::class)->except(['create','store','edit','update','destroy']);
@@ -782,6 +831,12 @@ Route::name('nur-lists.')->group(function () {
         Route::get('dtShow3', [NurListController::class, 'dtShow3'])->name('dtShow3');
         Route::post('changeStatus', [NurListController::class, 'changeStatus'])->name('changeStatus');
         Route::post('changeSkorAkar', [NurListController::class, 'changeSkorAkar'])->name('changeSkorAkar');
+
+        // comment
+        Route::get('comment/{id}', [NurListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [NurListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [NurListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [NurListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('nur-lists', NurListController::class)->except(['create','store','edit','update','destroy']);
@@ -824,6 +879,12 @@ Route::name('field-lists.')->group(function () {
         Route::get('dtShow2', [FieldListController::class, 'dtShow2'])->name('dtShow2');
         Route::post('changeStatus', [FieldListController::class, 'changeStatus'])->name('changeStatus');
         Route::post('changeSkorAkar', [FieldListController::class, 'changeSkorAkar'])->name('changeSkorAkar');
+
+        // comment
+        Route::get('comment/{id}', [FieldListController::class, 'comment'])->name('comment');
+        Route::get('dtComment', [FieldListController::class, 'dtComment'])->name('dtComment');
+        Route::post('comment/store', [FieldListController::class, 'commentStore'])->name('commentStore');
+        Route::delete('comment/destroy', [FieldListController::class, 'commentDestroy'])->name('commentDestroy');
     });
 });
 Route::resource('field-lists', FieldListController::class)->except(['create','store','edit','update','destroy']);
