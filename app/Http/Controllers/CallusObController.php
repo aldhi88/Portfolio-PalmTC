@@ -30,18 +30,25 @@ class CallusObController extends Controller
     {
         $data = TcInit::select('tc_inits.*')
             ->with([
-                "tc_samples"
+                "tc_samples",
+                "tc_callus_obs"
             ])
             ->withCount([
                 "tc_callus_obs" => function ($q) {
                     $q->where('status', 1);
                 }
             ]);
+        // dd($data->get()->toArray());
         return DataTables::of($data)
             ->addColumn('reminder', function ($data) {
                 return '';
             })
             ->addColumn('sample_action', function ($data) {
+                // $mark = null;
+                // if($data->tc_worker_id==99){
+                //     $mark = '*';
+                // }
+                // dump($data->tc_callus_obs->tc_worker_id);
                 $q = TcCallusOb::where('tc_init_id', $data->id)
                     ->latest()
                     ->first();

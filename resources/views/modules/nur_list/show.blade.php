@@ -58,7 +58,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -87,6 +87,7 @@
                 <table id="myTable3" class="table table-striped table-bordered nowrap table-xs w-100">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Date</th>
                             <th>Program</th>
                             <th>Sample</th>
@@ -99,11 +100,12 @@
                             <th>Total<br>Death</th>
                             <th>Total<br>Transfer</th>
                             <th>Active</th>
-                            
+
                         </tr>
                     </thead>
                     <thead id="header-filter2" class="bg-white">
                         <tr>
+                            <th class="bg-white" disable="true"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
@@ -121,7 +123,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -147,7 +149,7 @@
                             <th>Number</th>
                             <th>Status</th>
                         </tr>
-                        
+
                     </thead>
                     <thead id="header-filter2" class="bg-white">
                         <tr>
@@ -159,7 +161,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>

@@ -66,7 +66,12 @@ class InitController extends Controller
         // dd($data->get()->toArray());
         return DataTables::eloquent($data)
             ->editColumn("date",function($data){
-                $el = '<strong class="mt-0 font-size-14">'.Carbon::parse($data->created_at)->format("d/m/Y").'</strong><br>';
+                $mark = null;
+                // dd($data->desc);
+                if($data->desc == 'IMPORT DATA'){
+                    $mark = "*";
+                }
+                $el = '<strong class="mt-0 font-size-14">'.Carbon::parse($data->created_at)->format("d/m/Y").$mark.'</strong><br>';
                 if(is_null($data->date_stop)){
                     $el .= "
                         <p class='mb-0'><a class='text-danger' data-id='".$data->id."' href='#' data-toggle='modal' data-target='#nonActiveModal'>Non Active</a></p>

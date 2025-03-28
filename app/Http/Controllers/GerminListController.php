@@ -201,6 +201,13 @@ class GerminListController extends Controller
             ->addColumn('last_total',function($data){
                 return $data->bottle_count - TcGerminBottle::usedBottle($data->id);
             })
+            ->addColumn('import',function($data){
+                $mark = null;
+                if($data->tc_worker_id == 99){
+                    $mark = '*';
+                }
+                return $mark;
+            })
             ->addColumn('column1',function($data){
                 $q = TcBottleInit::where('keyword','germin_column1')->with('tc_bottle_init_details')->get();
                 $dataBottle = $q[0]->tc_bottle_init_details;

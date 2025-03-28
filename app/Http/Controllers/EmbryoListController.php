@@ -35,6 +35,7 @@ class EmbryoListController extends Controller
             ->whereHas('tc_embryo_bottles')
             ->with([
                 'tc_samples:id,sample_number,program',
+                'tc_embryo_bottles:tc_worker_id'
             ])
             ->withCount([
                 'tc_embryo_bottles as first_total' => function($q){
@@ -106,6 +107,13 @@ class EmbryoListController extends Controller
             ->filterColumn('bottle_date_format', function($query, $keyword) {
                 $sql = 'convert(varchar,bottle_date, 103) like ?';
                 $query->whereRaw($sql, ["{$keyword}"]);
+            })
+            ->addColumn('import',function($data){
+                $mark = null;
+                if($data->tc_worker_id == 99){
+                    $mark = '*';
+                }
+                return $mark;
             })
             ->addColumn('last_total',function($data){
                 return $data->number_of_bottle - TcEmbryoBottle::usedBottle($data->id);

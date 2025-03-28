@@ -164,7 +164,14 @@ class SampleController extends Controller
         return DataTables::of($data)
             ->addColumn('custom_name', function($data){
                 $editLink = route('samples.edit', $data->id);
-                $el = '<strong class="mt-0 font-size-14">'.$data->sample_number_display.'</strong>';
+                if($data->desc == 'IMPORT DATA'){
+                    $name = $data->sample_number_display.'*';
+                }else{
+                    $name = $data->sample_number_display;
+
+                }
+
+                $el = '<strong class="mt-0 font-size-14">'.$name.'</strong>';
                 $el .= "
                     <p class='mb-0 font-size-14'>
                         <a class='text-primary' data-id='".$data->id."' href='".$editLink."'>Modify</a>

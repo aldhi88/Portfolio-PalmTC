@@ -6,7 +6,7 @@
 <script>
 
 var dtTable = $('#myTable').DataTable({
-    processing: true,serverSide: true,scrollX: true,pageLength: 25,order: [[4, 'desc']],
+    processing: true,serverSide: true,scrollX: true,pageLength: 25,order: [[5, 'desc']],
     columnDefs: [
         { className: 'text-center', targets: ['_all'] },
     ],
@@ -18,6 +18,7 @@ var dtTable = $('#myTable').DataTable({
         }
     },
     columns: [
+        { data: 'import', name: 'import', orderable:false, searchable:true},
         { data: 'tree_date_action', name: 'tree_date_format', orderable:false, searchable:true},
         { data: 'tc_inits.tc_samples.program', name: 'tc_inits.tc_samples.program', orderable:false, searchable:true},
         { data: 'tc_inits.tc_samples.sample_number_display', name: 'tc_inits.tc_samples.sample_number', orderable:false, searchable:true},
@@ -55,7 +56,7 @@ var dtTable = $('#myTable').DataTable({
         });
         onClickDetail();
     },
-    
+
 });
 
 function onClickDetail(){
@@ -101,7 +102,7 @@ var dtTable2 = $('#myTable2').DataTable({
         initSwitch();
         changeSkorAkar();
     },
-    
+
 });
 
 function initSwitch(){
@@ -114,7 +115,7 @@ function initSwitch(){
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
             type: 'POST', cache: false, processData: true,
             url: '{{ route("harden-lists.changeStatus") }}',
-            data: { 
+            data: {
                 status:status,
                 id:id,
             },
@@ -125,7 +126,7 @@ function initSwitch(){
             error: (a) => {
                 alert("Error #003, InitiationController-getStep2 function is invalid.");
             }
-        });       
+        });
     })
 }
 
@@ -140,14 +141,14 @@ function changeSkorAkar(){
             url: '{{ route("harden-lists.changeSkorAkar") }}',
             data: formData,
             success: function(a) {
-                $('#myTable2').DataTable().ajax.reload(function(){ 
+                $('#myTable2').DataTable().ajax.reload(function(){
                 },false);
             },
             error: (a) => {
                 alert("Error #003, CallusObservationController - store function is invalid.");
             }
         });
-        
+
     });
 }
 

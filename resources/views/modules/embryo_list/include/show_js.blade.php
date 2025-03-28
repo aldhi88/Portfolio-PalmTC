@@ -8,7 +8,7 @@
 var dtTable = $('#myTable').DataTable({
     processing: true,serverSide: true,scrollX: true,pageLength: 25,
     // destroy: true,
-    order: [ [5, 'desc'],[6, 'desc'] ],
+    order: [ [6, 'desc'],[7, 'desc'] ],
     columnDefs: [
         { className: 'text-center', targets: ['_all'] },
     ],
@@ -20,6 +20,7 @@ var dtTable = $('#myTable').DataTable({
         }
     },
     columns: [
+        { data: 'import', name: 'import', orderable:true, searchable:true},
         { data: 'bottle_date_format', name: 'bottle_date_format', orderable:true, searchable:true},
         { data: 'tc_inits.tc_samples.program', name: 'tc_inits.tc_samples.program', orderable:true, searchable:true},
         { data: 'tc_inits.tc_samples.sample_number_display', name: 'tc_inits.tc_samples.sample_number', orderable:true, searchable:true},

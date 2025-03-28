@@ -32,6 +32,7 @@
                 <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Bottle<br>Date</th>
                             <th>Program</th>
                             <th>Sample</th>
@@ -46,7 +47,7 @@
                     </thead>
                     <thead>
                         <tr class="bg-danger">
-                            <th colspan="6" class="text-right bg-success text-white">Total: </th>
+                            <th colspan="7" class="text-right bg-success text-white">Total: </th>
                             <th id="col1Total" class="text-center"></th>
                             <th id="col2Total" class="text-center"></th>
                             <th id="firstTotal" class="text-center"></th>
@@ -55,6 +56,7 @@
                     </thead>
                     <thead id="header-filter" class="bg-white">
                         <tr>
+                            <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
@@ -70,7 +72,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
@@ -102,7 +104,7 @@
                             <th>Worker</th>
                             <th>Last<br>Total</th>
                         </tr>
-                        
+
                     </thead>
                     <thead id="header-filter2" class="bg-white">
                         <tr>
@@ -122,7 +124,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
