@@ -285,7 +285,7 @@ class InitController extends Controller
             $data['session'] = $dtStep3;
             $data["medium_stocks"] = TcMediumStock::with("tc_mediums")
                 ->orderBy("created_at","desc")
-                ->where('id','!=',0)
+                ->where('id','!=',99)
                 ->get();
 
             if(!is_null($request->page)){
@@ -410,7 +410,11 @@ class InitController extends Controller
         $dtInit['desc'] = $dtSessionStep1['desc'];
         $dtInit['date_work'] = $dtSessionStep1['date_work'];
         $dtInit['created_at'] = $dtSessionStep1['created_at'];
+        $lastId = TcInit::max('id') ?? 0; // ambil ID terakhir, default 0 kalau kosong
+        $dtInit['id'] = $lastId + 1;
+        DB::unprepared('SET IDENTITY_INSERT tc_inits ON');
         $q = TcInit::create($dtInit);
+        DB::unprepared('SET IDENTITY_INSERT tc_inits OFF');
         $initId = $q->id;
 
         // insert ke table tc_callus_obs
