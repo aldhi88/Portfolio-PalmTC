@@ -70,25 +70,25 @@ var dtTable = $('#myTable').DataTable({
                     i : 0;
         };
         // Total over this page
-        col1Total = api.column( 5, { page: 'current'} ).data().reduce( function (a, b) {
+        col1Total = api.column( 6, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
-        ex1Total = api.column( 6, { page: 'current'} ).data().reduce( function (a, b) {
+        ex1Total = api.column( 7, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
-        col2Total = api.column( 7, { page: 'current'} ).data().reduce( function (a, b) {
+        col2Total = api.column( 8, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
-        firstTotal = api.column( 8, { page: 'current'} ).data().reduce( function (a, b) {
+        firstTotal = api.column( 9, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
-        firstLeaf = api.column( 9, { page: 'current'} ).data().reduce( function (a, b) {
+        firstLeaf = api.column( 10, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
-        lastTotal = api.column( 10, { page: 'current'} ).data().reduce( function (a, b) {
+        lastTotal = api.column( 11, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
-        lastLeaf = api.column( 11, { page: 'current'} ).data().reduce( function (a, b) {
+        lastLeaf = api.column( 12, { page: 'current'} ).data().reduce( function (a, b) {
             return intVal(a) + intVal(b);
         }, 0 );
 

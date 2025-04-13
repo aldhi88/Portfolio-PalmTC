@@ -8,7 +8,7 @@
         loader(true);
         e.preventDefault();
         var formData = new FormData(this);
-        formData.append('tc_init_id', '{{ $data["initId"] }}'); 
+        formData.append('tc_init_id', '{{ $data["initId"] }}');
         $.ajax({
             type: 'POST',
             url: "{{ route('germin-obs.store') }}",
@@ -59,6 +59,7 @@
                 { data: 'bottle_date_format', name: 'bottle_date', orderable:true, searchable:false},
                 { data: 'tc_inits.tc_samples.sample_number_display', name: 'tc_inits.tc_samples.sample_number', orderable:false, searchable:true},
                 { data: 'tc_workers.code', name: 'tc_workers.code', orderable:false, searchable:true},
+                { data: 'type', name: 'type', orderable:true, searchable:true},
                 { data: 'alpha', name: 'alpha', orderable:true, searchable:true},
                 { data: 'tc_bottles.code', name: 'tc_bottles.code', orderable:false, searchable:true},
                 { data: 'first_total', name: 'first_total', orderable:false, searchable:false},
@@ -74,7 +75,7 @@
             }
         });
     }
-    
+
     function initFormObs(){
         $('body').on('change','input.form-obs',function(){
             var formData = {};
@@ -92,7 +93,7 @@
                 data: formData,
                 success: function(a) {
                     $('#alert-area2').empty();
-                    $('#myTable').DataTable().ajax.reload(function(){ 
+                    $('#myTable').DataTable().ajax.reload(function(){
                         // initFormObs();
                         // initSearchColumn();
                     },false);
@@ -102,7 +103,7 @@
                     alert("Error #003, GerminObController - store function is invalid.");
                 }
             });
-            
+
         });
     }
     function initSearchColumn(){

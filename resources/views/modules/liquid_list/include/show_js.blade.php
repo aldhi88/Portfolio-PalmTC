@@ -65,16 +65,16 @@ var dtTable = $('#myTable').DataTable({
                     i : 0;
         };
         // Total over this page
-        col1Total = api.column( 6, { page: 'current'} ).data().reduce( function (a, b) {
+        col1Total = api.column( 7, { page: 'current'} ).data().reduce( function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0 );
-        col2Total = api.column( 7, { page: 'current'} ).data().reduce( function (a, b) {
+        col2Total = api.column( 8, { page: 'current'} ).data().reduce( function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0 );
-        firstTotal = api.column( 8, { page: 'current'} ).data().reduce( function (a, b) {
+        firstTotal = api.column( 9, { page: 'current'} ).data().reduce( function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0 );
-        lastTotal = api.column( 9, { page: 'current'} ).data().reduce( function (a, b) {
+        lastTotal = api.column( 10, { page: 'current'} ).data().reduce( function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0 );
 

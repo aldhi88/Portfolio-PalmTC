@@ -55,8 +55,26 @@ class TcRootingBottle extends Model
         }
         return $return;
     }
+    public static function firstStockLeaf2($bottleId){
+        $return = TcRootingBottle::where('id',$bottleId)->first()->getAttribute('leaf_count');
+        $q = TcRootingTransaction::where('tc_rooting_bottle_id',$bottleId)
+            ->orderBy('id','desc')->get();
+        if(count($q) > 0){
+            $return = $q->first()->first_leaf;
+        }
+        return $return;
+    }
     public static function lastStockLeaf($bottleId){
         $return = TcRootingBottle::where('id',$bottleId)->first()->getAttribute('bottle_count');
+        $q = TcRootingTransaction::where('tc_rooting_bottle_id',$bottleId)
+            ->orderBy('id','desc')->get();
+        if(count($q) > 0){
+            $return = $q->first()->last_leaf;
+        }
+        return $return;
+    }
+    public static function lastStockLeaf2($bottleId){
+        $return = TcRootingBottle::where('id',$bottleId)->first()->getAttribute('leaf_count');
         $q = TcRootingTransaction::where('tc_rooting_bottle_id',$bottleId)
             ->orderBy('id','desc')->get();
         if(count($q) > 0){

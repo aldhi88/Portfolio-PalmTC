@@ -47,7 +47,7 @@
                             </div>
                         </form>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="card-body">
@@ -68,6 +68,7 @@
                                     <th rowspan="2">Bottle<br>Date</th>
                                     <th rowspan="2">Program</th>
                                     <th rowspan="2">Name</th>
+                                    <th rowspan="2">Type</th>
                                     <th rowspan="2">Alpha</th>
                                     <th rowspan="2">Bottle</th>
                                     <th rowspan="2">First<br>Total</th>
@@ -88,6 +89,7 @@
                                     <th class="bg-white"></th>
                                     <th class="bg-white"></th>
                                     <th class="bg-white"></th>
+                                    <th class="bg-white"></th>
                                     <th class="bg-white" disable="true"></th>
                                     <th class="bg-white" disable="true"></th>
                                     <th class="bg-white" disable="true"></th>
@@ -97,12 +99,12 @@
                                     {{-- <th class="bg-white" disable="true"></th> --}}
                                 </tr>
                             </thead>
-                        </table>    
+                        </table>
                     </div>
                 </div>
-                
+
             </div>
-            
+
         </div>
 
     </div>

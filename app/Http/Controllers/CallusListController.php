@@ -79,6 +79,7 @@ class CallusListController extends Controller
             ->addColumn('end_date',function($data){
                 return is_null($data->date_stop)?'On Going':Carbon::parse($data->date_stop)->format('d/m/Y');
             })
+            ->smart(false)
             ->toJson();
     }
     public function exportPrint(Request $request){
@@ -120,7 +121,7 @@ class CallusListController extends Controller
         }
 
         $data['samples'] = $data;
-        
+
         $data['title'] = "Print Report";
         $data['desc'] = "Print selected report.";
         return view('modules.callus_list.print.download_print', compact('data'));

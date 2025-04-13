@@ -60,7 +60,7 @@
             }
         });
     })
-    
+
     $("body").on("click", "button#btnPrint", function(){
         loader(true);
         var from = parseInt($("select[name='from_year']").val());
@@ -69,7 +69,7 @@
             showAlert('danger', 'times', 'alert-area-print', 'Year value is not valid.');
             return false;
         }
-        
+
         else{
             var div = document.getElementById("exportPrint");
             var route = '{{ route("callus-lists.exportPrint") }}?from='+from+'&to='+to;
@@ -96,7 +96,7 @@
         ],
         ajax: '{{ route("callus-lists.dt") }}',
         columns: [
-            { data: 'tc_samples.sample_number_display', name: 'tc_samples.sample_number', orderable:false, searchable:false},
+            { data: 'tc_samples.sample_number_display', name: 'tc_samples.sample_number', orderable:false, searchable:true},
             { data: 'created_at_format', name: 'created_at', orderable:false, searchable:false},
             { data: 'total_explant', name: 'total_explant', orderable:false, searchable:false},
             { data: 'total_explant_callus', name: 'total_explant_callus', orderable:false, searchable:false},

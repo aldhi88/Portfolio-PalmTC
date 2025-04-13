@@ -305,8 +305,8 @@ class RootingObController extends Controller
 
             $stokAwal = TcRootingBottle::firstStock($request->tc_rooting_bottle_id);
             $stokAkhir = TcRootingBottle::lastStock($request->tc_rooting_bottle_id);
-            $stokAwalLeaf = TcRootingBottle::firstStockLeaf($request->tc_rooting_bottle_id);
-            $stokAkhirLeaf = TcRootingBottle::lastStockLeaf($request->tc_rooting_bottle_id);
+            $stokAwalLeaf = TcRootingBottle::firstStockLeaf2($request->tc_rooting_bottle_id);
+            $stokAkhirLeaf = TcRootingBottle::lastStockLeaf2($request->tc_rooting_bottle_id);
             $dt1 = $request->except('alpha','type','value','tc_worker_id','root');
             $dt1[$this->aryType($request->type)] = (int)round($request->value/2);
             $dt1[$this->aryType2($request->type)] = $request->value;
