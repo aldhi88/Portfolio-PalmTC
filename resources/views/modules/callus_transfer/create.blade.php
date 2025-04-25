@@ -68,7 +68,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                
+
                             </div>
 
                             <div class="form-row">
@@ -154,7 +154,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>

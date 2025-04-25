@@ -43,7 +43,7 @@ class MediumController extends Controller
                     'stock_out' => 0,
                     'total' => $lastTotal,
                 ]);
-                
+
                 // buat collection dari stock validate
                 foreach ($mediumOpname as $key1 => $value2) {
                     if($value['id'] == $value2['tc_medium_stock_id']){
@@ -91,7 +91,7 @@ class MediumController extends Controller
         }else{
             $data['histories'] = NULL;
         }
-        
+
         return view('modules.medium.history', compact('data'));
     }
 
@@ -107,7 +107,9 @@ class MediumController extends Controller
     }
     public function dt(){
         $data = TcMedium::with('tc_medium_stocks','tc_medium_opname')
+            ->with(['tc_medium_stocks'])
             ->where('id', '!=', 99);
+
         return DataTables::of($data)
             ->addColumn('custom_name', function($data){
                 $el = '<strong class="mt-0 font-size-14">'.$data->name.'</strong>';
@@ -119,10 +121,13 @@ class MediumController extends Controller
                         <a class='text-primary' data-id='".$data->id."' href='#' data-toggle='modal' data-target='#editModal'>Edit</a>
                 ";
 
-                $el .= "
-                        <span class='text-muted'>-</span>
-                        <a class='text-danger' data-id='".$data->id."' href='#' data-toggle='modal' data-target='#deleteModal'>Delete</a>
-                    ";
+                if($data->tc_medium_stocks->isEmpty()){
+                    $el .= "
+                            <span class='text-muted'>-</span>
+                            <a class='text-danger' data-id='".$data->id."' href='#' data-toggle='modal' data-target='#deleteModal'>Delete</a>
+                        ";
+                }
+
                 // $el .= "
                 //         <span class='text-muted'>-</span>
                 //         <a class='text-primary' href='#' data-id='".$data->id."' data-toggle='modal' data-target='#historyModal'>History</a>

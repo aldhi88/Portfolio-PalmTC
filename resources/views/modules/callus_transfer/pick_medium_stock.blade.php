@@ -1,6 +1,6 @@
 <style>
-    .dataTables_filter { 
-        display: none; 
+    .dataTables_filter {
+        display: none;
     }
 </style>
 <div class="modal-content">
@@ -11,7 +11,7 @@
     <div class="modal-body">
         <span id="alert-area-addStock"></span>
         <div class="row">
-            <div class="col">
+            <div class="col-7">
                 <table id="myTableMediumStock" class="table table-xs table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                     <thead>
                         <tr>
@@ -20,7 +20,7 @@
                             <th>Bottle</th>
                             <th>Agar</th>
                             <th class="text-center">Stock</th>
-                            <th width="100"></th>
+                            <th style="min-width: 100px"></th>
                         </tr>
                     </thead>
                     <thead id="myTableMediumStockFilter">
@@ -60,5 +60,5 @@
 </div>
 
 <script>
-    
+
 </script>

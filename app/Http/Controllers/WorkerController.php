@@ -28,7 +28,7 @@ class WorkerController extends Controller
                 DB::raw('convert(varchar,date_of_birth, 103) as date_of_birth_format'), //note*
             ])
             ->where('id', '!=', 99);
-            
+
         ;
         return DataTables::of($data)
             ->addColumn('created_at_custom',function($data){
@@ -54,7 +54,7 @@ class WorkerController extends Controller
                 $query->whereRaw($sql, ["{$keyword}"]);
             })
             ->rawColumns(['custom_no_pekerja', 'custom_status','created_at_custom'])
-            ->smart(false)->toJson();
+            ->toJson();
 
     }
     public function index()

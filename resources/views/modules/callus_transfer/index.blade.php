@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 {{-- @if ($data['dtObs']) --}}
-    
+
 
 
 @section('css')
@@ -50,7 +50,7 @@
                     <tbody></tbody>
                 </table>
             </div>
-            
+
         </div>
 
     </div>
