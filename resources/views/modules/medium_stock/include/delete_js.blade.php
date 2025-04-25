@@ -28,7 +28,7 @@
             data: formData,
             success: (a) => {
                 if(a.status == 'success'){
-                    initDt();
+                    dtTable.ajax.reload();
                 }
                 $('#deleteModal').modal('toggle');
                 showAlert(a.data.type, a.data.icon, a.data.el, a.data.msg);

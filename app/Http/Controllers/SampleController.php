@@ -29,7 +29,7 @@ class SampleController extends Controller
                 MONTH(created_at) as month
             '))
             ->whereBetween('created_at',[$from,$to])
-            ->orderBy('created_at','asc')
+            ->orderBy('sample_number','asc')
             ->get();
         $data['title'] = "Export to PDF";
         $data['desc'] = "Display layout before convert to PDF file.";
