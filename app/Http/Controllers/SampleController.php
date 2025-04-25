@@ -351,7 +351,7 @@ class SampleController extends Controller
 
     public function update(SampleEdit $request, $id)
     {
-        $data = $request->except('_token', '_method', 'id', 'no_seleksi');
+        $data = $request->except('_token', '_method', 'id', 'no_seleksi','DTComment_length');
         $data['program'] = Str::upper($data['program']);
         $TcSample = new TcSample();
         $TcSample->upData($id, $data);
