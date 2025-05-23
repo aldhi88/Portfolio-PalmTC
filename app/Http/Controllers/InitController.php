@@ -56,8 +56,8 @@ class InitController extends Controller
             //     $q->where('status',1);
             // },
         ])
+        ->whereHas('tc_samples')
         ->with([
-            'tc_samples',
             'tc_samples.master_treefile',
             'tc_rooms',
             'tc_init_bottles',
@@ -760,7 +760,7 @@ class InitController extends Controller
                 return '<i data-id="'.$data->id.'" data-status="'.$data->status.'" class="switch fas fa-toggle-'.$badge.'"></i>';
             })
             ->rawColumns(["status_control"])
-            ->smart(false)
+            ->smart(true)
             ->toJson();
     }
     public function changeBottleStatus(Request $request){
@@ -891,8 +891,8 @@ class InitController extends Controller
         return view("modules.init.print.print_label_botol_layout", compact('data'));
     }
     public function dtPrintByCheck(Request $request){
-        $data = TcInitBottle::select('*')
-            ->where('status',1)
+        $data = TcInitBottle::select('tc_init_bottles.*')
+            ->where('tc_init_bottles.status',1)
             ->where('tc_init_id',$request->id)
             ->with("tc_workers");
         return DataTables::eloquent($data)
@@ -912,7 +912,7 @@ class InitController extends Controller
                 return '<input '.$checked.' class="check-bottle" type="checkbox" name="bottle_id[]" value="'.$data->id.'">';
             })
             ->rawColumns(["actionColumn"])
-            ->smart(false)
+            ->smart(true)
             ->toJson();
     }
     public function checkBottlePrint(Request $request){

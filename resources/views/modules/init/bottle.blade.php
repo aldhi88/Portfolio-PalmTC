@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <hr>
-                
+
                 <h5>Add New Bottle</h5><hr>
                 <span id="alert-area-addBottle"></span>
                 <form id="formAddBottleWorker">@csrf
@@ -82,11 +82,11 @@
                 </form>
 
                 <hr>
-                <h5>Disable Spesific Bottle</h5><hr>
+                <h5>Disable Spesific Bottles</h5><hr>
                 <div class="row">
                     <div class="col">
                         <div class="dt-responsive table-responsive">
-                            
+
                             <table id="myTable" class="table table-xs table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                 <thead>
                                     <tr class="text-center align-middle">
@@ -106,7 +106,7 @@
                                 </thead>
                                 <tbody></tbody>
                             </table>
-        
+
                         </div>
                     </div>
                 </div>

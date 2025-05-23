@@ -68,7 +68,7 @@ class CallusObController extends Controller
                     ";
                 $el .= "
                         <span class='text-muted mx-1'>-</span>
-                        <a class='text-primary' data-id='".$data->id."' href='".route('callus-obs.comment',$data->id)."'>Comment</a>
+                        <a class='text-primary' data-id='" . $data->id . "' href='" . route('callus-obs.comment', $data->id) . "'>Comment</a>
                     ";
                 $el .= '</p>';
                 return $el;
@@ -279,9 +279,34 @@ class CallusObController extends Controller
         $explantNumber = TcInit::where('id', $initId)
             ->first()
             ->getAttribute('number_of_plant');
-        $data = TcInitBottle::where('tc_init_id', $initId)
-            ->with('tc_workers:id,code');
-        // dd($data->get()->toArray());
+        // $data = TcInitBottle::select([
+        //         'tc_init_bottles.*'
+        //     ])
+        //     ->where('tc_init_bottles.tc_init_id', $initId)
+        //     ->with([
+        //         'tc_workers:id,code',
+        //         'tc_inits.tc_callus_ob_details:id,tc_init_id,tc_init_bottle_id,result'
+        //     ])
+        // ;
+
+        $sub = DB::table('tc_callus_ob_details')
+            ->selectRaw("
+                tc_init_bottle_id,
+                STRING_AGG(CAST(result AS VARCHAR), ', ') WITHIN GROUP (ORDER BY id) as result_list
+            ")
+            ->groupBy('tc_init_bottle_id');
+
+        $data = TcInitBottle::select([
+                'tc_init_bottles.*',
+                'tc_workers.code as worker_code',
+                'result_sub.result_list',
+            ])
+            ->where('tc_init_bottles.tc_init_id', $initId)
+            ->leftJoin('tc_workers', 'tc_workers.id', '=', 'tc_init_bottles.tc_worker_id')
+            ->leftJoinSub($sub, 'result_sub', function ($join) {
+                $join->on('tc_init_bottles.id', '=', 'result_sub.tc_init_bottle_id');
+            });
+
         return DataTables::of($data)
             ->addColumn('explant_number', function ($data) use ($explantNumber, $obsId) {
                 $el = null;
@@ -370,8 +395,17 @@ class CallusObController extends Controller
                 }
                 return $el;
             })
+            ->addColumn('form_search', fn($row) => $row->result_list ?: '-')
+            ->filterColumn('form_search', function ($query, $keyword) {
+                $query->whereRaw("EXISTS (
+                    SELECT 1 FROM tc_callus_ob_details
+                    WHERE tc_callus_ob_details.tc_init_bottle_id = tc_init_bottles.id
+                    AND tc_callus_ob_details.result LIKE ?
+                )", ["%{$keyword}%"]);
+            })
+
             ->rawColumns(['explant_number'])
-            ->smart(false)
+            ->smart(true)
             ->toJson();
     }
     public function store(Request $request)
@@ -652,7 +686,7 @@ class CallusObController extends Controller
             'tc_callus_comments.*',
             DB::raw('convert(varchar,created_at, 103) as created_at_format'), //note*
         ])
-            ->where('tc_init_id',$request->id)
+            ->where('tc_init_id', $request->id)
             // ->with(['tck_acclims:id'])
         ;
         // if($request->filter==1){
@@ -663,7 +697,7 @@ class CallusObController extends Controller
         //     $data->whereNull('file');
         // }
         return Datatables::of($data)
-            ->addColumn('action', function($data){
+            ->addColumn('action', function ($data) {
                 // $el = '
                 //     <a class="text-primary fs-13" data-id="'.$data->id.'" href="#" data-toggle="modal" data-target="#editCommentModal">Edit</a>
                 // ';
@@ -671,19 +705,19 @@ class CallusObController extends Controller
                 $dtJson['id'] = $data->id;
                 $json = json_encode($dtJson);
                 $el = '
-                    <a class="text-danger fs-13" data-json=\''.htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8').'\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
+                    <a class="text-danger fs-13" data-json=\'' . htmlspecialchars(json_encode($json), ENT_QUOTES, 'UTF-8') . '\' href="#" data-toggle="modal" data-target="#deleteCommentModal">Delete</a>
                 ';
                 return $el;
             })
-            ->filterColumn('created_at_format', function($query, $keyword){
+            ->filterColumn('created_at_format', function ($query, $keyword) {
                 $sql = 'convert(varchar,created_at, 103) like ?';
                 $query->whereRaw($sql, ["{$keyword}"]);
             })
-            ->addColumn('image_file', function($data){
+            ->addColumn('image_file', function ($data) {
                 $el = null;
-                if(!is_null($data->file)){
+                if (!is_null($data->file)) {
                     $el = '
-                        <a href="'.asset("storage/media/callus/file").'/'.$data->file.'">
+                        <a href="' . asset("storage/media/callus/file") . '/' . $data->file . '">
                             <h5><i class="feather mr-2 icon-file"></i>Download</h5>
                         </a>
                     ';
@@ -691,25 +725,25 @@ class CallusObController extends Controller
 
                 return $el;
             })
-            ->addColumn('image_format', function($data){
+            ->addColumn('image_format', function ($data) {
                 $el = null;
-                if(!is_null($data->image)){
+                if (!is_null($data->image)) {
                     $el = '
-                        <a href="'.asset("storage/media/callus/image").'/'.$data->image.'" target="_blank">
-                        <img src="'.asset("storage/media/callus/image").'/'.$data->image.'" class="img-thumbnail" width="70">
+                        <a href="' . asset("storage/media/callus/image") . '/' . $data->image . '" target="_blank">
+                        <img src="' . asset("storage/media/callus/image") . '/' . $data->image . '" class="img-thumbnail" width="70">
                         </a>
                     ';
                 }
                 return $el;
             })
-            ->rawColumns(['image_format','image_file','action'])
+            ->rawColumns(['image_format', 'image_file', 'action'])
             ->smart(false)->toJson();
     }
 
 
     public function commentStore(Request $request)
     {
-        $dt = $request->except('_token','file','image');
+        $dt = $request->except('_token', 'file', 'image');
         if ($request->hasFile('file')) {
             $dt['file'] = Str::uuid() . '.' . ($request->file('file'))->getClientOriginalExtension();
             ($request->file('file'))->storeAs('public/media/callus/file', $dt['file']);
@@ -735,8 +769,8 @@ class CallusObController extends Controller
     public function commentDestroy(Request $request)
     {
         $data = TcCallusComment::find($request->id);
-        Storage::delete('public/media/callus/file/'.$data->file);
-        Storage::delete('public/media/callus/image/'.$data->image);
+        Storage::delete('public/media/callus/file/' . $data->file);
+        Storage::delete('public/media/callus/image/' . $data->image);
         TcCallusComment::find($request->id)->delete();
         return response()->json([
             'status' => 'success',

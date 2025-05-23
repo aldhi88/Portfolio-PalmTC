@@ -10,6 +10,7 @@
             processing: true,
             serverSide: true,
             pageLength: 25,
+            // stateSave: true,
             order: [ [1,'asc'] ],
             destroy: true,
             columnDefs: [
@@ -25,8 +26,8 @@
             columns: [
                 { data: 'block_number', name: 'block_number', orderable:true, searchable:true},
                 { data: 'bottle_number', name: 'bottle_number', orderable:true, searchable:true},
-                { data: 'tc_workers.code', name: 'tc_workers.code', orderable:true, searchable:true},
-                { data: 'explant_number', name: 'explant_number', orderable:false, searchable:true},
+                { data: 'worker_code', name: 'worker_code', orderable:true, searchable:true},
+                { data: 'explant_number', name: 'form_search', orderable:false, searchable:true},
             ],
             initComplete: function () {
                 initSearchColumn();

@@ -1,4 +1,4 @@
-<script>  
+<script>
     $("#sampleModal").on("show.bs.modal", function(e) {
         genSample();
     });
@@ -20,7 +20,7 @@
             processing: true,
             serverSide: true,
             order:[
-                [2, 'desc']
+                [0, 'desc']
             ],
             columnDefs: [
                 { className: 'text-center', targets: ['_all'] },
@@ -48,13 +48,13 @@
 
                     $('form input[name="master_treefile_id"]').val($(this).attr('id-treefile'));
                     $('form input[name="no_seleksi"]').val($(this).attr('noseleksi'));
-                    
+
                     $('#sampleModal').modal('toggle');
                 })
             }
         });
     }
-    
+
     function clearValidationCreate(){
         $('#formStep1 input').removeClass('is-invalid');
         $('span.msg').text('');

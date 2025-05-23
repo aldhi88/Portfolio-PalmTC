@@ -135,6 +135,6 @@ class TcSample extends Model
     }
     public function delData($id){
         return $this->where('id', $id)
-                    ->delete();
+                    ->forceDelete();
     }
 }

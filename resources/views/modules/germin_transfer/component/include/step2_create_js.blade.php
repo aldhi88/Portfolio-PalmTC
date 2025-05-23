@@ -34,10 +34,16 @@ function addItemStep2(){
             data: formData,
             cache: false, contentType: false, processData: false,
             success: (a) => {
-                genStep2();
+                if(a.status == 'duplicate'){
+                    alert(a.msg);
+                }else{
+                    genStep2();
+                }
                 loader(false);
             },
             error: (a) => {
+                console.log(a);
+
                 if(a.status == 422){
                     clearValidationCreate();
                     $.each(a.responseJSON.errors, function(key, value){
@@ -110,3 +116,5 @@ $('#finishStep2').submit(function (e) {
     });
 });
 </script>
+
+

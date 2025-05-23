@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-    
+
         <div class="col">
             <div class="form-group">
                 <label><strong>Note/Desc</strong></label>
@@ -72,7 +72,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col text-right">
             <button class="btn btn-primary btn-sm" type="submit">Finish Step 1</button>

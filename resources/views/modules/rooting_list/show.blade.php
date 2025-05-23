@@ -37,6 +37,7 @@
                             <th rowspan="2">Bottle<br>Date</th>
                             <th rowspan="2">Program</th>
                             <th rowspan="2">Sample</th>
+                            <th rowspan="2">Type</th>
                             <th rowspan="2">Alpha</th>
                             <th rowspan="2">Worker</th>
                             <th rowspan="2">{{ $data['column1'] }}</th>
@@ -54,7 +55,7 @@
                     </thead>
                     <thead>
                         <tr class="bg-danger">
-                            <th colspan="6" class="text-right bg-success text-white">Total: </th>
+                            <th colspan="7" class="text-right bg-success text-white">Total: </th>
                             <th id="col1Total" class="text-center"></th>
                             <th id="ex1Total" class="text-center"></th>
                             <th id="col2Total" class="text-center"></th>
@@ -66,6 +67,7 @@
                     </thead>
                     <thead id="header-filter" class="bg-white">
                         <tr>
+                            <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
@@ -108,6 +110,7 @@
                             <th rowspan="2">Bottle<br>Date</th>
                             <th rowspan="2">Program</th>
                             <th rowspan="2">Sample</th>
+                            <th rowspan="2">Type</th>
                             <th rowspan="2">Alpha</th>
                             <th rowspan="2">Name</th>
                             <th colspan="2" class="text-center">First Total</th>
@@ -125,6 +128,7 @@
                     </thead>
                     <thead id="header-filter2" class="bg-white">
                         <tr>
+                            <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>
                             <th class="bg-white"></th>

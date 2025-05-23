@@ -44,7 +44,7 @@
                     </div>
                 </div>
         </div>
-            
+
         </div>
     </div>
 </div>
@@ -110,21 +110,23 @@
                                     <th class="bg-white"></th>
                                     <th class="bg-white"></th>
                                     <th class="bg-white"></th>
-                                    <th class="bg-white" disable="true"></th>
+                                    {{-- <th class="bg-white" disable="true"></th> --}}
+                                    <th class="bg-white">
+                                        1 = Callus; 2 = Oxidate; 3 = Contaminated
+                                    </th>
                                 </tr>
                             </thead>
-                            
+
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
 
             </div>
-            
+
         </div>
 
     </div>
 </div>
 
 @endsection
-

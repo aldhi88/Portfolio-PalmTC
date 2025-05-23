@@ -9,18 +9,20 @@
 
 <span id="alert-area-step2"></span>
 <div class="row">
-    
+
     <div class="col">
         <table id="myTable" class="table table-striped table-bordered nowrap table-xs w-100">
             <thead>
                 <tr>
                     <th>Bottle<br>Date</th>
+                    <th>Type</th>
                     <th>Alpha</th>
                     <th>Total<br>Bottle</th>
                     <th>Working<br>Bottle</th>
                 </tr>
                 <thead id="header-filter" class="bg-white">
                     <tr>
+                        <th class="bg-white"></th>
                         <th class="bg-white"></th>
                         <th class="bg-white"></th>
                         <th class="bg-white" disable="true"></th>
@@ -42,6 +44,7 @@
                     @endphp
                     <tr>
                         <td>{{ $item->bottle_date_format }}</td>
+                        <td>{{ $item->tc_germin_bottles->type }}</td>
                         <td>{{ $item->tc_germin_bottles->alpha }}</td>
                         <td>{{ $bottleLeft }}</td>
                         <td>
@@ -71,6 +74,7 @@
             <thead>
                 <tr>
                     <th>Bottle<br>Date</th>
+                    <th>Type</th>
                     <th>Alpha</th>
                     <th>Work<br>Bottle</th>
                     <th class="text-center">Delete</th>
@@ -83,6 +87,7 @@
                     @foreach ($dtSession as $item)
                         <tr>
                             <td>{{ $item['bottle_date'] }}</td>
+                            <td>{{ $item['type'] }}</td>
                             <td>{{ $item['alpha'] }}</td>
                             <td>{{ $item['work_bottle'] }}</td>
                             <td>

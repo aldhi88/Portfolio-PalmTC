@@ -147,6 +147,8 @@ class GerminTransferController extends Controller
             $qCode = DB::raw('DATE_FORMAT(tc_germin_bottles.bottle_date, "%d/%m/%Y") as bottle_date_format');
         }
 
+        // dd($qCode);
+
         if(session()->has("germintrans_step2")){
             $data['bottles'] = TcGerminTransferBottle::select([
                 'tc_germin_transfer_bottles.*',
@@ -172,12 +174,21 @@ class GerminTransferController extends Controller
     }
     public function addItemStep2(Request $request)
     {
+
         $dt = $request->except('_token');
         $dtSession = session('germintrans_step2');
         $dtSession['page'] = 'step2_create';
         $dtSessionData = collect($dtSession['data']);
         $obsId = $request->id;
         $dtFilter = array_values($dtSessionData->where('id',$obsId)->toArray());
+        if(count($dtSession['data']) > 0){
+            if ($dtSession['data'][0]['type'] !== $request->type) {
+                return response()->json([
+                    'status' => 'duplicate',
+                    'msg' => 'Type '.$request->type.' tidak sama.',
+                ]);
+            }
+        }
         if(count($dtFilter) != 0){
             $oldCount = $dtFilter[0]['work_bottle'];
             $newCount = $request->work_bottle;

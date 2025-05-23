@@ -7,7 +7,7 @@
         </div>
     @endsection
 @else
-    
+
 @section('css')
     @include('modules.init.include.create_css')
 @endsection
@@ -22,7 +22,7 @@
         <a href="{{ route('inits.index') }}" class="btn btn-warning btn-sm d-none d-sm-inline"><i class="feather mr-2 icon-skip-back"></i>Back to All Initiation Data</a>
         <a href="{{ route('inits.index') }}" class="btn btn-warning btn-sm btn-block d-sm-none"><i class="feather mr-2 icon-skip-back"></i>Back to All Initiation Data</a>
     </div>
-    
+
     <div class="card-body">
         <div id="step1"></div>
         <hr>

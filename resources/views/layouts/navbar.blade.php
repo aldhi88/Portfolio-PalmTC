@@ -23,7 +23,7 @@
 
                 {{-- new section --}}
                 <li class="nav-item pcoded-menu-caption"><label>Dashboard</label></li>
-                <li class="nav-item"><a href="{{ route('dashboard.index') }}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Index</span></a></li>
+                {{-- <li class="nav-item"><a href="{{ route('dashboard.index') }}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Index</span></a></li> --}}
                 {{-- <li class="nav-item pcoded-hasmenu">
                     <a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-share"></i></span><span class="pcoded-mtext">Import Data</span></a>
                     <ul class="pcoded-submenu">

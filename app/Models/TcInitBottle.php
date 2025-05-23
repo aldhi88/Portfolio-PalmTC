@@ -31,6 +31,9 @@ class TcInitBottle extends Model
     public function tc_laminars(){
         return $this->belongsTo('App\Models\TcLaminar','tc_laminar_id','id');
     }
+    public function tc_callus_obs(){
+        return $this->hasMany('App\Models\TcCallusOb','tc_laminar_id','id');
+    }
 
     public static function getLaminar($initId,$workerId){
         $q = TcInitBottle::select('tc_laminar_id')
@@ -48,5 +51,5 @@ class TcInitBottle extends Model
             ->count();
         return $q;
     }
-    
+
 }

@@ -288,9 +288,9 @@ class GerminObController extends Controller
         if(count($dtDetailPerBottle) == 0){ //jika data ob detail untuk bottle itu belum ada
             if(count($dtDetailPerOb) != 0){
                 $dataSub = $dtDetailPerOb[0]['tc_germin_bottles']['alpha'];
-                if($request->alpha != $dataSub){
-                    return $this->returnTemplate(0,'Error, alpha is different from before data.');
-                }
+                // if($request->alpha != $dataSub){
+                //     return $this->returnTemplate(0,'Error, alpha is different from before data.');
+                // }
             }
             if($request->value != 0){ //hanya proses jika yg diinput tidak 0
                 if($stokAkhir >= $request->value){

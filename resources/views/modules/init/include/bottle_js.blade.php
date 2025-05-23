@@ -28,7 +28,7 @@
         $.ajax({
             type: 'GET', cache: false, processData: true,
             url: '{{ route("inits.addBlockOption") }}',
-            data: { 
+            data: {
                 worker_id:workerId,
                 init_id:id,
             },
@@ -39,7 +39,7 @@
             error: (a) => {
                 alert("Error #003, InitiationController-getStep2 function is invalid.");
             }
-        });       
+        });
     }
     $("select[name='tc_worker_id']").on("change",function(){
         addBlockOption();
@@ -115,7 +115,7 @@
         }
     });
     // }
-    
+
     function initSwitch(){
         $("#myTable").on("click","i.switch",function(){
             loader(true);
@@ -126,7 +126,7 @@
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 type: 'POST', cache: false, processData: true,
                 url: '{{ route("inits.changeBottleStatus") }}',
-                data: { 
+                data: {
                     status:status,
                     id:id,
                 },
@@ -138,7 +138,7 @@
                 error: (a) => {
                     alert("Error #003, InitiationController-getStep2 function is invalid.");
                 }
-            });       
+            });
         })
     }
 </script>

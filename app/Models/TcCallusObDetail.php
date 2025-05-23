@@ -22,6 +22,10 @@ class TcCallusObDetail extends Model
     public function tc_init_bottles(){
         return $this->belongsTo(TcInitBottle::class,'tc_init_bottle_id','id');
     }
+    public function tc_inits()
+    {
+        return $this->belongsTo(TcInit::class, 'tc_init_id','id');
+    }
 
     public static function getTotalBottleCallusByInit($initId){
         $q = TcCallusOb::select('id')
@@ -41,7 +45,7 @@ class TcCallusObDetail extends Model
             ->where('is_count_bottle',1)
             ->get()
             ->count();
-        
+
         $return = $q;
         return $return;
     }
@@ -406,5 +410,5 @@ class TcCallusObDetail extends Model
         return $return;
     }
 
-    
+
 }

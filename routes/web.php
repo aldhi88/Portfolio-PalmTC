@@ -77,11 +77,11 @@ Route::prefix('bo')->group(function () {
     });
 });
 
-// end new route
+// end new rout
 
 //============ Index
 Route::get('/', function () {
-    return redirect()->route('dashboard.index');
+    return redirect()->route('workers.index');
 });
 //============ Auth
 Route::name('auth.')->group(function () {

@@ -7,7 +7,7 @@
 
 var dtTable = $('#myTable').DataTable({
     processing: true,serverSide: true,scrollX: true,pageLength: 25,
-    order: [[10, 'desc'],[12, 'desc']],
+    order: [[11, 'desc'],[13, 'desc']],
     columnDefs: [
         { className: 'text-center', targets: ['_all'] },
     ],
@@ -23,6 +23,7 @@ var dtTable = $('#myTable').DataTable({
         { data: 'bottle_date_format', name: 'bottle_date_format', orderable:true, searchable:true},
         { data: 'tc_inits.tc_samples.program', name: 'tc_inits.tc_samples.program', orderable:false, searchable:true},
         { data: 'tc_inits.tc_samples.sample_number_display', name: 'tc_inits.tc_samples.sample_number', orderable:true, searchable:true},
+        { data: 'bottle_type', name: 'bottle_type', orderable:false, searchable:true},
         { data: 'alpha', name: 'alpha', orderable:false, searchable:true},
         { data: 'tc_workers.code', name: 'tc_workers.code', orderable:false, searchable:true},
         { data: 'column1', name: 'column1', orderable:false, searchable:false},
@@ -120,6 +121,7 @@ var dtTable2 = $('#myTable2').DataTable({
         { data: 'bottle_date_format', name: 'bottle_date_format', orderable:false, searchable:true},
         { data: 'tc_inits.tc_samples.program', name: 'tc_inits.tc_samples.program', orderable:true, searchable:true},
         { data: 'tc_inits.tc_samples.sample_number_display', name: 'tc_inits.tc_samples.sample_number', orderable:true, searchable:true},
+        { data: 'tc_rooting_bottles.bottle_type', name: 'tc_rooting_bottles.bottle_type', orderable:true, searchable:true},
         { data: 'tc_rooting_bottles.alpha', name: 'tc_rooting_bottles.alpha', orderable:true, searchable:true},
         { data: 'tc_rooting_bottles.tc_workers.code', name: 'tc_rooting_bottles.tc_workers.code', orderable:true, searchable:true},
         { data: 'first_total', name: 'first_total', orderable:false, searchable:true},
