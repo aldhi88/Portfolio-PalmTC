@@ -90,11 +90,15 @@ Route::name('auth.')->group(function () {
     });
 });
 //============ Dashboard
-Route::name('dashboard.')->group(function () {
-    Route::prefix('dashboard')->group(function(){
-        Route::get('index', [DashboardController::class, 'index'])->name('index');
-    });
+Route::get('dashboard/index', function () {
+    return redirect()->route('workers.index');
 });
+
+// Route::name('dashboard.')->group(function () {
+//     Route::prefix('dashboard')->group(function(){
+//         Route::get('index', [DashboardController::class, 'index'])->name('index');
+//     });
+// });
 
 // =========== migration
 Route::name('migrations.')->group(function () {

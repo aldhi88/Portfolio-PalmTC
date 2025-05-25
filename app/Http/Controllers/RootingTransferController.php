@@ -239,6 +239,10 @@ class RootingTransferController extends Controller
     {
         $page = 'step3_blank';
         $data['initId'] = $request->initId;
+        if(session()->has("rootingtrans_step2")){
+            $dtSession2 = session('rootingtrans_step2')['data'];
+            $data['totalLeaf'] = (collect($dtSession2)->sum('work_leaf'));
+        }
         if(session()->has("rootingtrans_step3")){
             $dtSession = session('rootingtrans_step3')['data'];
             $page = session('rootingtrans_step3')['page'];
@@ -344,6 +348,7 @@ class RootingTransferController extends Controller
     }
     public function finishStep3(Request $request)
     {
+        dump($request->all());
         $back = $request->to_back;
         $root2 = $request->to_root2;
         $next = $request->to_next;

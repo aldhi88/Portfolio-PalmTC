@@ -33,10 +33,10 @@
         <div class="form-group col">
             <label class="font-wight-bold">To Acclimatization</label>
             <div class="input-group">
-                <input type="number" name="to_next" value="0" class="form-control form-control-sm px-2">
+                <input type="number" name="to_next" value="0" max="{{ $data['totalLeaf'] }}" class="form-control form-control-sm px-2">
             </div>
         </div>
-    
+
     </div>
     <div class="row">
         <div class="col text-right">

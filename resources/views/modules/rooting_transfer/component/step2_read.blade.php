@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th>Bottle Date</th>
+            <th>Type</th>
             <th>Alphabetic</th>
             <th>Media Bottle</th>
             <th>First Total</th>
@@ -26,6 +27,7 @@
         @foreach ($dtSession as $item)
             <tr>
                 <td>{{ $item['bottle_date'] }}</td>
+                <td>{{ $item['bottle_type'] }}</td>
                 <td>{{ $item['alpha'] }}</td>
                 <td>{{ $item['media'] }}</td>
                 <td>{{ $item['first_total'] }}</td>
@@ -34,7 +36,7 @@
             </tr>
         @endforeach
         <tr class="bg-light">
-            <th colspan="4" class="text-right">Total:</th>
+            <th colspan="5" class="text-right">Total:</th>
             <th>{{ $data['total'] }}</th>
             <th>{{ $data['totalLeaf'] }}</th>
         </tr>

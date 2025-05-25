@@ -22,7 +22,7 @@
                         </a>
                     </div>
                     <div class="col text-right">
-                        <h5>Sample:</h5> 
+                        <h5>Sample:</h5>
                         <span class="badge-light text-dark font-weight-bold px-2 py-1 border">
                             <i class="fas fa-eye-dropper mr-2"></i> {{ $data['sampleNumber'] }}
                         </span>
@@ -41,7 +41,7 @@
                 <div id="step4"></div>
 
             </div>
-            
+
             <div class="card-footer">
                 <span id="alert-finish"></span>
                 <div class="row">

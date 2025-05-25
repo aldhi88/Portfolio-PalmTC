@@ -8,7 +8,7 @@
         loader(true);
         e.preventDefault();
         var formData = new FormData(this);
-        formData.append('tc_init_id', '{{ $data["initId"] }}'); 
+        formData.append('tc_init_id', '{{ $data["initId"] }}');
         $.ajax({
             type: 'POST',
             url: "{{ route('rooting-obs.store') }}",
@@ -57,6 +57,7 @@
                 { data: 'tc_inits.tc_samples.program', name: 'tc_inits.tc_samples.program', orderable:false, searchable:true},
                 { data: 'tc_inits.tc_samples.sample_number_display', name: 'tc_inits.tc_samples.sample_number', orderable:false, searchable:true},
                 { data: 'tc_workers.code', name: 'tc_workers.code', orderable:false, searchable:true},
+                { data: 'bottle_type', name: 'bottle_type', orderable:true, searchable:true},
                 { data: 'alpha', name: 'alpha', orderable:true, searchable:true},
                 { data: 'tc_bottles.code', name: 'tc_bottles.code', orderable:false, searchable:true},
                 { data: 'first_total', name: 'first_total', orderable:false, searchable:false},
@@ -66,7 +67,7 @@
                 { data: 'form_other', name: 'form_other', orderable:false, searchable:false},
                 { data: 'last_total', name: 'last_total', orderable:false, searchable:false},
             ],
-            initComplete: function () { 
+            initComplete: function () {
                 initFormObs();
                 initSearchColumn();
             }
@@ -90,7 +91,7 @@
                 data: formData,
                 success: function(a) {
                     $('#alert-area2').empty();
-                    $('#myTable').DataTable().ajax.reload(function(){ 
+                    $('#myTable').DataTable().ajax.reload(function(){
                         // initFormObs();
                         // initSearchColumn();
                     },false);
@@ -100,7 +101,7 @@
                     alert("Error #003, CallusObservationController - store function is invalid.");
                 }
             });
-            
+
         });
     }
     function initSearchColumn(){

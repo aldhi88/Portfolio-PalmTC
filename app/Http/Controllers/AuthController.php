@@ -9,7 +9,8 @@ class AuthController extends Controller
 {
     public function logout(){
         Auth::logout();
-        session_destroy();
+        session()->invalidate();
+        session()->regenerateToken();
         return redirect(env('PORTAL_URL'));
     }
 }
