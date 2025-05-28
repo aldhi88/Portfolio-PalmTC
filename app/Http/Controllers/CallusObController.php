@@ -279,28 +279,24 @@ class CallusObController extends Controller
         $explantNumber = TcInit::where('id', $initId)
             ->first()
             ->getAttribute('number_of_plant');
-        // $data = TcInitBottle::select([
-        //         'tc_init_bottles.*'
-        //     ])
-        //     ->where('tc_init_bottles.tc_init_id', $initId)
-        //     ->with([
-        //         'tc_workers:id,code',
-        //         'tc_inits.tc_callus_ob_details:id,tc_init_id,tc_init_bottle_id,result'
-        //     ])
-        // ;
-
-        $sub = DB::table('tc_callus_ob_details')
+        $sub = DB::table('tc_callus_ob_details as a')
             ->selectRaw("
-                tc_init_bottle_id,
-                STRING_AGG(CAST(result AS VARCHAR), ', ') WITHIN GROUP (ORDER BY id) as result_list
+                a.tc_init_bottle_id,
+                STUFF((
+                    SELECT ', ' + CAST(b.result AS VARCHAR)
+                    FROM tc_callus_ob_details b
+                    WHERE b.tc_init_bottle_id = a.tc_init_bottle_id
+                    ORDER BY b.id
+                    FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS result_list
             ")
-            ->groupBy('tc_init_bottle_id');
+            ->groupBy('a.tc_init_bottle_id');
+
 
         $data = TcInitBottle::select([
-                'tc_init_bottles.*',
-                'tc_workers.code as worker_code',
-                'result_sub.result_list',
-            ])
+            'tc_init_bottles.*',
+            'tc_workers.code as worker_code',
+            'result_sub.result_list',
+        ])
             ->where('tc_init_bottles.tc_init_id', $initId)
             ->leftJoin('tc_workers', 'tc_workers.id', '=', 'tc_init_bottles.tc_worker_id')
             ->leftJoinSub($sub, 'result_sub', function ($join) {
